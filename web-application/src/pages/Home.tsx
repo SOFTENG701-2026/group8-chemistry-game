@@ -1,4 +1,4 @@
-import { Container, Title, Text, Button, Stack } from '@mantine/core';
+import { Container, Title, Text, Button, Stack, Group } from '@mantine/core';
 import { useNavigate } from 'react-router';
 
 export function Home() {
@@ -11,9 +11,14 @@ export function Home() {
         <Text c="dimmed" ta="center">
           Build and explore organic chemistry structures using a drag-and-drop canvas.
         </Text>
-        <Button size="md" onClick={() => navigate('/molecules')}>
-          View Molecules
-        </Button>
+        <Group>
+          <Button size="md" onClick={() => navigate('/molecules')}>
+            View Molecules
+          </Button>
+          <Button size="md" variant="outline" onClick={() => navigate('/chem-assembler')}>
+            Chem Assembler
+          </Button>
+        </Group>
       </Stack>
     </Container>
   );
