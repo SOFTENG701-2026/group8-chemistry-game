@@ -101,7 +101,7 @@ export function ChemAssembler() {
                 color: '#1A2E3B',
               }}
             >
-              Chem Assembler
+              Sandbox
             </h1>
           </div>
           <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
