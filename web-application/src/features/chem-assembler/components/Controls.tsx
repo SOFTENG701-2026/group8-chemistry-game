@@ -14,6 +14,7 @@ const ghostBtn: React.CSSProperties = {
 };
 
 type ControlsProps = {
+  isSandbox?: boolean;
   onCheck: () => void;
   onReset: () => void;
   onHint: () => void;
@@ -25,7 +26,7 @@ type ControlsProps = {
 };
 
 export function Controls({
-  onCheck, onReset, onHint, onPrev, onNext,
+  isSandbox, onCheck, onReset, onHint, onPrev, onNext,
   builtCount, feedback, hintLevel,
 }: ControlsProps) {
   const checkDisabled = builtCount === 0 || feedback === 'right';
@@ -41,45 +42,53 @@ export function Controls({
         alignItems: 'center',
       }}
     >
-      <button
-        onClick={onCheck}
-        disabled={checkDisabled}
-        onMouseDown={(e) => (e.currentTarget.style.transform = 'translate(2px,2px)')}
-        onMouseUp={(e) => (e.currentTarget.style.transform = '')}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = '')}
-        style={{
-          background: '#1A2E3B',
-          color: '#F5EFE1',
-          border: 'none',
-          padding: '12px 24px',
-          fontFamily: '"DM Sans", sans-serif',
-          fontWeight: 600,
-          fontSize: '0.95rem',
-          borderRadius: '4px',
-          cursor: checkDisabled ? 'not-allowed' : 'pointer',
-          opacity: checkDisabled ? 0.4 : 1,
-          letterSpacing: '0.02em',
-          transition: 'transform 0.15s',
-          boxShadow: '3px 3px 0 #E2603F',
-        }}
-      >
-        check assembly
-      </button>
+      {!isSandbox && (
+        <button
+          onClick={onCheck}
+          disabled={checkDisabled}
+          onMouseDown={(e) => (e.currentTarget.style.transform = 'translate(2px,2px)')}
+          onMouseUp={(e) => (e.currentTarget.style.transform = '')}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = '')}
+          style={{
+            background: '#1A2E3B',
+            color: '#F5EFE1',
+            border: 'none',
+            padding: '12px 24px',
+            fontFamily: '"DM Sans", sans-serif',
+            fontWeight: 600,
+            fontSize: '0.95rem',
+            borderRadius: '4px',
+            cursor: checkDisabled ? 'not-allowed' : 'pointer',
+            opacity: checkDisabled ? 0.4 : 1,
+            letterSpacing: '0.02em',
+            transition: 'transform 0.15s',
+            boxShadow: '3px 3px 0 #E2603F',
+          }}
+        >
+          check assembly
+        </button>
+      )}
 
-      <button onClick={onReset} style={ghostBtn}>reset</button>
+      <button onClick={onReset} style={ghostBtn}>{isSandbox ? 'clear bench' : 'reset'}</button>
 
-      <button
-        onClick={onHint}
-        disabled={hintDisabled}
-        style={{ ...ghostBtn, opacity: hintDisabled ? 0.4 : 1 }}
-      >
-        {hintLevel === 0 ? 'hint' : hintLevel === 1 ? 'another hint' : 'out of hints'}
-      </button>
+      {!isSandbox && (
+        <button
+          onClick={onHint}
+          disabled={hintDisabled}
+          style={{ ...ghostBtn, opacity: hintDisabled ? 0.4 : 1 }}
+        >
+          {hintLevel === 0 ? 'hint' : hintLevel === 1 ? 'another hint' : 'out of hints'}
+        </button>
+      )}
 
       <div style={{ flex: 1 }} />
 
-      <button onClick={onPrev} style={ghostBtn} aria-label="previous">←</button>
-      <button onClick={onNext} style={ghostBtn} aria-label="next">skip →</button>
+      {!isSandbox && (
+        <>
+          <button onClick={onPrev} style={ghostBtn} aria-label="previous">←</button>
+          <button onClick={onNext} style={ghostBtn} aria-label="next">skip →</button>
+        </>
+      )}
     </footer>
   );
 }

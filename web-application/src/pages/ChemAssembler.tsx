@@ -44,7 +44,7 @@ function ChemAssemblerStyles() {
 
 export function ChemAssembler() {
   const {
-    idx, problem, pool, built, feedback, streak, progress,
+    isSandbox, idx, problem, pool, built, feedback, streak, progress,
     shake, hintLevel, assembledFormula,
     moveToBuild, moveToPool,
     onDragStart, onDragOver, onDropBuild, onDropPool,
@@ -88,7 +88,7 @@ export function ChemAssembler() {
                 color: '#4A6275',
               }}
             >
-              an exercise in
+              {isSandbox ? 'free play' : 'an exercise in'}
             </div>
             <h1
               style={{
@@ -104,13 +104,15 @@ export function ChemAssembler() {
               Sandbox
             </h1>
           </div>
-          <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-            <Stat label="streak" value={streak} accent />
-            <Stat label="solved" value={`${progress}/${PROBLEMS.length}`} />
-          </div>
+          {!isSandbox && (
+            <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+              <Stat label="streak" value={streak} accent />
+              <Stat label="solved" value={`${progress}/${PROBLEMS.length}`} />
+            </div>
+          )}
         </header>
 
-        <PromptCard problem={problem} idx={idx} hintLevel={hintLevel} />
+        {!isSandbox && problem && <PromptCard problem={problem} idx={idx} hintLevel={hintLevel} />}
 
         <BuildArea
           built={built}
@@ -123,7 +125,7 @@ export function ChemAssembler() {
           onCardClick={moveToPool}
         />
 
-        <FeedbackRow feedback={feedback} onNext={next} />
+        {!isSandbox && <FeedbackRow feedback={feedback} onNext={next} />}
 
         <ReagentTray
           pool={pool}
@@ -135,6 +137,7 @@ export function ChemAssembler() {
         />
 
         <Controls
+          isSandbox={isSandbox}
           onCheck={check}
           onReset={reset}
           onHint={giveHint}
