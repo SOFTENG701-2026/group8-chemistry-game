@@ -55,12 +55,14 @@ export function useChemAssembler() {
     setHintLevel(0);
   }, [idx, isSandbox, resetKey]);
 
-  // Sync idx if URL changes
+  // Sync idx when the URL's molecule param changes (not when next/prev mutate idx locally)
   useEffect(() => {
-    if (!isSandbox && foundIdx !== -1 && foundIdx !== idx) {
+    if (!isSandbox && foundIdx !== -1) {
       setIdx(foundIdx);
     }
-  }, [foundIdx, isSandbox, idx]);
+    // Intentionally omitting idx — we only want to sync on URL changes, not local navigation
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [foundIdx, isSandbox]);
 
   function moveToBuild(instanceId: string) {
     const card = pool.find((c) => c.instanceId === instanceId);
