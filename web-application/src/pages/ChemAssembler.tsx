@@ -7,6 +7,7 @@ import { ReagentTray } from '../features/chem-assembler/components/ReagentTray';
 import { Controls } from '../features/chem-assembler/components/Controls';
 import { Legend } from '../features/chem-assembler/components/Legend';
 import { PROBLEMS } from '../features/chem-assembler/data/problems';
+import { AppHeader } from '../components/AppHeader';
 
 function ChemAssemblerStyles() {
   return (
@@ -65,6 +66,9 @@ export function ChemAssembler() {
     >
       <ChemAssemblerStyles />
       <div className="grid-bg" style={{ position: 'absolute', inset: 0 }} />
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <AppHeader />
+      </div>
 
       <div style={{ maxWidth: '780px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <header
