@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { DragEvent } from 'react';
+import { useSearchParams } from 'react-router';
 import type { CardInstance, Feedback, DragSource } from '../types';
 import { PROBLEMS } from '../data/problems';
 import { CARD_DEF } from '../data/cards';
@@ -20,10 +21,20 @@ function buildCards(idx: number): CardInstance[] {
   return cards;
 }
 
+function buildSandboxCards(): CardInstance[] {
+  return Object.keys(CARD_DEF).map(k => ({ key: k, instanceId: uid() }));
+}
+
 export function useChemAssembler() {
-  const [idx, setIdx] = useState(0);
+  const [searchParams] = useSearchParams();
+  const moleculeQuery = searchParams.get('molecule');
+  
+  const foundIdx = moleculeQuery ? PROBLEMS.findIndex(p => p.name === moleculeQuery) : -1;
+  const isSandbox = foundIdx === -1;
+
+  const [idx, setIdx] = useState(isSandbox ? 0 : foundIdx);
   const [resetKey, setResetKey] = useState(0);
-  const [pool, setPool] = useState<CardInstance[]>(() => buildCards(0));
+  const [pool, setPool] = useState<CardInstance[]>(() => isSandbox ? buildSandboxCards() : buildCards(isSandbox ? 0 : foundIdx));
   const [built, setBuilt] = useState<CardInstance[]>([]);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [streak, setStreak] = useState(0);
@@ -31,19 +42,39 @@ export function useChemAssembler() {
   const [shake, setShake] = useState(false);
   const [hintLevel, setHintLevel] = useState(0);
 
-  const problem = PROBLEMS[idx];
+  const problem = isSandbox ? null : PROBLEMS[idx];
 
   useEffect(() => {
-    setPool(buildCards(idx));
+    if (isSandbox) {
+      setPool(buildSandboxCards());
+    } else {
+      setPool(buildCards(idx));
+    }
     setBuilt([]);
     setFeedback(null);
     setHintLevel(0);
-  }, [idx, resetKey]);
+  }, [idx, isSandbox, resetKey]);
+
+  // Sync idx when the URL's molecule param changes (not when next/prev mutate idx locally)
+  useEffect(() => {
+    if (!isSandbox && foundIdx !== -1) {
+      setIdx(foundIdx);
+    }
+    // Intentionally omitting idx — we only want to sync on URL changes, not local navigation
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [foundIdx, isSandbox]);
 
   function moveToBuild(instanceId: string) {
     const card = pool.find((c) => c.instanceId === instanceId);
     if (!card) return;
-    setPool(pool.filter((c) => c.instanceId !== instanceId));
+    
+    if (isSandbox) {
+      // Replace the card in the pool so it acts as an infinite supply
+      setPool([...pool.filter((c) => c.instanceId !== instanceId), { key: card.key, instanceId: uid() }]);
+    } else {
+      setPool(pool.filter((c) => c.instanceId !== instanceId));
+    }
+    
     setBuilt([...built, card]);
     setFeedback(null);
   }
@@ -52,7 +83,10 @@ export function useChemAssembler() {
     const card = built.find((c) => c.instanceId === instanceId);
     if (!card) return;
     setBuilt(built.filter((c) => c.instanceId !== instanceId));
-    setPool([...pool, card]);
+    
+    if (!isSandbox) {
+      setPool([...pool, card]);
+    }
     setFeedback(null);
   }
 
@@ -83,7 +117,7 @@ export function useChemAssembler() {
   }
 
   function check() {
-    if (built.length === 0) return;
+    if (built.length === 0 || isSandbox || !problem) return;
     const seq = built.map((c) => c.key);
     const ok =
       arraysEqual(seq, problem.correct) ||
@@ -101,11 +135,11 @@ export function useChemAssembler() {
   }
 
   function next() {
-    setIdx((i) => (i + 1) % PROBLEMS.length);
+    if (!isSandbox) setIdx((i) => (i + 1) % PROBLEMS.length);
   }
 
   function prev() {
-    setIdx((i) => (i - 1 + PROBLEMS.length) % PROBLEMS.length);
+    if (!isSandbox) setIdx((i) => (i - 1 + PROBLEMS.length) % PROBLEMS.length);
   }
 
   function reset() {
@@ -122,7 +156,7 @@ export function useChemAssembler() {
   );
 
   return {
-    idx, problem, pool, built, feedback, streak,
+    isSandbox, idx, problem, pool, built, feedback, streak,
     solved, shake, hintLevel, assembledFormula,
     progress: solved.size,
     moveToBuild, moveToPool,

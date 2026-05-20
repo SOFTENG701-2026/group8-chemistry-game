@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
 import { Home } from './pages/Home';
-import { Molecules } from './pages/Molecules';
+import { Levels } from './pages/Levels';
 import { ChemAssembler } from './pages/ChemAssembler';
 
 export default function App() {
@@ -8,8 +8,10 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/molecules" element={<Molecules />} />
-        <Route path="/chem-assembler" element={<ChemAssembler />} />
+        <Route path="/levels" element={<Levels />} />
+        <Route path="/sandbox" element={<ChemAssembler />} />
+        {/* Progress page is placeholder for now */}
+        <Route path="/progress" element={<div style={{ padding: 20 }}>Progress Page (Coming Soon)</div>} />
       </Routes>
     </BrowserRouter>
   );

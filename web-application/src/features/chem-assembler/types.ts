@@ -1,6 +1,6 @@
 export type FamilyName =
   | 'alkyl' | 'alcohol' | 'amine' | 'acid' | 'aldehyde'
-  | 'ketone' | 'ether' | 'ester' | 'aromatic' | 'nitro' | 'halide';
+  | 'ketone' | 'ether' | 'ester' | 'aromatic' | 'nitro' | 'halide' | 'amide';
 
 export type CardDef = {
   display: string;
