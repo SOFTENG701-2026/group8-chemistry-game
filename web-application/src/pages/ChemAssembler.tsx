@@ -9,6 +9,49 @@ import { Legend } from '../features/chem-assembler/components/Legend';
 import { PROBLEMS } from '../features/chem-assembler/data/problems';
 import { AppHeader } from '../components/AppHeader';
 
+function MoleculeReadoutPanel({ moleculeName }: { moleculeName: string | null }) {
+  const isKnown = moleculeName !== null;
+
+  return (
+    <section
+      style={{
+        marginTop: '24px',
+        background: 'rgba(255,255,255,0.72)',
+        border: '1.5px solid rgba(26,46,59,0.14)',
+        borderRadius: '10px',
+        padding: '14px 18px',
+        boxShadow: '0 1px 0 rgba(26,46,59,0.04)',
+      }}
+    >
+      <div
+        style={{
+          fontFamily: '"DM Sans", system-ui, sans-serif',
+          fontSize: '0.68rem',
+          fontWeight: 700,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: '#4A6275',
+          marginBottom: 4,
+        }}
+      >
+        Current molecule
+      </div>
+      <div
+        style={{
+          fontFamily: '"Fraunces", Georgia, serif',
+          fontSize: '1.35rem',
+          fontWeight: isKnown ? 600 : 400,
+          fontStyle: isKnown ? 'normal' : 'italic',
+          color: isKnown ? '#1A2E3B' : '#8A9BA8',
+          lineHeight: 1.2,
+        }}
+      >
+        {moleculeName ?? 'Unknown'}
+      </div>
+    </section>
+  );
+}
+
 function ChemAssemblerStyles() {
   return (
     <style>{`
@@ -46,7 +89,7 @@ function ChemAssemblerStyles() {
 export function ChemAssembler() {
   const {
     isSandbox, idx, problem, pool, built, feedback, streak, progress,
-    shake, hintLevel, assembledFormula,
+    shake, hintLevel, assembledFormula, assembledMoleculeName,
     moveToBuild, moveToPool,
     onDragStart, onDragOver, onDropBuild, onDropPool,
     check, next, prev, reset, giveHint,
@@ -117,6 +160,8 @@ export function ChemAssembler() {
         </header>
 
         {!isSandbox && problem && <PromptCard problem={problem} idx={idx} hintLevel={hintLevel} />}
+
+        <MoleculeReadoutPanel moleculeName={assembledMoleculeName} />
 
         <BuildArea
           built={built}
