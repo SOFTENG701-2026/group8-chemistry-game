@@ -10,6 +10,17 @@ const uid = () => Math.random().toString(36).slice(2, 9);
 const arraysEqual = (a: string[], b: string[]) =>
   a.length === b.length && a.every((x, i) => x === b[i]);
 
+function getMatchingProblemName(cardKeys: string[]) {
+  if (cardKeys.length === 0) return null;
+
+  const match = PROBLEMS.find((candidate) =>
+    arraysEqual(cardKeys, candidate.correct) ||
+    (candidate.symmetric === true && arraysEqual(cardKeys, [...candidate.correct].reverse())),
+  );
+
+  return match?.name ?? null;
+}
+
 function buildCards(idx: number): CardInstance[] {
   const p = PROBLEMS[idx];
   const keys = [...p.correct, ...p.extras];
@@ -155,9 +166,14 @@ export function useChemAssembler() {
     [built],
   );
 
+  const assembledMoleculeName = useMemo(
+    () => getMatchingProblemName(built.map((c) => c.key)),
+    [built],
+  );
+
   return {
     isSandbox, idx, problem, pool, built, feedback, streak,
-    solved, shake, hintLevel, assembledFormula,
+    solved, shake, hintLevel, assembledFormula, assembledMoleculeName,
     progress: solved.size,
     moveToBuild, moveToPool,
     onDragStart, onDragOver, onDropBuild, onDropPool,
