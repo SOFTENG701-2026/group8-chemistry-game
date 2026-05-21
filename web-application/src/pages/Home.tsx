@@ -1,7 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { Container, Text, Group } from '@mantine/core';
 import { NavLink as RouterNavLink } from 'react-router';
-import { AppHeader } from '../components/AppHeader';
 import { CARD_DEF, FAMILY } from '../features/chem-assembler/data/cards';
 import type { FamilyName } from '../features/chem-assembler/types';
 
@@ -87,9 +86,7 @@ function CardLabel({ children }: { children: ReactNode }) {
 
 export function Home() {
   return (
-    <div style={{ minHeight: '100vh', paddingBottom: '60px' }}>
-      <AppHeader />
-
+    <div style={{ paddingBottom: '60px' }}>
       <Container size="xl">
         {/* Hero */}
         <div style={{ marginBottom: '48px' }}>
