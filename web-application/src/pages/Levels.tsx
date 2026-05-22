@@ -2,7 +2,6 @@ import type { CSSProperties } from 'react';
 import { useState, useMemo } from 'react';
 import { Container, Text, Group, Flex } from '@mantine/core';
 import { useNavigate } from 'react-router';
-import { AppHeader } from '../components/AppHeader';
 import { PROBLEMS } from '../features/chem-assembler/data/problems';
 import { CARD_DEF, FAMILY } from '../features/chem-assembler/data/cards';
 import type { FamilyName } from '../features/chem-assembler/types';
@@ -215,9 +214,7 @@ export function Levels() {
   });
 
   return (
-    <div style={{ minHeight: '100vh', paddingBottom: '60px' }}>
-      <AppHeader />
-
+    <div style={{ paddingBottom: '60px' }}>
       <Container size="xl">
         {/* Page header */}
         <Text style={{

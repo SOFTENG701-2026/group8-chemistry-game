@@ -19,10 +19,6 @@ export function LewisEditor() {
         .react-flow__edge-interaction { cursor: pointer; }
       `}</style>
 
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        <AppHeader />
-      </div>
-
       <div
         style={{
           flex: 1,
