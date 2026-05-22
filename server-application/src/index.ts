@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { moleculesRouter } from './routes/molecules';
+import { progressRouter } from './routes/progress';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -13,6 +14,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api/molecules', moleculesRouter);
+app.use('/api/progress', progressRouter);
 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);

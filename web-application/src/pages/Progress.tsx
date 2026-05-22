@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
-import { useState, useMemo } from 'react';
-import { Container, Text, Group, Flex } from '@mantine/core';
+import { useEffect, useMemo, useState } from 'react';
+import { Container, Flex, Group, Text } from '@mantine/core';
 import { useNavigate } from 'react-router';
 import { PROBLEMS } from '../features/chem-assembler/data/problems';
 import { CARD_DEF, FAMILY } from '../features/chem-assembler/data/cards';
@@ -10,11 +10,68 @@ import {
   getPrimaryFamily,
   levelData,
 } from '../features/chem-assembler/data/lessonLibrary';
+import { fetchProgress, type ProgressStore } from '../features/chem-assembler/api/progress';
 import type { FamilyName } from '../features/chem-assembler/types';
 
 type FilterValue = 'all' | FamilyName | 'unsolved';
 
-function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => void }) {
+const MASTERED_BUILDS = 3;
+
+function getBuildCount(progress: ProgressStore | null, molecule: string) {
+  return Math.min(progress?.molecules[molecule]?.successfulBuilds ?? 0, MASTERED_BUILDS);
+}
+
+function getStatusLabel(builds: number) {
+  if (builds >= MASTERED_BUILDS) return 'Mastered';
+  if (builds > 0) return 'In progress';
+  return 'Not mastered';
+}
+
+function ProgressBar({ builds }: { builds: number }) {
+  const ratio = Math.min(builds / MASTERED_BUILDS, 1);
+  const color = builds >= MASTERED_BUILDS ? '#3C8D6A' : builds > 0 ? '#E2603F' : '#C9C5BB';
+
+  return (
+    <div style={{ display: 'grid', gap: 6 }}>
+      <div
+        aria-label={`${builds} of ${MASTERED_BUILDS} successful builds`}
+        style={{
+          height: 8,
+          borderRadius: 999,
+          background: '#EEE9DF',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            width: `${ratio * 100}%`,
+            height: '100%',
+            background: color,
+            transition: 'width 0.2s ease',
+          }}
+        />
+      </div>
+      <Group justify="space-between" gap={8}>
+        <Text style={{ fontSize: 11, color: '#4A6275', fontFamily: '"DM Sans", system-ui, sans-serif' }}>
+          {getStatusLabel(builds)}
+        </Text>
+        <Text style={{ fontSize: 11, color: '#4A6275', fontFamily: '"DM Sans", system-ui, sans-serif' }}>
+          {builds}/{MASTERED_BUILDS}
+        </Text>
+      </Group>
+    </div>
+  );
+}
+
+function MoleculeProgressCard({
+  molecule,
+  builds,
+  onClick,
+}: {
+  molecule: string;
+  builds: number;
+  onClick: () => void;
+}) {
   const problem = PROBLEMS.find(p => p.name === molecule);
   const family = getPrimaryFamily(molecule);
   const familyStyle = FAMILY[family];
@@ -33,13 +90,12 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
-        gap: 6,
+        gap: 10,
         boxShadow: hovered ? '0 2px 12px rgba(26,46,59,0.1)' : 'none',
         transition: 'box-shadow 0.15s ease',
       }}
     >
-      {/* Category */}
-      <Group gap={6} mb={4}>
+      <Group gap={6}>
         <div style={{
           width: 8,
           height: 8,
@@ -59,7 +115,6 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
         </Text>
       </Group>
 
-      {/* Name */}
       <Text style={{
         fontFamily: '"Fraunces", Georgia, serif',
         fontWeight: 600,
@@ -70,7 +125,6 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
         {molecule}
       </Text>
 
-      {/* Formula */}
       {problem && (
         <Text style={{
           fontFamily: "'JetBrains Mono', monospace",
@@ -82,9 +136,8 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
         </Text>
       )}
 
-      {/* Piece squares + count */}
       {problem && (
-        <Group gap={4} mt="auto" pt={10} align="center">
+        <Group gap={4} mt="auto" pt={4} align="center">
           {problem.correct.map((cardId, i) => {
             const card = CARD_DEF[cardId];
             const pieceStyle = card ? FAMILY[card.family as FamilyName] : FAMILY.alkyl;
@@ -102,38 +155,47 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
               />
             );
           })}
-          <Text style={{
-            fontSize: 11,
-            color: '#4A6275',
-            marginLeft: 4,
-            fontFamily: '"DM Sans", system-ui, sans-serif',
-            whiteSpace: 'nowrap',
-          }}>
-            {problem.correct.length} {problem.correct.length === 1 ? 'piece' : 'pieces'}
-          </Text>
         </Group>
       )}
+
+      <ProgressBar builds={builds} />
     </div>
   );
 }
 
-export function Levels() {
+export function Progress() {
   const [activeFilter, setActiveFilter] = useState<FilterValue>('all');
+  const [progress, setProgress] = useState<ProgressStore | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const allMolecules = levelData.flatMap(l => l.molecules);
-  const totalCount = allMolecules.length;
-
+  const allMolecules = useMemo(() => levelData.flatMap(l => l.molecules), []);
   const presentFamilies = useMemo<FamilyName[]>(() => {
     const families = new Set<FamilyName>();
     allMolecules.forEach(m => families.add(getPrimaryFamily(m)));
     return [...families];
+  }, [allMolecules]);
+
+  useEffect(() => {
+    fetchProgress()
+      .then((data) => {
+        setProgress(data);
+        setLoadError(null);
+      })
+      .catch(() => setLoadError('Progress is unavailable right now.'));
   }, []);
 
   function shouldShow(molecule: string): boolean {
-    if (activeFilter === 'all' || activeFilter === 'unsolved') return true;
+    if (activeFilter === 'all') return true;
+    if (activeFilter === 'unsolved') return getBuildCount(progress, molecule) === 0;
     return getPrimaryFamily(molecule) === activeFilter;
   }
+
+  const visibleMolecules = allMolecules.filter(shouldShow);
+  const totalBuilds = visibleMolecules.reduce((sum, molecule) => sum + getBuildCount(progress, molecule), 0);
+  const possibleBuilds = visibleMolecules.length * MASTERED_BUILDS;
+  const masteredCount = visibleMolecules.filter(molecule => getBuildCount(progress, molecule) >= MASTERED_BUILDS).length;
+  const completion = possibleBuilds === 0 ? 0 : totalBuilds / possibleBuilds;
 
   const chipStyle = (isActive: boolean): CSSProperties => ({
     padding: '6px 16px',
@@ -152,7 +214,6 @@ export function Levels() {
   return (
     <div style={{ paddingBottom: '60px' }}>
       <Container size="xl">
-        {/* Page header */}
         <Text style={{
           color: '#E2603F',
           fontSize: 11,
@@ -162,23 +223,22 @@ export function Levels() {
           fontFamily: '"DM Sans", system-ui, sans-serif',
           marginBottom: 8,
         }}>
-          Pick a specimen
+          Mastery tracker
         </Text>
 
-        <h1 style={{ margin: '0 0 8px' }}>Lesson library</h1>
+        <h1 style={{ margin: '0 0 8px' }}>My progress</h1>
 
         <Text style={{
           fontFamily: '"Fraunces", Georgia, serif',
           fontStyle: 'italic',
           color: '#4A6275',
           fontSize: '1rem',
-          marginBottom: 32,
+          marginBottom: 28,
         }}>
-          {totalCount} molecules, ordered by difficulty.
+          Build each molecule correctly three times to master it.
         </Text>
 
-        {/* Filter chips */}
-        <Flex gap={8} mb={48} wrap="wrap" align="center">
+        <Flex gap={8} mb={24} wrap="wrap" align="center">
           <button style={chipStyle(activeFilter === 'all')} onClick={() => setActiveFilter('all')}>
             All
           </button>
@@ -196,7 +256,69 @@ export function Levels() {
           </button>
         </Flex>
 
-        {/* Level sections */}
+        <section
+          style={{
+            background: '#FFFFFF',
+            border: '1px solid #E5E1D8',
+            borderRadius: 8,
+            padding: 18,
+            marginBottom: 40,
+          }}
+        >
+          <Group justify="space-between" align="flex-start" gap={16} mb={12}>
+            <div>
+              <Text style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: '#4A6275',
+                fontFamily: '"DM Sans", system-ui, sans-serif',
+              }}>
+                Selected filter
+              </Text>
+              <Text style={{
+                fontFamily: '"Fraunces", Georgia, serif',
+                fontSize: '1.25rem',
+                fontWeight: 600,
+                color: '#1A2E3B',
+              }}>
+                {activeFilter === 'all'
+                  ? 'All molecules'
+                  : activeFilter === 'unsolved'
+                    ? 'Unsolved molecules'
+                    : FILTER_CHIP_LABEL[activeFilter] ?? FAMILY_LABEL[activeFilter]}
+              </Text>
+            </div>
+            <Text style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '0.8rem',
+              color: '#4A6275',
+              textAlign: 'right',
+            }}>
+              {totalBuilds}/{possibleBuilds} builds
+              <br />
+              {masteredCount}/{visibleMolecules.length} mastered
+            </Text>
+          </Group>
+          <div style={{ height: 10, borderRadius: 999, background: '#EEE9DF', overflow: 'hidden' }}>
+            <div
+              style={{
+                width: `${completion * 100}%`,
+                height: '100%',
+                background: '#3C8D6A',
+                transition: 'width 0.2s ease',
+              }}
+            />
+          </div>
+        </section>
+
+        {loadError && (
+          <Text style={{ color: '#B34A33', marginBottom: 24, fontFamily: '"DM Sans", system-ui, sans-serif' }}>
+            {loadError}
+          </Text>
+        )}
+
         {levelData.map(level => {
           const visible = level.molecules.filter(shouldShow);
           if (visible.length === 0) return null;
@@ -229,9 +351,10 @@ export function Levels() {
                 gap: 14,
               }}>
                 {visible.map(molecule => (
-                  <MoleculeCard
+                  <MoleculeProgressCard
                     key={molecule}
                     molecule={molecule}
+                    builds={getBuildCount(progress, molecule)}
                     onClick={() => navigate(`/sandbox?molecule=${encodeURIComponent(molecule)}`)}
                   />
                 ))}

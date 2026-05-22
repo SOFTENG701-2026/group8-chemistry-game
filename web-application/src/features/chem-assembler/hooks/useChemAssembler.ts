@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router';
 import type { CardInstance, Feedback, DragSource } from '../types';
 import { PROBLEMS } from '../data/problems';
 import { CARD_DEF } from '../data/cards';
+import { recordSuccessfulBuild } from '../api/progress';
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 
@@ -136,7 +137,10 @@ export function useChemAssembler() {
     if (ok) {
       setFeedback('right');
       setStreak((s) => s + 1);
-      setSolved(new Set([...solved, idx]));
+      setSolved((current) => new Set([...current, idx]));
+      void recordSuccessfulBuild(problem.name).catch((error) => {
+        console.error('Failed to save progress', error);
+      });
     } else {
       setFeedback('wrong');
       setStreak(0);

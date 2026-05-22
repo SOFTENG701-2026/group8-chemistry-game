@@ -3,6 +3,7 @@ import { RootLayout } from './layouts/RootLayout';
 import { Home } from './pages/Home';
 import { Levels } from './pages/Levels';
 import { ChemAssembler } from './pages/ChemAssembler';
+import { Progress } from './pages/Progress';
 
 export default function App() {
   return (
@@ -12,7 +13,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/levels" element={<Levels />} />
           <Route path="/sandbox" element={<ChemAssembler />} />
-          <Route path="/progress" element={<div style={{ padding: 20 }}>Progress Page (Coming Soon)</div>} />
+          <Route path="/progress" element={<Progress />} />
         </Route>
       </Routes>
     </BrowserRouter>
