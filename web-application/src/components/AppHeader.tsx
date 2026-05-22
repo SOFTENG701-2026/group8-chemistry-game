@@ -1,5 +1,6 @@
-import { Group, Text, Avatar, UnstyledButton, Container } from '@mantine/core';
+import { Group, Text, Avatar, UnstyledButton } from '@mantine/core';
 import { NavLink as RouterNavLink, useLocation } from 'react-router';
+import { IconAtom } from '@tabler/icons-react';
 
 export function AppHeader() {
   const location = useLocation();
@@ -17,23 +18,10 @@ export function AppHeader() {
       padding: '18px 0 16px',
       marginBottom: '32px',
     }}>
-      <Container size="xl">
+      <div style={{ padding: '0 24px' }}>
         <Group justify="space-between" align="center">
           <RouterNavLink to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{
-              width: 22,
-              height: 22,
-              border: '1.5px solid #1A2E3B',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 11,
-              color: '#1A2E3B',
-              flexShrink: 0,
-            }}>
-              ⊙
-            </div>
+            <IconAtom size={22} stroke={1.5} color="#1A2E3B" style={{ flexShrink: 0 }} />
             <Text style={{
               fontFamily: '"Fraunces", Georgia, serif',
               fontWeight: 600,
@@ -46,7 +34,7 @@ export function AppHeader() {
             </Text>
           </RouterNavLink>
 
-          <Group gap="xl">
+          <Group gap="xl" align="center">
             {links.map((link) => {
               const isActive = location.pathname.startsWith(link.path);
               return (
@@ -55,6 +43,8 @@ export function AppHeader() {
                   component={RouterNavLink}
                   to={link.path}
                   style={{
+                    display: 'flex',
+                    alignItems: 'center',
                     fontFamily: '"DM Sans", system-ui, sans-serif',
                     fontWeight: isActive ? 600 : 500,
                     fontSize: '0.95rem',
@@ -68,13 +58,12 @@ export function AppHeader() {
                 </UnstyledButton>
               );
             })}
+            <Avatar radius="xl" size={36} style={{ backgroundColor: '#E2603F', color: 'white', fontFamily: '"DM Sans", sans-serif', fontWeight: 600, fontSize: '0.8rem' }}>
+              AN
+            </Avatar>
           </Group>
-
-          <Avatar radius="xl" size={36} style={{ backgroundColor: '#E2603F', color: 'white', fontFamily: '"DM Sans", sans-serif', fontWeight: 600, fontSize: '0.8rem' }}>
-            AN
-          </Avatar>
         </Group>
-      </Container>
+      </div>
     </header>
   );
 }
