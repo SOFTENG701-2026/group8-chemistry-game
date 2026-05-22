@@ -90,7 +90,7 @@ function MasteryBadge({
           lineHeight: 1,
         }}
       >
-        {unlocked ? 'M' : '--'}
+        {unlocked ? '★' : '--'}
       </div>
       <div style={{ minWidth: 0 }}>
         <Text style={{
