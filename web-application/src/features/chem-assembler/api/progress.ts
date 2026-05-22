@@ -20,3 +20,21 @@ export async function recordSuccessfulBuild(moleculeName: string): Promise<Molec
   if (!response.ok) throw new Error('Unable to save progress');
   return response.json();
 }
+
+export async function resetProgress(): Promise<ProgressStore> {
+  const response = await fetch('/api/progress', {
+    method: 'DELETE',
+  });
+  if (!response.ok) throw new Error('Unable to reset progress');
+  return response.json();
+}
+
+export async function completeMasteries(moleculeNames: string[]): Promise<ProgressStore> {
+  const response = await fetch('/api/progress/masteries', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ moleculeNames }),
+  });
+  if (!response.ok) throw new Error('Unable to complete masteries');
+  return response.json();
+}

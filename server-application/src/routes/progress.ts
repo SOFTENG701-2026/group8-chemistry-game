@@ -41,6 +41,38 @@ progressRouter.get('/', async (_req, res, next) => {
   }
 });
 
+progressRouter.delete('/', async (_req, res, next) => {
+  try {
+    await writeProgress(EMPTY_STORE);
+    res.json(EMPTY_STORE);
+  } catch (error) {
+    next(error);
+  }
+});
+
+progressRouter.post('/masteries', async (req, res, next) => {
+  try {
+    const moleculeNames: string[] = Array.isArray(req.body?.moleculeNames)
+      ? req.body.moleculeNames.filter((name: unknown): name is string => typeof name === 'string')
+      : [];
+
+    const store = await readProgress();
+    const updatedAt = new Date().toISOString();
+
+    moleculeNames.forEach((moleculeName) => {
+      store.molecules[moleculeName] = {
+        successfulBuilds: 3,
+        updatedAt,
+      };
+    });
+
+    await writeProgress(store);
+    res.json(store);
+  } catch (error) {
+    next(error);
+  }
+});
+
 progressRouter.post('/:moleculeName/builds', async (req, res, next) => {
   try {
     const moleculeName = decodeURIComponent(req.params.moleculeName);

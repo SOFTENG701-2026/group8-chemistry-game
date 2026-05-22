@@ -10,7 +10,12 @@ import {
   getPrimaryFamily,
   levelData,
 } from '../features/chem-assembler/data/lessonLibrary';
-import { fetchProgress, type ProgressStore } from '../features/chem-assembler/api/progress';
+import {
+  completeMasteries,
+  fetchProgress,
+  resetProgress,
+  type ProgressStore,
+} from '../features/chem-assembler/api/progress';
 import type { FamilyName } from '../features/chem-assembler/types';
 
 type FilterValue = 'all' | FamilyName | 'unsolved';
@@ -253,6 +258,8 @@ export function Progress() {
   const [activeFilter, setActiveFilter] = useState<FilterValue>('all');
   const [progress, setProgress] = useState<ProgressStore | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [debugActionError, setDebugActionError] = useState<string | null>(null);
+  const [debugActionPending, setDebugActionPending] = useState(false);
   const navigate = useNavigate();
 
   const allMolecules = useMemo(() => levelData.flatMap(l => l.molecules), []);
@@ -313,6 +320,43 @@ export function Progress() {
     lineHeight: 1,
   });
 
+  const debugButtonStyle = (variant: 'primary' | 'danger'): CSSProperties => ({
+    border: `1.5px solid ${variant === 'primary' ? '#1A2E3B' : '#B34A33'}`,
+    backgroundColor: variant === 'primary' ? '#1A2E3B' : 'transparent',
+    color: variant === 'primary' ? '#FFFFFF' : '#B34A33',
+    borderRadius: 8,
+    padding: '9px 14px',
+    fontFamily: '"DM Sans", system-ui, sans-serif',
+    fontSize: '0.82rem',
+    fontWeight: 700,
+    cursor: debugActionPending ? 'not-allowed' : 'pointer',
+    opacity: debugActionPending ? 0.55 : 1,
+  });
+
+  async function handleResetProgress() {
+    setDebugActionPending(true);
+    setDebugActionError(null);
+    try {
+      setProgress(await resetProgress());
+    } catch {
+      setDebugActionError('Could not reset progress.');
+    } finally {
+      setDebugActionPending(false);
+    }
+  }
+
+  async function handleCompleteSelectedFilter() {
+    setDebugActionPending(true);
+    setDebugActionError(null);
+    try {
+      setProgress(await completeMasteries(visibleMolecules));
+    } catch {
+      setDebugActionError('Could not complete selected masteries.');
+    } finally {
+      setDebugActionPending(false);
+    }
+  }
+
   return (
     <div style={{ paddingBottom: '60px' }}>
       <Container size="xl">
@@ -357,6 +401,51 @@ export function Progress() {
             Unsolved
           </button>
         </Flex>
+
+        <section
+          style={{
+            border: '1px dashed #C9C5BB',
+            borderRadius: 8,
+            padding: 14,
+            marginBottom: 30,
+          }}
+        >
+          <Group justify="space-between" align="center" gap={12}>
+            <Text style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: '#4A6275',
+              fontFamily: '"DM Sans", system-ui, sans-serif',
+            }}>
+              Debug controls
+            </Text>
+            <Group gap={8}>
+              <button
+                type="button"
+                style={debugButtonStyle('primary')}
+                onClick={handleCompleteSelectedFilter}
+                disabled={debugActionPending || visibleMolecules.length === 0}
+              >
+                Complete selected filter
+              </button>
+              <button
+                type="button"
+                style={debugButtonStyle('danger')}
+                onClick={handleResetProgress}
+                disabled={debugActionPending}
+              >
+                Reset progress
+              </button>
+            </Group>
+          </Group>
+          {debugActionError && (
+            <Text style={{ color: '#B34A33', marginTop: 10, fontFamily: '"DM Sans", system-ui, sans-serif' }}>
+              {debugActionError}
+            </Text>
+          )}
+        </section>
 
         <section style={{ marginBottom: 34 }}>
           <Group justify="space-between" align="baseline" mb={14}>
