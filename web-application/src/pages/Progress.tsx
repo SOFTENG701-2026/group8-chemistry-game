@@ -282,6 +282,7 @@ export function Progress() {
   const possibleBuilds = visibleMolecules.length * MASTERED_BUILDS;
   const masteredCount = visibleMolecules.filter(molecule => isMastered(progress, molecule)).length;
   const completion = possibleBuilds === 0 ? 0 : totalBuilds / possibleBuilds;
+  const globalProgressColor = completion >= 1 ? '#3C8D6A' : '#E2603F';
   const ultimateUnlocked = allMolecules.every(molecule => isMastered(progress, molecule));
 
   const familyBadges = presentFamilies.map((family) => {
@@ -453,7 +454,7 @@ export function Progress() {
               style={{
                 width: `${completion * 100}%`,
                 height: '100%',
-                background: '#3C8D6A',
+                background: globalProgressColor,
                 transition: 'width 0.2s ease',
               }}
             />

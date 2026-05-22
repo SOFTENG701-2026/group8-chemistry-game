@@ -3,6 +3,14 @@
     "Methane": {
       "successfulBuilds": 3,
       "updatedAt": "2026-05-22T03:47:35.213Z"
+    },
+    "Ethane": {
+      "successfulBuilds": 2,
+      "updatedAt": "2026-05-22T03:49:04.580Z"
+    },
+    "Methanol": {
+      "successfulBuilds": 1,
+      "updatedAt": "2026-05-22T03:49:15.544Z"
     }
   }
 }
