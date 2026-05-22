@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   ReactFlow,
   Background,
@@ -21,7 +21,12 @@ import type { BondEdgeType } from './BondEdge';
 const nodeTypes: NodeTypes = { atom: AtomNode };
 const edgeTypes: EdgeTypes = { bond: BondEdge };
 
-export function LewisCanvas() {
+type LewisCanvasProps = {
+  resetKey?: number;
+};
+
+export function LewisCanvas({ resetKey }: LewisCanvasProps) {
+  const isFirstRender = useRef(true);
   const {
     nodes,
     edges,
@@ -36,6 +41,12 @@ export function LewisCanvas() {
     deleteSelectedElements,
     selectedNode,
   } = useLewisEditor();
+
+  useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return; }
+    clearAll();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetKey]);
 
   const typedNodes = nodes as AtomNodeType[];
   const typedEdges = edges as BondEdgeType[];

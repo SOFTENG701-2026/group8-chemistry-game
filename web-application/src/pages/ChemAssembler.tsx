@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { ReactFlowProvider } from '@xyflow/react';
 import { useChemAssembler } from '../features/chem-assembler/hooks/useChemAssembler';
 import { Stat } from '../features/chem-assembler/components/Stat';
 import { PromptCard } from '../features/chem-assembler/components/PromptCard';
@@ -6,6 +8,7 @@ import { FeedbackRow } from '../features/chem-assembler/components/FeedbackRow';
 import { ReagentTray } from '../features/chem-assembler/components/ReagentTray';
 import { Controls } from '../features/chem-assembler/components/Controls';
 import { Legend } from '../features/chem-assembler/components/Legend';
+import { LewisCanvas } from '../features/lewis-editor/components/LewisCanvas';
 import { PROBLEMS } from '../features/chem-assembler/data/problems';
 import { AppHeader } from '../components/AppHeader';
 
@@ -87,6 +90,9 @@ function ChemAssemblerStyles() {
 }
 
 export function ChemAssembler() {
+  const [lewisMode, setLewisMode] = useState(false);
+  const [lewisResetKey, setLewisResetKey] = useState(0);
+
   const {
     isSandbox, idx, problem, pool, built, feedback, streak, progress,
     shake, hintLevel, assembledFormula, assembledMoleculeName,
@@ -161,43 +167,87 @@ export function ChemAssembler() {
 
         {!isSandbox && problem && <PromptCard problem={problem} idx={idx} hintLevel={hintLevel} />}
 
-        <MoleculeReadoutPanel moleculeName={assembledMoleculeName} />
+        {/* Mode toggle */}
+        <div style={{ display: 'flex', gap: 6, marginTop: 16 }}>
+          {(['cards', 'lewis'] as const).map((m) => {
+            const active = (m === 'lewis') === lewisMode;
+            return (
+              <button
+                key={m}
+                onClick={() => {
+                  const togglingToLewis = m === 'lewis';
+                  setLewisMode(togglingToLewis);
+                  if (togglingToLewis) reset();
+                  else setLewisResetKey((k) => k + 1);
+                }}
+                style={{
+                  padding: '6px 16px',
+                  border: '1.5px solid #1A2E3B',
+                  borderRadius: 6,
+                  background: active ? '#1A2E3B' : 'transparent',
+                  color: active ? '#F5EFE1' : '#1A2E3B',
+                  fontFamily: '"DM Sans", sans-serif',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  transition: 'background 0.15s, color 0.15s',
+                }}
+              >
+                {m === 'cards' ? 'Cards' : 'Lewis Structure'}
+              </button>
+            );
+          })}
+        </div>
 
-        <BuildArea
-          built={built}
-          feedback={feedback}
-          shake={shake}
-          assembledFormula={assembledFormula}
-          onDragOver={onDragOver}
-          onDrop={onDropBuild}
-          onDragStart={onDragStart}
-          onCardClick={moveToPool}
-        />
+        {!lewisMode && <MoleculeReadoutPanel moleculeName={assembledMoleculeName} />}
+
+        {lewisMode ? (
+          <div style={{ marginTop: 24, height: 480 }}>
+            <ReactFlowProvider>
+              <LewisCanvas resetKey={lewisResetKey} />
+            </ReactFlowProvider>
+          </div>
+        ) : (
+          <BuildArea
+            built={built}
+            feedback={feedback}
+            shake={shake}
+            assembledFormula={assembledFormula}
+            onDragOver={onDragOver}
+            onDrop={onDropBuild}
+            onDragStart={onDragStart}
+            onCardClick={moveToPool}
+          />
+        )}
 
         {!isSandbox && <FeedbackRow feedback={feedback} onNext={next} />}
 
-        <ReagentTray
-          pool={pool}
-          feedback={feedback}
-          onDragOver={onDragOver}
-          onDrop={onDropPool}
-          onDragStart={onDragStart}
-          onCardClick={moveToBuild}
-        />
+        {!lewisMode && (
+          <ReagentTray
+            pool={pool}
+            feedback={feedback}
+            onDragOver={onDragOver}
+            onDrop={onDropPool}
+            onDragStart={onDragStart}
+            onCardClick={moveToBuild}
+          />
+        )}
 
-        <Controls
-          isSandbox={isSandbox}
-          onCheck={check}
-          onReset={reset}
-          onHint={giveHint}
-          onPrev={prev}
-          onNext={next}
-          builtCount={built.length}
-          feedback={feedback}
-          hintLevel={hintLevel}
-        />
+        {!lewisMode && (
+          <Controls
+            isSandbox={isSandbox}
+            onCheck={check}
+            onReset={reset}
+            onHint={giveHint}
+            onPrev={prev}
+            onNext={next}
+            builtCount={built.length}
+            feedback={feedback}
+            hintLevel={hintLevel}
+          />
+        )}
 
-        <Legend />
+        {!lewisMode && <Legend />}
       </div>
     </div>
   );
