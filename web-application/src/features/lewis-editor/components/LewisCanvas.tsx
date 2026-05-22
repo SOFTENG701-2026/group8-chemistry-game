@@ -202,7 +202,7 @@ function HintBox() {
       <ul style={{ margin: '4px 0 0', paddingLeft: 14 }}>
         <li>Drag atoms from palette onto canvas</li>
         <li>Hover an atom → dots appear; drag a dot to another atom to bond</li>
-        <li>Click a bond to cycle 1→2→3</li>
+        <li>Click a bond to toggle single/double</li>
         <li>Delete key removes selected</li>
       </ul>
     </div>

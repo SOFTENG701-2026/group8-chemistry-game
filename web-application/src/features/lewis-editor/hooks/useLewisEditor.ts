@@ -66,7 +66,7 @@ export function useLewisEditor() {
         eds.map((e) => {
           if (e.id !== edge.id) return e;
           const current: BondOrder = e.data?.order ?? 1;
-          const proposed: BondOrder = current === 3 ? 1 : ((current + 1) as BondOrder);
+          const proposed: BondOrder = current === 2 ? 1 : 2;
           // Only need to validate increases; decreasing to 1 is always safe
           if (proposed > current) {
             const typedEds = eds as BondEdgeType[];
