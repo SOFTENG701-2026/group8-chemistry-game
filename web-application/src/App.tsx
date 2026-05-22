@@ -11,6 +11,7 @@ export default function App() {
       <Routes>
         <Route element={<RootLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/lewis" element={<LewisEditor />} />
           <Route path="/levels" element={<Levels />} />
           <Route path="/sandbox" element={<ChemAssembler />} />
           <Route path="/progress" element={<Progress />} />
