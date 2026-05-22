@@ -111,7 +111,7 @@ export function Home() {
         {/* Cards row */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
+          gridTemplateColumns: 'repeat(4, 1fr)',
           gap: 20,
           alignItems: 'stretch',
         }}>
@@ -212,11 +212,48 @@ export function Home() {
             </div>
           </div>
 
+          {/* Lewis Editor card */}
+          <div style={{ ...cardBase, backgroundColor: '#EFE6D2', border: '1.5px solid #C9B98F' }}>
+            <Group justify="space-between" align="center" mb={20} style={{ color: '#8C7A4A' }}>
+              <CardLabel>Visual · Structural</CardLabel>
+              <CounterBadge n="03" />
+            </Group>
+
+            <h2 style={{ margin: '0 0 8px', color: '#1A2E3B' }}>Lewis Editor</h2>
+            <Text style={{ color: '#4A6275', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: 24 }}>
+              Draw molecules atom-by-atom. Place atoms on a canvas, drag bonds between them, and see the structure emerge.
+            </Text>
+
+            <div style={{ flex: 1 }} />
+
+            <div style={{ marginTop: 28, paddingTop: 20, borderTop: '1px solid rgba(26,46,59,0.1)' }}>
+              <RouterNavLink
+                to="/lewis"
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '10px 20px',
+                  backgroundColor: '#1A2E3B',
+                  color: 'white',
+                  borderRadius: 8,
+                  textAlign: 'center',
+                  fontFamily: '"DM Sans", sans-serif',
+                  fontWeight: 600,
+                  fontSize: '0.9rem',
+                  textDecoration: 'none',
+                  boxSizing: 'border-box',
+                }}
+              >
+                draw →
+              </RouterNavLink>
+            </div>
+          </div>
+
           {/* My Progress card */}
           <div style={{ ...cardBase, backgroundColor: 'white' }}>
             <Group justify="space-between" align="center" mb={20} style={{ color: '#1A2E3B' }}>
               <CardLabel>Your record</CardLabel>
-              <CounterBadge n="03" />
+              <CounterBadge n="04" />
             </Group>
 
             <h2 style={{ margin: '0 0 8px' }}>My progress</h2>
