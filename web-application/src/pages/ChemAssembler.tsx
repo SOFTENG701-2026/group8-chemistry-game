@@ -1,15 +1,11 @@
 import { useState } from 'react';
 import { ReactFlowProvider } from '@xyflow/react';
 import { useChemAssembler } from '../features/chem-assembler/hooks/useChemAssembler';
-import { Stat } from '../features/chem-assembler/components/Stat';
-import { PromptCard } from '../features/chem-assembler/components/PromptCard';
 import { BuildArea } from '../features/chem-assembler/components/BuildArea';
-import { FeedbackRow } from '../features/chem-assembler/components/FeedbackRow';
 import { ReagentTray } from '../features/chem-assembler/components/ReagentTray';
-import { Controls } from '../features/chem-assembler/components/Controls';
 import { Legend } from '../features/chem-assembler/components/Legend';
 import { LewisCanvas } from '../features/lewis-editor/components/LewisCanvas';
-import { PROBLEMS } from '../features/chem-assembler/data/problems';
+
 function MoleculeReadoutPanel({ moleculeName }: { moleculeName: string | null }) {
   const isKnown = moleculeName !== null;
 
@@ -53,22 +49,10 @@ function MoleculeReadoutPanel({ moleculeName }: { moleculeName: string | null })
   );
 }
 
-function ChemAssemblerStyles() {
+function SandboxStyles() {
   return (
     <style>{`
       @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-      @keyframes shakeX {
-        0%, 100% { transform: translateX(0); }
-        20% { transform: translateX(-8px); }
-        40% { transform: translateX(8px); }
-        60% { transform: translateX(-5px); }
-        80% { transform: translateX(5px); }
-      }
-      @keyframes popIn {
-        0% { transform: scale(0.6); opacity: 0; }
-        70% { transform: scale(1.08); opacity: 1; }
-        100% { transform: scale(1); opacity: 1; }
-      }
       .grid-bg::before {
         content: "";
         position: absolute;
@@ -80,8 +64,6 @@ function ChemAssemblerStyles() {
         pointer-events: none;
         z-index: 0;
       }
-      .shake { animation: shakeX 0.45s ease-in-out; }
-      .pop-in { animation: popIn 0.3s ease-out; }
       button:focus-visible { outline: 2px solid #E2603F; outline-offset: 2px; }
     `}</style>
   );
@@ -92,12 +74,11 @@ export function ChemAssembler() {
   const [lewisResetKey, setLewisResetKey] = useState(0);
 
   const {
-    isSandbox, idx, problem, pool, built, feedback, streak, progress,
-    shake, hintLevel, assembledFormula, assembledMoleculeName,
+    pool, built, assembledFormula, assembledMoleculeName,
     moveToBuild, moveToPool,
     onDragStart, onDragOver, onDropBuild, onDropPool,
-    check, next, prev, reset, giveHint,
-  } = useChemAssembler();
+    reset,
+  } = useChemAssembler(null);
 
   return (
     <div
@@ -111,7 +92,7 @@ export function ChemAssembler() {
         overflow: 'hidden',
       }}
     >
-      <ChemAssemblerStyles />
+      <SandboxStyles />
       <div className="grid-bg" style={{ position: 'absolute', inset: 0 }} />
 
       <div style={{ maxWidth: '780px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
@@ -136,7 +117,7 @@ export function ChemAssembler() {
                 color: '#4A6275',
               }}
             >
-              {isSandbox ? 'free play' : 'an exercise in'}
+              free play
             </div>
             <h1
               style={{
@@ -152,17 +133,8 @@ export function ChemAssembler() {
               Sandbox
             </h1>
           </div>
-          {!isSandbox && (
-            <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-              <Stat label="streak" value={streak} accent />
-              <Stat label="solved" value={`${progress}/${PROBLEMS.length}`} />
-            </div>
-          )}
         </header>
 
-        {!isSandbox && problem && <PromptCard problem={problem} idx={idx} hintLevel={hintLevel} />}
-
-        {/* Mode toggle */}
         <div style={{ display: 'flex', gap: 6, marginTop: 16 }}>
           {(['cards', 'lewis'] as const).map((m) => {
             const active = (m === 'lewis') === lewisMode;
@@ -205,8 +177,8 @@ export function ChemAssembler() {
         ) : (
           <BuildArea
             built={built}
-            feedback={feedback}
-            shake={shake}
+            feedback={null}
+            shake={false}
             assembledFormula={assembledFormula}
             onDragOver={onDragOver}
             onDrop={onDropBuild}
@@ -215,30 +187,14 @@ export function ChemAssembler() {
           />
         )}
 
-        {!isSandbox && <FeedbackRow feedback={feedback} onNext={next} />}
-
         {!lewisMode && (
           <ReagentTray
             pool={pool}
-            feedback={feedback}
+            feedback={null}
             onDragOver={onDragOver}
             onDrop={onDropPool}
             onDragStart={onDragStart}
             onCardClick={moveToBuild}
-          />
-        )}
-
-        {!lewisMode && (
-          <Controls
-            isSandbox={isSandbox}
-            onCheck={check}
-            onReset={reset}
-            onHint={giveHint}
-            onPrev={prev}
-            onNext={next}
-            builtCount={built.length}
-            feedback={feedback}
-            hintLevel={hintLevel}
           />
         )}
 

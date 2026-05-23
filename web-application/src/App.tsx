@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
 import { RootLayout } from './layouts/RootLayout';
 import { Home } from './pages/Home';
-import { Levels } from './pages/Levels';
+import { Lessons } from './pages/Lessons';
+import { LessonPage } from './pages/LessonPage';
 import { ChemAssembler } from './pages/ChemAssembler';
 import { Progress } from './pages/Progress';
 
@@ -11,7 +12,8 @@ export default function App() {
       <Routes>
         <Route element={<RootLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/levels" element={<Levels />} />
+          <Route path="/lessons" element={<Lessons />} />
+          <Route path="/lesson" element={<LessonPage />} />
           <Route path="/sandbox" element={<ChemAssembler />} />
           <Route path="/progress" element={<Progress />} />
         </Route>

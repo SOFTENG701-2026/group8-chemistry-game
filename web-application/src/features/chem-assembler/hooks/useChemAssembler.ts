@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { DragEvent } from 'react';
-import { useSearchParams } from 'react-router';
 import type { CardInstance, Feedback, DragSource } from '../types';
 import { PROBLEMS } from '../data/problems';
 import { CARD_DEF } from '../data/cards';
@@ -37,11 +36,8 @@ function buildSandboxCards(): CardInstance[] {
   return Object.keys(CARD_DEF).map(k => ({ key: k, instanceId: uid() }));
 }
 
-export function useChemAssembler() {
-  const [searchParams] = useSearchParams();
-  const moleculeQuery = searchParams.get('molecule');
-  
-  const foundIdx = moleculeQuery ? PROBLEMS.findIndex(p => p.name === moleculeQuery) : -1;
+export function useChemAssembler(moleculeName: string | null = null) {
+  const foundIdx = moleculeName ? PROBLEMS.findIndex(p => p.name === moleculeName) : -1;
   const isSandbox = foundIdx === -1;
 
   const [idx, setIdx] = useState(isSandbox ? 0 : foundIdx);
@@ -67,26 +63,16 @@ export function useChemAssembler() {
     setHintLevel(0);
   }, [idx, isSandbox, resetKey]);
 
-  // Sync idx when the URL's molecule param changes (not when next/prev mutate idx locally)
-  useEffect(() => {
-    if (!isSandbox && foundIdx !== -1) {
-      setIdx(foundIdx);
-    }
-    // Intentionally omitting idx — we only want to sync on URL changes, not local navigation
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [foundIdx, isSandbox]);
-
   function moveToBuild(instanceId: string) {
     const card = pool.find((c) => c.instanceId === instanceId);
     if (!card) return;
-    
+
     if (isSandbox) {
-      // Replace the card in the pool so it acts as an infinite supply
       setPool([...pool.filter((c) => c.instanceId !== instanceId), { key: card.key, instanceId: uid() }]);
     } else {
       setPool(pool.filter((c) => c.instanceId !== instanceId));
     }
-    
+
     setBuilt([...built, card]);
     setFeedback(null);
   }
@@ -95,7 +81,7 @@ export function useChemAssembler() {
     const card = built.find((c) => c.instanceId === instanceId);
     if (!card) return;
     setBuilt(built.filter((c) => c.instanceId !== instanceId));
-    
+
     if (!isSandbox) {
       setPool([...pool, card]);
     }
@@ -128,8 +114,8 @@ export function useChemAssembler() {
     } catch { /* ignore malformed drag data */ }
   }
 
-  function check() {
-    if (built.length === 0 || isSandbox || !problem) return;
+  function check(level: 1 | 2 | 3 = 1) {
+    if (built.length === 0 || isSandbox || !problem) return false;
     const seq = built.map((c) => c.key);
     const ok =
       arraysEqual(seq, problem.correct) ||
@@ -138,7 +124,7 @@ export function useChemAssembler() {
       setFeedback('right');
       setStreak((s) => s + 1);
       setSolved((current) => new Set([...current, idx]));
-      void recordSuccessfulBuild(problem.name).catch((error) => {
+      void recordSuccessfulBuild(problem.name, level).catch((error) => {
         console.error('Failed to save progress', error);
       });
     } else {
@@ -147,6 +133,7 @@ export function useChemAssembler() {
       setShake(true);
       setTimeout(() => setShake(false), 500);
     }
+    return ok;
   }
 
   function next() {
@@ -162,7 +149,7 @@ export function useChemAssembler() {
   }
 
   function giveHint() {
-    setHintLevel((h) => Math.min(h + 1, 2));
+    setHintLevel((h) => Math.min(h + 1, 3));
   }
 
   const assembledFormula = useMemo(

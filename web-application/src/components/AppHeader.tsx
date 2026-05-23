@@ -6,7 +6,7 @@ export function AppHeader() {
   const location = useLocation();
 
   const links = [
-    { label: 'Lessons', path: '/levels' },
+    { label: 'Lessons', path: '/lessons' },
     { label: 'Sandbox', path: '/sandbox' },
     { label: 'My progress', path: '/progress' },
   ];
