@@ -132,7 +132,7 @@ export function Home() {
 
             <div style={{ marginTop: 28, paddingTop: 20, borderTop: '1px solid rgba(26,46,59,0.1)' }}>
               <RouterNavLink
-                to="/levels"
+                to="/lessons"
                 style={{
                   display: 'block',
                   width: '100%',

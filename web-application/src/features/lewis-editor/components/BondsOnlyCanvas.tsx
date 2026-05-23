@@ -49,6 +49,7 @@ function validateBonds(drawn: BondEdgeType[], expected: MolBond[]): boolean {
 export type BondsOnlyCanvasHandle = {
   validate: () => boolean;
   reset: () => void;
+  flashNextHint: () => void;
 };
 
 type Props = {
@@ -71,6 +72,7 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
   function BondsOnlyCanvas({ graph, resetKey }, ref) {
     const [nodes, , onNodesChange] = useNodesState<AtomNodeType>(graphToNodes(graph));
     const [edges, setEdges, onEdgesChange] = useEdgesState<BondEdgeType>([]);
+    const [hintBondIdx, setHintBondIdx] = useState<number | null>(null);
 
     useEffect(() => {
       setEdges([]);
@@ -79,6 +81,13 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
     useImperativeHandle(ref, () => ({
       validate: () => validateBonds(edges as BondEdgeType[], graph.bonds),
       reset: () => setEdges([]),
+      flashNextHint: () => {
+        setHintBondIdx(prev => {
+          const next = prev === null ? 0 : (prev + 1) % graph.bonds.length;
+          setTimeout(() => setHintBondIdx(null), 1500);
+          return next;
+        });
+      },
     }), [edges, graph.bonds, setEdges]);
 
     const isValidConnection: IsValidConnection = (connection) => {
@@ -114,8 +123,6 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
       );
     };
 
-    const [hintBondIdx, setHintBondIdx] = useState<number | null>(null);
-
     return (
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
         <style>{`
@@ -144,28 +151,6 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
           style={{ width: '100%', height: '100%' }}
         >
           <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="rgba(26,46,59,0.1)" />
-          <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 10 }}>
-            <button
-              onClick={() => {
-                const nextIdx = hintBondIdx === null ? 0 : (hintBondIdx + 1) % graph.bonds.length;
-                setHintBondIdx(nextIdx);
-                setTimeout(() => setHintBondIdx(null), 1500);
-              }}
-              style={{
-                padding: '5px 10px',
-                border: 'none',
-                borderRadius: 6,
-                background: '#4A6275',
-                color: 'white',
-                fontFamily: '"DM Sans", system-ui, sans-serif',
-                fontWeight: 600,
-                fontSize: '0.75rem',
-                cursor: 'pointer',
-              }}
-            >
-              Flash hint bond
-            </button>
-          </div>
           {hintBondIdx !== null && graph.bonds[hintBondIdx] && (
             <HintBondOverlay
               bond={graph.bonds[hintBondIdx]}

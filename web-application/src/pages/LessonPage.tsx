@@ -309,7 +309,11 @@ function Level2Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
       <LessonControls
         onCheck={handleCheck}
         onReset={handleReset}
-        onHint={() => setHintLevel(h => Math.min(h + 1, 3))}
+        onHint={() => {
+          const next = hintLevel + 1;
+          setHintLevel(Math.min(next, 3));
+          if (next >= 3) canvasRef.current?.flashNextHint();
+        }}
         onNextLevel={onNextLevel}
         checkDisabled={false}
         hintDisabled={hintLevel >= 3}
