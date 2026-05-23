@@ -300,7 +300,7 @@ function Level2Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
   return (
     <>
       <LessonPrompt problem={problem} hintLevel={hintLevel} level={level} bondCount={graph.bonds.length} />
-      <div className={shake ? 'shake' : ''} style={{ height: 420, borderRadius: 10, overflow: 'hidden', border: '1.5px solid rgba(26,46,59,0.14)', background: '#FDFAF5' }}>
+      <div className={shake ? 'shake' : ''} style={{ height: 480, borderRadius: 10, overflow: 'hidden', border: '1.5px solid rgba(26,46,59,0.14)', background: '#FDFAF5' }}>
         <ReactFlowProvider>
           <BondsOnlyCanvas ref={canvasRef} graph={graph} resetKey={resetKey} />
         </ReactFlowProvider>
@@ -355,9 +355,11 @@ function Level3Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
   return (
     <>
       <LessonPrompt problem={problem} hintLevel={hintLevel} level={level} />
-      <div className={shake ? 'shake' : ''} style={{ height: 480, marginTop: 16 }}>
+      <div className={shake ? 'shake' : ''} style={{ height: 480, marginTop: 16, position: 'relative' }}>
         <ReactFlowProvider>
-          <LewisCanvas resetKey={resetKey} onMoleculeChange={setDrawnName} />
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
+            <LewisCanvas resetKey={resetKey} onMoleculeChange={setDrawnName} />
+          </div>
         </ReactFlowProvider>
       </div>
       <FeedbackRow feedback={feedback} />
