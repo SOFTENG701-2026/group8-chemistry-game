@@ -24,6 +24,11 @@ type ScreenRect = {
   y2: number;
 };
 
+type DragOffset = {
+  x: number;
+  y: number;
+};
+
 function usedBonds(nodeId: string, edgeList: BondEdgeType[], excludeEdgeId?: string): number {
   return edgeList.reduce((sum, e) => {
     if (e.id === excludeEdgeId) return sum;
@@ -36,6 +41,21 @@ function valenceOf(nodeId: string, nodeList: AtomNodeType[]): number {
   const node = nodeList.find((n) => n.id === nodeId);
   const element = node?.data.element;
   return element ? (ELEMENTS[element]?.valence ?? Infinity) : Infinity;
+}
+
+function getDragOffset(event: React.DragEvent<HTMLDivElement>): DragOffset {
+  try {
+    const rawOffset = event.dataTransfer.getData('application/lewis-atom-offset');
+    if (!rawOffset) throw new Error('Missing atom drag offset');
+    const offset = JSON.parse(rawOffset) as Partial<DragOffset>;
+
+    return {
+      x: typeof offset.x === 'number' ? offset.x : ATOM_NODE_SIZE / 2,
+      y: typeof offset.y === 'number' ? offset.y : ATOM_NODE_SIZE / 2,
+    };
+  } catch {
+    return { x: ATOM_NODE_SIZE / 2, y: ATOM_NODE_SIZE / 2 };
+  }
 }
 
 export function useLewisEditor() {
@@ -95,7 +115,11 @@ export function useLewisEditor() {
       event.preventDefault();
       const element = event.dataTransfer.getData('application/lewis-atom');
       if (!element) return;
-      const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+      const offset = getDragOffset(event);
+      const position = screenToFlowPosition({
+        x: event.clientX - offset.x,
+        y: event.clientY - offset.y,
+      });
       const newNode: AtomNodeType = {
         id: uid(),
         type: 'atom',
