@@ -7,7 +7,7 @@ type Props = {
   edges: BondEdgeType[];
 };
 
-function hillFormula(nodes: AtomNodeType[]): string {
+export function hillFormula(nodes: AtomNodeType[]): string {
   if (nodes.length === 0) return '';
   const counts: Record<string, number> = {};
   for (const n of nodes) {
@@ -23,7 +23,7 @@ function hillFormula(nodes: AtomNodeType[]): string {
   return parts.join('');
 }
 
-function isConnected(nodes: AtomNodeType[], edges: BondEdgeType[]): boolean {
+export function isConnected(nodes: AtomNodeType[], edges: BondEdgeType[]): boolean {
   if (nodes.length === 0) return false;
   if (nodes.length === 1) return true;
 
@@ -47,7 +47,7 @@ function isConnected(nodes: AtomNodeType[], edges: BondEdgeType[]): boolean {
   return visited.size === nodes.length;
 }
 
-function allValencesSatisfied(nodes: AtomNodeType[], edges: BondEdgeType[]): boolean {
+export function allValencesSatisfied(nodes: AtomNodeType[], edges: BondEdgeType[]): boolean {
   for (const node of nodes) {
     const valence = ELEMENTS[node.data.element]?.valence;
     if (valence === undefined) continue;

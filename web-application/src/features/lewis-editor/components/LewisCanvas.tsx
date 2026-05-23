@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
   ReactFlow,
   Background,
@@ -14,7 +14,8 @@ import { BondEdge } from './BondEdge';
 import { useLewisEditor } from '../hooks/useLewisEditor';
 import { AtomPalette } from './AtomPalette';
 import { AtomInfoPanel } from './AtomInfoPanel';
-import { MoleculeReadout } from './MoleculeReadout';
+import { MoleculeReadout, hillFormula, isConnected, allValencesSatisfied } from './MoleculeReadout';
+import { FORMULA_TO_NAME } from '../data/elements';
 import type { AtomNodeType } from './AtomNode';
 import type { BondEdgeType } from './BondEdge';
 
@@ -23,9 +24,10 @@ const edgeTypes: EdgeTypes = { bond: BondEdge };
 
 type LewisCanvasProps = {
   resetKey?: number;
+  onMoleculeChange?: (name: string | null) => void;
 };
 
-export function LewisCanvas({ resetKey }: LewisCanvasProps) {
+export function LewisCanvas({ resetKey, onMoleculeChange }: LewisCanvasProps) {
   const isFirstRender = useRef(true);
   const {
     nodes,
@@ -50,6 +52,18 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
 
   const typedNodes = nodes as AtomNodeType[];
   const typedEdges = edges as BondEdgeType[];
+
+  const derivedName = useMemo(() => {
+    if (typedNodes.length === 0) return null;
+    if (!isConnected(typedNodes, typedEdges)) return null;
+    if (!allValencesSatisfied(typedNodes, typedEdges)) return null;
+    return FORMULA_TO_NAME[hillFormula(typedNodes)] ?? null;
+  }, [typedNodes, typedEdges]);
+
+  useEffect(() => {
+    onMoleculeChange?.(derivedName);
+  }, [derivedName, onMoleculeChange]);
+
   const hasSelection = nodes.some((n) => n.selected) || edges.some((e) => e.selected);
 
   return (
