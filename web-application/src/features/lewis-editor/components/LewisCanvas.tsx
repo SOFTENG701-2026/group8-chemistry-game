@@ -4,8 +4,11 @@ import {
   Background,
   BackgroundVariant,
   ConnectionMode,
+  ConnectionLineType,
+  getStraightPath,
   type NodeTypes,
   type EdgeTypes,
+  type ConnectionLineComponentProps,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -20,6 +23,11 @@ import type { BondEdgeType } from './BondEdge';
 
 const nodeTypes: NodeTypes = { atom: AtomNode };
 const edgeTypes: EdgeTypes = { bond: BondEdge };
+const ATOM_NODE_SIZE = 44;
+const connectionLineContainerStyle: React.CSSProperties = {
+  zIndex: 0,
+  pointerEvents: 'none',
+};
 
 type LewisCanvasProps = {
   resetKey?: number;
@@ -31,6 +39,49 @@ type SelectionBox = {
   currentX: number;
   currentY: number;
 };
+
+function CenteredConnectionLine({
+  fromNode,
+  toNode,
+  toHandle,
+  toX,
+  toY,
+  connectionStatus,
+  connectionLineStyle,
+}: ConnectionLineComponentProps<AtomNodeType>) {
+  const sourceX =
+    fromNode.internals.positionAbsolute.x + (fromNode.measured.width ?? ATOM_NODE_SIZE) / 2;
+  const sourceY =
+    fromNode.internals.positionAbsolute.y + (fromNode.measured.height ?? ATOM_NODE_SIZE) / 2;
+  const shouldSnapToTarget =
+    toNode !== null &&
+    toHandle?.type === 'target' &&
+    toHandle.id === 'atom-target' &&
+    connectionStatus === 'valid';
+  const targetX = shouldSnapToTarget
+    ? toNode.internals.positionAbsolute.x + (toNode.measured.width ?? ATOM_NODE_SIZE) / 2
+    : toX;
+  const targetY = shouldSnapToTarget
+    ? toNode.internals.positionAbsolute.y + (toNode.measured.height ?? ATOM_NODE_SIZE) / 2
+    : toY;
+  const [path] = getStraightPath({
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+  });
+
+  return (
+    <path
+      d={path}
+      fill="none"
+      stroke="#1A2E3B"
+      strokeWidth={2}
+      strokeLinecap="round"
+      style={connectionLineStyle}
+    />
+  );
+}
 
 export function LewisCanvas({ resetKey }: LewisCanvasProps) {
   const isFirstRender = useRef(true);
@@ -129,15 +180,46 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
     <>
       {/* Reveal handles when hovering a node; keep them hidden otherwise */}
       <style>{`
-        .lewis-atom-node:hover .react-flow__handle,
-        .react-flow__node.selected .lewis-atom-node .react-flow__handle {
+        .lewis-atom-node:hover .lewis-atom-source,
+        .react-flow__node.selected .lewis-atom-node .lewis-atom-source {
           opacity: 1 !important;
         }
-        .react-flow__handle-connecting,
-        .react-flow__handle-valid {
+        .lewis-atom-source.react-flow__handle-connecting,
+        .lewis-atom-source.react-flow__handle-valid {
           opacity: 1 !important;
           background: #E2603F !important;
           border-color: white !important;
+        }
+        .lewis-atom-target.react-flow__handle,
+        .lewis-atom-target.react-flow__handle-connecting,
+        .lewis-atom-target.react-flow__handle-valid {
+          opacity: 1 !important;
+          background: transparent !important;
+          border: none !important;
+        }
+        .lewis-atom-node:has(.lewis-atom-target.react-flow__handle-valid) {
+          box-shadow:
+            0 0 0 3px rgba(226,96,63,0.28),
+            0 0 0 6px rgba(226,96,63,0.12),
+            0 2px 6px rgba(0,0,0,0.12) !important;
+        }
+        .lewis-atom-node:has(.lewis-atom-target.react-flow__handle-valid)::after {
+          content: "";
+          position: absolute;
+          inset: -5px;
+          border: 2px solid #E2603F;
+          border-radius: 50%;
+          pointer-events: none;
+        }
+        .react-flow__connectionline {
+          z-index: 0 !important;
+          pointer-events: none;
+        }
+        .react-flow__nodes {
+          z-index: 5 !important;
+        }
+        .react-flow__node {
+          z-index: 5 !important;
         }
         /* Remove default React Flow handle background so ours shows */
         .react-flow__handle { background: transparent; }
@@ -175,7 +257,10 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
             onDragOver={onDragOver}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
-            connectionMode={ConnectionMode.Loose}
+            connectionMode={ConnectionMode.Strict}
+            connectionLineType={ConnectionLineType.Straight}
+            connectionLineComponent={CenteredConnectionLine}
+            connectionLineContainerStyle={connectionLineContainerStyle}
             fitView
             deleteKeyCode="Delete"
             style={{ width: '100%', height: '100%' }}
@@ -293,10 +378,12 @@ function HintBox() {
     >
       <strong style={{ color: '#1A2E3B' }}>Tips</strong>
       <ul style={{ margin: '4px 0 0', paddingLeft: 14 }}>
-        <li>Drag atoms from palette onto canvas</li>
-        <li>Hover an atom → dots appear; drag a dot to another atom to bond</li>
+        <li>Drag atoms from the palette onto the canvas</li>
+        <li>Start bonds from the edge of an atom</li>
+        <li>Release on an atom to complete the bond</li>
         <li>Click a bond to toggle single/double</li>
-        <li>Delete key removes selected</li>
+        <li>Right-drag to box select atoms</li>
+        <li>Delete key removes selected items</li>
       </ul>
     </div>
   );
