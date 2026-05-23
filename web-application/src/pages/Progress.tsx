@@ -281,7 +281,11 @@ export function Progress() {
 
   function shouldShow(molecule: string): boolean {
     if (activeFilter === 'all') return true;
-    if (activeFilter === 'unsolved') return getBuildCount(progress, molecule) === 0;
+    if (activeFilter === 'unsolved') return (
+      getLevelBuilds(progress, molecule, 1) === 0 &&
+      getLevelBuilds(progress, molecule, 2) === 0 &&
+      getLevelBuilds(progress, molecule, 3) === 0
+    );
     return getPrimaryFamily(molecule) === activeFilter;
   }
 

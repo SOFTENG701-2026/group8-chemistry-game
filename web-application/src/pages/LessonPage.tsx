@@ -242,7 +242,7 @@ function Level1Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
         onDragStart={onDragStart}
         onCardClick={moveToPool}
       />
-      <FeedbackRow feedback={fb} onNext={() => {}} />
+      <FeedbackRow feedback={fb} />
       <ReagentTray
         pool={pool}
         feedback={fb}
@@ -305,7 +305,7 @@ function Level2Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
           <BondsOnlyCanvas ref={canvasRef} graph={graph} resetKey={resetKey} />
         </ReactFlowProvider>
       </div>
-      <FeedbackRow feedback={feedback} onNext={() => {}} />
+      <FeedbackRow feedback={feedback} />
       <LessonControls
         onCheck={handleCheck}
         onReset={handleReset}
@@ -360,7 +360,7 @@ function Level3Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
           <LewisCanvas resetKey={resetKey} onMoleculeChange={setDrawnName} />
         </ReactFlowProvider>
       </div>
-      <FeedbackRow feedback={feedback} onNext={() => {}} />
+      <FeedbackRow feedback={feedback} />
       <LessonControls
         onCheck={handleCheck}
         onReset={handleReset}
