@@ -138,6 +138,27 @@ export function useLewisEditor() {
 
   const deleteSelected: NodeMouseHandler = useCallback(() => {}, []);
 
+  const selectOnlyNode: NodeMouseHandler<AtomNodeType> = useCallback(
+    (_event, clickedNode) => {
+      const selectedCount = nodes.filter((node) => node.selected).length;
+      if (selectedCount <= 1 || !clickedNode.selected) return;
+
+      setNodes((nds) =>
+        nds.map((node) => ({
+          ...node,
+          selected: node.id === clickedNode.id,
+        })),
+      );
+      setEdges((eds) =>
+        eds.map((edge) => ({
+          ...edge,
+          selected: false,
+        })),
+      );
+    },
+    [nodes, setEdges, setNodes],
+  );
+
   const selectNodesInScreenRect = useCallback(
     ({ x1, y1, x2, y2 }: ScreenRect) => {
       const start = screenToFlowPosition({ x: Math.min(x1, x2), y: Math.min(y1, y2) });
@@ -212,6 +233,7 @@ export function useLewisEditor() {
     clearAll,
     deleteSelectedElements,
     deleteSelected,
+    selectOnlyNode,
     selectNodesInScreenRect,
     selectedNodes,
   };

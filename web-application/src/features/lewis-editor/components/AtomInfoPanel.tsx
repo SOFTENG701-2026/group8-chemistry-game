@@ -43,35 +43,27 @@ export function AtomInfoPanel({ selectedNodes, edges, onPreviewAtomChange }: Pro
 
   return (
     <div style={containerStyle}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+      <div style={headerStyle}>
         <div style={labelStyle}>Atom</div>
-        {hasMultiple && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-            <CycleButton
-              label="Previous atom"
-              onClick={() => setSelectedIndex((i) => (i - 1 + selectedNodes.length) % selectedNodes.length)}
-            >
-              ‹
-            </CycleButton>
-            <span
-              style={{
-                fontFamily: '"JetBrains Mono", monospace',
-                fontSize: '0.68rem',
-                color: '#4A6275',
-                minWidth: 34,
-                textAlign: 'center',
-              }}
-            >
-              {selectedIndex + 1}/{selectedNodes.length}
-            </span>
-            <CycleButton
-              label="Next atom"
-              onClick={() => setSelectedIndex((i) => (i + 1) % selectedNodes.length)}
-            >
-              ›
-            </CycleButton>
-          </div>
-        )}
+        <div style={{ ...cycleControlsStyle, visibility: hasMultiple ? 'visible' : 'hidden' }}>
+          <CycleButton
+            label="Previous atom"
+            disabled={!hasMultiple}
+            onClick={() => setSelectedIndex((i) => (i - 1 + selectedNodes.length) % selectedNodes.length)}
+          >
+            &lsaquo;
+          </CycleButton>
+          <span style={cycleCountStyle}>
+            {selectedIndex + 1}/{selectedNodes.length}
+          </span>
+          <CycleButton
+            label="Next atom"
+            disabled={!hasMultiple}
+            onClick={() => setSelectedIndex((i) => (i + 1) % selectedNodes.length)}
+          >
+            &rsaquo;
+          </CycleButton>
+        </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
         <div
@@ -116,16 +108,19 @@ export function AtomInfoPanel({ selectedNodes, edges, onPreviewAtomChange }: Pro
 
 function CycleButton({
   label,
+  disabled = false,
   onClick,
   children,
 }: {
   label: string;
+  disabled?: boolean;
   onClick: () => void;
   children: React.ReactNode;
 }) {
   return (
     <button
       aria-label={label}
+      disabled={disabled}
       onClick={onClick}
       style={{
         width: 22,
@@ -138,7 +133,7 @@ function CycleButton({
         fontSize: '0.9rem',
         fontWeight: 700,
         lineHeight: 1,
-        cursor: 'pointer',
+        cursor: disabled ? 'default' : 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -182,5 +177,30 @@ const labelStyle: React.CSSProperties = {
   letterSpacing: '0.12em',
   textTransform: 'uppercase',
   color: '#4A6275',
+};
+
+const headerStyle: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  gap: 8,
+  height: 24,
   marginBottom: 10,
+};
+
+const cycleControlsStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  width: 90,
+  height: 24,
+  flexShrink: 0,
+};
+
+const cycleCountStyle: React.CSSProperties = {
+  fontFamily: '"JetBrains Mono", monospace',
+  fontSize: '0.68rem',
+  color: '#4A6275',
+  width: 34,
+  textAlign: 'center',
 };

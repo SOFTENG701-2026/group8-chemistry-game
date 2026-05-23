@@ -96,6 +96,7 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
     onConnect,
     isValidConnection,
     cycleEdgeOrder,
+    selectOnlyNode,
     onDrop,
     onDragOver,
     clearAll,
@@ -260,6 +261,7 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             isValidConnection={isValidConnection}
+            onNodeClick={selectOnlyNode}
             onEdgeClick={cycleEdgeOrder}
             onDrop={onDrop}
             onDragOver={onDragOver}
