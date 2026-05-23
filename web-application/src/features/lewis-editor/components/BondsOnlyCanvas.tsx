@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import {
   ReactFlow,
   Background,
@@ -23,23 +23,25 @@ import type { MolGraph, MolBond } from '../../chem-assembler/data/molecularGraph
 import { ELEMENTS } from '../data/elements';
 import type { BondOrder } from '@app/shared';
 
+const HINT_EDGE_ID = '__hint__';
 const ATOM_RADIUS = 22;
 const nodeTypes: NodeTypes = { atom: AtomNode };
 const edgeTypes: EdgeTypes = { bond: BondEdge };
 
 function usedBonds(nodeId: string, edgeList: BondEdgeType[], excludeId?: string): number {
   return edgeList.reduce((sum, e) => {
-    if (e.id === excludeId) return sum;
+    if (e.id === excludeId || e.data?.isHint) return sum;
     if (e.source === nodeId || e.target === nodeId) return sum + (e.data?.order ?? 1);
     return sum;
   }, 0);
 }
 
 function validateBonds(drawn: BondEdgeType[], expected: MolBond[]): boolean {
-  if (drawn.length !== expected.length) return false;
+  const real = drawn.filter(e => !e.data?.isHint);
+  if (real.length !== expected.length) return false;
   const key = (s: string, t: string) => [s, t].sort().join('|');
   const drawnMap = new Map<string, number>();
-  for (const e of drawn) drawnMap.set(key(e.source, e.target), e.data?.order ?? 1);
+  for (const e of real) drawnMap.set(key(e.source, e.target), e.data?.order ?? 1);
   for (const b of expected) {
     if (drawnMap.get(key(b.source, b.target)) !== b.order) return false;
   }
@@ -72,7 +74,8 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
   function BondsOnlyCanvas({ graph, resetKey }, ref) {
     const [nodes, , onNodesChange] = useNodesState<AtomNodeType>(graphToNodes(graph));
     const [edges, setEdges, onEdgesChange] = useEdgesState<BondEdgeType>([]);
-    const [hintBondIdx, setHintBondIdx] = useState<number | null>(null);
+    const hintIdxRef = useRef(0);
+    const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
       setEdges([]);
@@ -82,11 +85,30 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
       validate: () => validateBonds(edges as BondEdgeType[], graph.bonds),
       reset: () => setEdges([]),
       flashNextHint: () => {
-        setHintBondIdx(prev => {
-          const next = prev === null ? 0 : (prev + 1) % graph.bonds.length;
-          setTimeout(() => setHintBondIdx(null), 1500);
-          return next;
-        });
+        if (graph.bonds.length === 0) return;
+
+        // Advance to next bond (cycle)
+        const bond = graph.bonds[hintIdxRef.current % graph.bonds.length];
+        hintIdxRef.current = (hintIdxRef.current + 1) % graph.bonds.length;
+
+        // Clear any existing hint edge + timer
+        if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
+        setEdges(eds => [
+          ...eds.filter(e => e.id !== HINT_EDGE_ID),
+          {
+            id: HINT_EDGE_ID,
+            source: bond.source,
+            target: bond.target,
+            type: 'bond',
+            data: { order: 1, isHint: true },
+            selectable: false,
+          } as BondEdgeType,
+        ]);
+
+        hintTimerRef.current = setTimeout(() => {
+          setEdges(eds => eds.filter(e => e.id !== HINT_EDGE_ID));
+          hintTimerRef.current = null;
+        }, 1500);
       },
     }), [edges, graph.bonds, setEdges]);
 
@@ -106,6 +128,7 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
     };
 
     const cycleEdgeOrder: OnEdgeClick = (_event, edge) => {
+      if (edge.data?.isHint) return;
       setEdges((eds) =>
         eds.map((e) => {
           if (e.id !== edge.id) return e;
@@ -122,6 +145,8 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
         }),
       );
     };
+
+    const drawnCount = (edges as BondEdgeType[]).filter(e => !e.data?.isHint).length;
 
     return (
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -151,12 +176,6 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
           style={{ width: '100%', height: '100%' }}
         >
           <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="rgba(26,46,59,0.1)" />
-          {hintBondIdx !== null && graph.bonds[hintBondIdx] && (
-            <HintBondOverlay
-              bond={graph.bonds[hintBondIdx]}
-              nodes={nodes as AtomNodeType[]}
-            />
-          )}
         </ReactFlow>
 
         <div style={{
@@ -180,25 +199,10 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
             <li>Click a bond to toggle single/double</li>
           </ul>
           <div style={{ marginTop: 6, color: '#1A2E3B', fontWeight: 600 }}>
-            {edges.length} / {graph.bonds.length} bonds drawn
+            {drawnCount} / {graph.bonds.length} bonds drawn
           </div>
         </div>
       </div>
     );
   },
 );
-
-function HintBondOverlay({ bond, nodes }: { bond: MolBond; nodes: AtomNodeType[] }) {
-  const src = nodes.find(n => n.id === bond.source);
-  const tgt = nodes.find(n => n.id === bond.target);
-  if (!src || !tgt) return null;
-  const sx = src.position.x + ATOM_RADIUS;
-  const sy = src.position.y + ATOM_RADIUS;
-  const tx = tgt.position.x + ATOM_RADIUS;
-  const ty = tgt.position.y + ATOM_RADIUS;
-  return (
-    <svg style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 20, width: '100%', height: '100%' }}>
-      <line x1={sx} y1={sy} x2={tx} y2={ty} stroke="#E2603F" strokeWidth={4} strokeDasharray="6 3" opacity={0.7} />
-    </svg>
-  );
-}
