@@ -18,17 +18,6 @@ export type MolBond = { id: string; source: string; target: string; order: 1 | 2
 export type MolGraph = { atoms: MolAtom[]; bonds: MolBond[] };
 
 const T: Record<string, CardTemplate> = {
-  // ── Standalone ──────────────────────────────────────────────────────────────
-  'CH4': {
-    atoms: [
-      { element: 'C', dx: 0, dy: 0 },
-      { element: 'H', dx: 55, dy: 0 }, { element: 'H', dx: -55, dy: 0 },
-      { element: 'H', dx: 0, dy: 55 }, { element: 'H', dx: 0, dy: -55 },
-    ],
-    bonds: [{ from: 0, to: 1 }, { from: 0, to: 2 }, { from: 0, to: 3 }, { from: 0, to: 4 }],
-    leftIdx: -1, rightIdx: -1, rightBondOrder: 1, advance: 0,
-  },
-
   // ── Terminal methyls ────────────────────────────────────────────────────────
   'CH3-': {
     atoms: [
@@ -46,6 +35,11 @@ const T: Record<string, CardTemplate> = {
       { element: 'H', dx: 65, dy: 0 },
     ],
     bonds: [{ from: 0, to: 1 }, { from: 0, to: 2 }, { from: 0, to: 3 }],
+    leftIdx: 0, rightIdx: -1, rightBondOrder: 1, advance: 0,
+  },
+  '-H': {
+    atoms: [{ element: 'H', dx: 0, dy: 0 }],
+    bonds: [],
     leftIdx: 0, rightIdx: -1, rightBondOrder: 1, advance: 0,
   },
 

@@ -2,7 +2,7 @@ import type { CardDef, FamilyName, FamilyStyle } from '../types';
 
 export const CARD_DEF: Record<string, CardDef> = {
   'H-':         { display: 'H—',          name: 'hydrogen',      family: 'alkyl'    },
-  'CH4':        { display: 'CH₄',         name: 'methane',       family: 'alkyl'    },
+  '-H':         { display: '—H',          name: 'hydrogen',      family: 'alkyl'    },
   'CH3-':       { display: 'CH₃—',        name: 'methyl',        family: 'alkyl'    },
   '-CH3':       { display: '—CH₃',        name: 'methyl',        family: 'alkyl'    },
   '-CH2-':      { display: '—CH₂—',       name: 'methylene',     family: 'alkyl'    },
