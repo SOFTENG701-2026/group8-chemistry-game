@@ -172,8 +172,10 @@ export function ChemAssembler() {
                 onClick={() => {
                   const togglingToLewis = m === 'lewis';
                   setLewisMode(togglingToLewis);
-                  if (togglingToLewis) reset();
-                  else setLewisResetKey((k) => k + 1);
+                  if (!isSandbox) {
+                    if (togglingToLewis) reset();
+                    else setLewisResetKey((k) => k + 1);
+                  }
                 }}
                 style={{
                   padding: '6px 16px',
@@ -196,7 +198,27 @@ export function ChemAssembler() {
 
         {!lewisMode && <MoleculeReadoutPanel moleculeName={assembledMoleculeName} />}
 
-        {lewisMode ? (
+        {isSandbox ? (
+          <>
+            <div style={{ display: lewisMode ? 'block' : 'none', marginTop: 24, height: 480 }}>
+              <ReactFlowProvider>
+                <LewisCanvas resetKey={lewisResetKey} />
+              </ReactFlowProvider>
+            </div>
+            {!lewisMode && (
+              <BuildArea
+                built={built}
+                feedback={feedback}
+                shake={shake}
+                assembledFormula={assembledFormula}
+                onDragOver={onDragOver}
+                onDrop={onDropBuild}
+                onDragStart={onDragStart}
+                onCardClick={moveToPool}
+              />
+            )}
+          </>
+        ) : lewisMode ? (
           <div style={{ marginTop: 24, height: 480 }}>
             <ReactFlowProvider>
               <LewisCanvas resetKey={lewisResetKey} />
