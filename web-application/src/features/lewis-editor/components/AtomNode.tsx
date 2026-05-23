@@ -3,6 +3,7 @@ import { ELEMENTS } from '../data/elements';
 
 export type AtomNodeData = {
   element: string;
+  isPreviewed?: boolean;
 };
 
 export type AtomNodeType = Node<AtomNodeData, 'atom'>;
@@ -57,6 +58,11 @@ export function AtomNode({ data, selected }: NodeProps<AtomNodeType>) {
   const bg = info?.bg ?? '#EFF3F6';
   const border = info?.border ?? '#A8BEC9';
   const fontSize = data.element.length > 1 ? '0.72rem' : '1rem';
+  const boxShadow = data.isPreviewed
+    ? '0 0 0 3px rgba(226,96,63,0.25), 0 0 0 7px rgba(61,117,48,0.32), 0 0 18px rgba(61,117,48,0.45)'
+    : selected
+      ? '0 0 0 3px rgba(226,96,63,0.25)'
+      : '0 2px 6px rgba(0,0,0,0.12)';
 
   return (
     <div
@@ -74,9 +80,7 @@ export function AtomNode({ data, selected }: NodeProps<AtomNodeType>) {
         fontWeight: 700,
         fontSize,
         color: '#1A2E3B',
-        boxShadow: selected
-          ? '0 0 0 3px rgba(226,96,63,0.25)'
-          : '0 2px 6px rgba(0,0,0,0.12)',
+        boxShadow,
         cursor: 'grab',
         userSelect: 'none',
         transition: 'border-color 0.15s, box-shadow 0.15s',

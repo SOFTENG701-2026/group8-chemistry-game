@@ -197,7 +197,7 @@ export function useLewisEditor() {
     });
   }
 
-  const selectedNode = nodes.find((n) => n.selected) as AtomNodeType | undefined;
+  const selectedNodes = nodes.filter((n) => n.selected) as AtomNodeType[];
 
   return {
     nodes,
@@ -213,6 +213,6 @@ export function useLewisEditor() {
     deleteSelectedElements,
     deleteSelected,
     selectNodesInScreenRect,
-    selectedNode,
+    selectedNodes,
   };
 }

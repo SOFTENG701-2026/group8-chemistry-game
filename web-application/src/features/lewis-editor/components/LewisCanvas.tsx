@@ -87,6 +87,7 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
   const isFirstRender = useRef(true);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const [selectionBox, setSelectionBox] = useState<SelectionBox | null>(null);
+  const [previewedAtomId, setPreviewedAtomId] = useState<string | null>(null);
   const {
     nodes,
     edges,
@@ -100,7 +101,7 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
     clearAll,
     deleteSelectedElements,
     selectNodesInScreenRect,
-    selectedNode,
+    selectedNodes,
   } = useLewisEditor();
 
   useEffect(() => {
@@ -111,6 +112,13 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
 
   const typedNodes = nodes as AtomNodeType[];
   const typedEdges = edges as BondEdgeType[];
+  const displayNodes = typedNodes.map((node) => ({
+    ...node,
+    data: {
+      ...node.data,
+      isPreviewed: node.id === previewedAtomId,
+    },
+  }));
   const hasSelection = nodes.some((n) => n.selected) || edges.some((e) => e.selected);
   const selectionBoxStyle = selectionBox
     ? {
@@ -246,7 +254,7 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
           }}
         >
           <ReactFlow
-            nodes={nodes}
+            nodes={displayNodes}
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
@@ -315,7 +323,11 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
             gap: 10,
           }}
         >
-          <AtomInfoPanel selectedNode={selectedNode} edges={typedEdges} />
+          <AtomInfoPanel
+            selectedNodes={selectedNodes}
+            edges={typedEdges}
+            onPreviewAtomChange={setPreviewedAtomId}
+          />
           <MoleculeReadout nodes={typedNodes} edges={typedEdges} />
           <HintBox />
         </div>

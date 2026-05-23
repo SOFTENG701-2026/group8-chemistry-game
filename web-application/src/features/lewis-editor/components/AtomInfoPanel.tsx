@@ -1,13 +1,27 @@
+import { useEffect, useState } from 'react';
 import { ELEMENTS } from '../data/elements';
 import type { BondEdgeType } from './BondEdge';
 import type { AtomNodeType } from './AtomNode';
 
 type Props = {
-  selectedNode: AtomNodeType | undefined;
+  selectedNodes: AtomNodeType[];
   edges: BondEdgeType[];
+  onPreviewAtomChange?: (atomId: string | null) => void;
 };
 
-export function AtomInfoPanel({ selectedNode, edges }: Props) {
+export function AtomInfoPanel({ selectedNodes, edges, onPreviewAtomChange }: Props) {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const selectedNode = selectedNodes[selectedIndex] ?? selectedNodes[0];
+  const hasMultiple = selectedNodes.length > 1;
+
+  useEffect(() => {
+    setSelectedIndex((current) => Math.min(current, Math.max(selectedNodes.length - 1, 0)));
+  }, [selectedNodes.length]);
+
+  useEffect(() => {
+    onPreviewAtomChange?.(selectedNode?.id ?? null);
+  }, [onPreviewAtomChange, selectedNode?.id]);
+
   if (!selectedNode) {
     return (
       <div style={containerStyle}>
@@ -29,7 +43,36 @@ export function AtomInfoPanel({ selectedNode, edges }: Props) {
 
   return (
     <div style={containerStyle}>
-      <div style={labelStyle}>Atom</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+        <div style={labelStyle}>Atom</div>
+        {hasMultiple && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+            <CycleButton
+              label="Previous atom"
+              onClick={() => setSelectedIndex((i) => (i - 1 + selectedNodes.length) % selectedNodes.length)}
+            >
+              ‹
+            </CycleButton>
+            <span
+              style={{
+                fontFamily: '"JetBrains Mono", monospace',
+                fontSize: '0.68rem',
+                color: '#4A6275',
+                minWidth: 34,
+                textAlign: 'center',
+              }}
+            >
+              {selectedIndex + 1}/{selectedNodes.length}
+            </span>
+            <CycleButton
+              label="Next atom"
+              onClick={() => setSelectedIndex((i) => (i + 1) % selectedNodes.length)}
+            >
+              ›
+            </CycleButton>
+          </div>
+        )}
+      </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
         <div
           style={{
@@ -68,6 +111,42 @@ export function AtomInfoPanel({ selectedNode, edges }: Props) {
         />
       </div>
     </div>
+  );
+}
+
+function CycleButton({
+  label,
+  onClick,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      aria-label={label}
+      onClick={onClick}
+      style={{
+        width: 22,
+        height: 22,
+        border: '1px solid rgba(26,46,59,0.22)',
+        borderRadius: '50%',
+        background: 'rgba(255,255,255,0.7)',
+        color: '#1A2E3B',
+        fontFamily: '"DM Sans", system-ui, sans-serif',
+        fontSize: '0.9rem',
+        fontWeight: 700,
+        lineHeight: 1,
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 0,
+      }}
+    >
+      {children}
+    </button>
   );
 }
 
