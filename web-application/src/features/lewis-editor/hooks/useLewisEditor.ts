@@ -5,7 +5,7 @@ import {
   addEdge,
   useReactFlow,
   type OnConnect,
-  type OnEdgeClick,
+  type EdgeMouseHandler,
   type NodeMouseHandler,
   type IsValidConnection,
 } from '@xyflow/react';
@@ -15,6 +15,14 @@ import { ELEMENTS } from '../data/elements';
 import type { BondOrder } from '@app/shared';
 
 const uid = () => Math.random().toString(36).slice(2, 9);
+const ATOM_NODE_SIZE = 44;
+
+type ScreenRect = {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+};
 
 function usedBonds(nodeId: string, edgeList: BondEdgeType[], excludeEdgeId?: string): number {
   return edgeList.reduce((sum, e) => {
@@ -60,7 +68,7 @@ export function useLewisEditor() {
     [setEdges],
   );
 
-  const cycleEdgeOrder: OnEdgeClick = useCallback(
+  const cycleEdgeOrder: EdgeMouseHandler<BondEdgeType> = useCallback(
     (_event, edge) => {
       setEdges((eds) =>
         eds.map((e) => {
@@ -106,6 +114,48 @@ export function useLewisEditor() {
 
   const deleteSelected: NodeMouseHandler = useCallback(() => {}, []);
 
+  const selectNodesInScreenRect = useCallback(
+    ({ x1, y1, x2, y2 }: ScreenRect) => {
+      const start = screenToFlowPosition({ x: Math.min(x1, x2), y: Math.min(y1, y2) });
+      const end = screenToFlowPosition({ x: Math.max(x1, x2), y: Math.max(y1, y2) });
+      const left = Math.min(start.x, end.x);
+      const right = Math.max(start.x, end.x);
+      const top = Math.min(start.y, end.y);
+      const bottom = Math.max(start.y, end.y);
+
+      const selectedNodeIds = new Set<string>();
+      for (const node of nodes as AtomNodeType[]) {
+        const width = node.measured?.width ?? node.width ?? ATOM_NODE_SIZE;
+        const height = node.measured?.height ?? node.height ?? ATOM_NODE_SIZE;
+        const nodeLeft = node.position.x;
+        const nodeRight = node.position.x + width;
+        const nodeTop = node.position.y;
+        const nodeBottom = node.position.y + height;
+        const overlaps =
+          nodeRight >= left &&
+          nodeLeft <= right &&
+          nodeBottom >= top &&
+          nodeTop <= bottom;
+
+        if (overlaps) selectedNodeIds.add(node.id);
+      }
+
+      setNodes((nds) =>
+        nds.map((node) => ({
+          ...node,
+          selected: selectedNodeIds.has(node.id),
+        })),
+      );
+      setEdges((eds) =>
+        eds.map((edge) => ({
+          ...edge,
+          selected: selectedNodeIds.has(edge.source) && selectedNodeIds.has(edge.target),
+        })),
+      );
+    },
+    [nodes, screenToFlowPosition, setEdges, setNodes],
+  );
+
   function clearAll() {
     setNodes([]);
     setEdges([]);
@@ -138,6 +188,7 @@ export function useLewisEditor() {
     clearAll,
     deleteSelectedElements,
     deleteSelected,
+    selectNodesInScreenRect,
     selectedNode,
   };
 }

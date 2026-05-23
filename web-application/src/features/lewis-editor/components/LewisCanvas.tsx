@@ -25,8 +25,17 @@ type LewisCanvasProps = {
   resetKey?: number;
 };
 
+type SelectionBox = {
+  startX: number;
+  startY: number;
+  currentX: number;
+  currentY: number;
+};
+
 export function LewisCanvas({ resetKey }: LewisCanvasProps) {
   const isFirstRender = useRef(true);
+  const canvasRef = useRef<HTMLDivElement | null>(null);
+  const [selectionBox, setSelectionBox] = useState<SelectionBox | null>(null);
   const {
     nodes,
     edges,
@@ -39,6 +48,7 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
     onDragOver,
     clearAll,
     deleteSelectedElements,
+    selectNodesInScreenRect,
     selectedNode,
   } = useLewisEditor();
 
@@ -51,6 +61,69 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
   const typedNodes = nodes as AtomNodeType[];
   const typedEdges = edges as BondEdgeType[];
   const hasSelection = nodes.some((n) => n.selected) || edges.some((e) => e.selected);
+  const selectionBoxStyle = selectionBox
+    ? {
+        left: Math.min(selectionBox.startX, selectionBox.currentX),
+        top: Math.min(selectionBox.startY, selectionBox.currentY),
+        width: Math.abs(selectionBox.currentX - selectionBox.startX),
+        height: Math.abs(selectionBox.currentY - selectionBox.startY),
+      }
+    : null;
+
+  function beginRightClickSelection(event: React.PointerEvent<HTMLDivElement>) {
+    if (event.button !== 2 || !canvasRef.current) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    canvasRef.current.setPointerCapture(event.pointerId);
+
+    const bounds = canvasRef.current.getBoundingClientRect();
+    const x = event.clientX - bounds.left;
+    const y = event.clientY - bounds.top;
+    setSelectionBox({ startX: x, startY: y, currentX: x, currentY: y });
+  }
+
+  function updateRightClickSelection(event: React.PointerEvent<HTMLDivElement>) {
+    if (!selectionBox || !canvasRef.current) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const bounds = canvasRef.current.getBoundingClientRect();
+    setSelectionBox((box) =>
+      box
+        ? {
+            ...box,
+            currentX: event.clientX - bounds.left,
+            currentY: event.clientY - bounds.top,
+          }
+        : null,
+    );
+  }
+
+  function finishRightClickSelection(event: React.PointerEvent<HTMLDivElement>) {
+    if (!selectionBox || !canvasRef.current) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    canvasRef.current.releasePointerCapture(event.pointerId);
+
+    const bounds = canvasRef.current.getBoundingClientRect();
+    const endX = event.clientX - bounds.left;
+    const endY = event.clientY - bounds.top;
+    const distance = Math.hypot(endX - selectionBox.startX, endY - selectionBox.startY);
+
+    if (distance > 4) {
+      selectNodesInScreenRect({
+        x1: bounds.left + selectionBox.startX,
+        y1: bounds.top + selectionBox.startY,
+        x2: event.clientX,
+        y2: event.clientY,
+      });
+    }
+
+    setSelectionBox(null);
+  }
 
   return (
     <>
@@ -74,8 +147,15 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
         <AtomPalette />
 
         <div
+          ref={canvasRef}
+          onPointerDownCapture={beginRightClickSelection}
+          onPointerMoveCapture={updateRightClickSelection}
+          onPointerUpCapture={finishRightClickSelection}
+          onPointerCancelCapture={() => setSelectionBox(null)}
+          onContextMenu={(event) => event.preventDefault()}
           style={{
             flex: 1,
+            position: 'relative',
             borderRadius: 12,
             overflow: 'hidden',
             border: '1.5px solid rgba(26,46,59,0.14)',
@@ -126,6 +206,19 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
               </ToolButton>
             </div>
           </ReactFlow>
+          {selectionBoxStyle && (
+            <div
+              style={{
+                position: 'absolute',
+                pointerEvents: 'none',
+                zIndex: 20,
+                border: '1.5px solid #E2603F',
+                background: 'rgba(226,96,63,0.12)',
+                borderRadius: 6,
+                ...selectionBoxStyle,
+              }}
+            />
+          )}
         </div>
 
         <div
