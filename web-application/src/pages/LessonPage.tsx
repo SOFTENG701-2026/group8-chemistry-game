@@ -211,7 +211,7 @@ function LessonControls({
 
 // ── Level 1: Cards ─────────────────────────────────────────────────────────────
 
-function Level1Exercise({ problem, level, onCorrect }: { problem: (typeof PROBLEMS)[0]; level: Level; onCorrect: () => void }) {
+function Level1Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (typeof PROBLEMS)[0]; level: Level; onCorrect: () => void; onNextLevel: () => void }) {
   const {
     pool, built, feedback, shake, hintLevel,
     assembledFormula, moveToBuild, moveToPool,
@@ -255,7 +255,7 @@ function Level1Exercise({ problem, level, onCorrect }: { problem: (typeof PROBLE
         onCheck={handleCheck}
         onReset={reset}
         onHint={giveHint}
-        onNextLevel={() => {}}
+        onNextLevel={onNextLevel}
         checkDisabled={built.length === 0}
         hintDisabled={hintLevel >= 3}
         feedback={fb}
@@ -268,7 +268,7 @@ function Level1Exercise({ problem, level, onCorrect }: { problem: (typeof PROBLE
 
 // ── Level 2: Bonds only ────────────────────────────────────────────────────────
 
-function Level2Exercise({ problem, level, onCorrect }: { problem: (typeof PROBLEMS)[0]; level: Level; onCorrect: () => void }) {
+function Level2Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (typeof PROBLEMS)[0]; level: Level; onCorrect: () => void; onNextLevel: () => void }) {
   const canvasRef = useRef<BondsOnlyCanvasHandle>(null);
   const [hintLevel, setHintLevel] = useState(0);
   const [feedback, setFeedback] = useState<Feedback>(null);
@@ -310,7 +310,7 @@ function Level2Exercise({ problem, level, onCorrect }: { problem: (typeof PROBLE
         onCheck={handleCheck}
         onReset={handleReset}
         onHint={() => setHintLevel(h => Math.min(h + 1, 3))}
-        onNextLevel={() => {}}
+        onNextLevel={onNextLevel}
         checkDisabled={false}
         hintDisabled={hintLevel >= 3}
         feedback={feedback}
@@ -322,7 +322,7 @@ function Level2Exercise({ problem, level, onCorrect }: { problem: (typeof PROBLE
 
 // ── Level 3: Free Lewis ────────────────────────────────────────────────────────
 
-function Level3Exercise({ problem, level, onCorrect }: { problem: (typeof PROBLEMS)[0]; level: Level; onCorrect: () => void }) {
+function Level3Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (typeof PROBLEMS)[0]; level: Level; onCorrect: () => void; onNextLevel: () => void }) {
   const [hintLevel, setHintLevel] = useState(0);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [shake, setShake] = useState(false);
@@ -361,7 +361,7 @@ function Level3Exercise({ problem, level, onCorrect }: { problem: (typeof PROBLE
         onCheck={handleCheck}
         onReset={handleReset}
         onHint={() => setHintLevel(h => Math.min(h + 1, 3))}
-        onNextLevel={() => {}}
+        onNextLevel={onNextLevel}
         checkDisabled={drawnName === null}
         hintDisabled={hintLevel >= 3}
         feedback={feedback}
@@ -385,10 +385,6 @@ export function LessonPage() {
 
   function goToLevel(lvl: Level) {
     navigate(`/lesson?molecule=${encodeURIComponent(moleculeName)}&level=${lvl}`);
-  }
-
-  function handleCorrect() {
-    // feedback state is managed inside each exercise; this just enables the next-level button
   }
 
   function handleNextLevel() {
@@ -452,13 +448,13 @@ export function LessonPage() {
 
             {/* Exercise */}
             {activeLevel === 1 && (
-              <Level1Exercise key={`${moleculeName}-1`} problem={problem} level={1} onCorrect={handleCorrect} />
+              <Level1Exercise key={`${moleculeName}-1`} problem={problem} level={1} onCorrect={() => {}} onNextLevel={handleNextLevel} />
             )}
             {activeLevel === 2 && (
-              <Level2Exercise key={`${moleculeName}-2`} problem={problem} level={2} onCorrect={handleCorrect} />
+              <Level2Exercise key={`${moleculeName}-2`} problem={problem} level={2} onCorrect={() => {}} onNextLevel={handleNextLevel} />
             )}
             {activeLevel === 3 && (
-              <Level3Exercise key={`${moleculeName}-3`} problem={problem} level={3} onCorrect={handleCorrect} />
+              <Level3Exercise key={`${moleculeName}-3`} problem={problem} level={3} onCorrect={() => {}} onNextLevel={handleNextLevel} />
             )}
           </>
         )}

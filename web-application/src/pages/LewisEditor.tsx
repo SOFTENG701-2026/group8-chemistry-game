@@ -1,5 +1,4 @@
 import { ReactFlowProvider } from '@xyflow/react';
-import { AppHeader } from '../components/AppHeader';
 import { LewisCanvas } from '../features/lewis-editor/components/LewisCanvas';
 
 export function LewisEditor() {

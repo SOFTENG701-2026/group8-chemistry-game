@@ -53,11 +53,8 @@ export function useChemAssembler(moleculeName: string | null = null) {
   const problem = isSandbox ? null : PROBLEMS[idx];
 
   useEffect(() => {
-    if (isSandbox) {
-      setPool(buildSandboxCards());
-    } else {
-      setPool(buildCards(idx));
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPool(isSandbox ? buildSandboxCards() : buildCards(idx));
     setBuilt([]);
     setFeedback(null);
     setHintLevel(0);

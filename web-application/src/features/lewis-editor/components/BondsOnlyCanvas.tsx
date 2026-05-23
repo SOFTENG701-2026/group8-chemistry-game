@@ -27,8 +27,6 @@ const ATOM_RADIUS = 22;
 const nodeTypes: NodeTypes = { atom: AtomNode };
 const edgeTypes: EdgeTypes = { bond: BondEdge };
 
-const uid = () => Math.random().toString(36).slice(2, 9);
-
 function usedBonds(nodeId: string, edgeList: BondEdgeType[], excludeId?: string): number {
   return edgeList.reduce((sum, e) => {
     if (e.id === excludeId) return sum;
