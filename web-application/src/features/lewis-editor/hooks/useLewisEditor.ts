@@ -88,11 +88,11 @@ export function useLewisEditor() {
     [setEdges],
   );
 
-  const cycleEdgeOrder: EdgeMouseHandler<BondEdgeType> = useCallback(
-    (_event, edge) => {
+  const toggleSelectedEdgeOrder = useCallback(
+    (edgeId: string) => {
       setEdges((eds) =>
         eds.map((e) => {
-          if (e.id !== edge.id) return e;
+          if (e.id !== edgeId) return e;
           const current: BondOrder = e.data?.order ?? 1;
           const proposed: BondOrder = current === 2 ? 1 : 2;
           // Only need to validate increases; decreasing to 1 is always safe
@@ -108,6 +108,31 @@ export function useLewisEditor() {
       );
     },
     [setEdges, nodes],
+  );
+
+  const selectOrCycleEdgeOrder: EdgeMouseHandler<BondEdgeType> = useCallback(
+    (event, edge) => {
+      event.stopPropagation();
+
+      if (edge.selected) {
+        toggleSelectedEdgeOrder(edge.id);
+        return;
+      }
+
+      setNodes((nds) =>
+        nds.map((node) => ({
+          ...node,
+          selected: false,
+        })),
+      );
+      setEdges((eds) =>
+        eds.map((e) => ({
+          ...e,
+          selected: e.id === edge.id,
+        })),
+      );
+    },
+    [setEdges, setNodes, toggleSelectedEdgeOrder],
   );
 
   const onDrop = useCallback(
@@ -227,7 +252,7 @@ export function useLewisEditor() {
     onEdgesChange,
     onConnect,
     isValidConnection,
-    cycleEdgeOrder,
+    selectOrCycleEdgeOrder,
     onDrop,
     onDragOver,
     clearAll,

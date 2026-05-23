@@ -3,6 +3,7 @@ import {
   ReactFlow,
   Background,
   BackgroundVariant,
+  MiniMap,
   ConnectionMode,
   ConnectionLineType,
   getStraightPath,
@@ -18,6 +19,7 @@ import { useLewisEditor } from '../hooks/useLewisEditor';
 import { AtomPalette } from './AtomPalette';
 import { AtomInfoPanel } from './AtomInfoPanel';
 import { MoleculeReadout } from './MoleculeReadout';
+import { ELEMENTS } from '../data/elements';
 import type { AtomNodeType } from './AtomNode';
 import type { BondEdgeType } from './BondEdge';
 
@@ -27,6 +29,15 @@ const ATOM_NODE_SIZE = 44;
 const connectionLineContainerStyle: React.CSSProperties = {
   zIndex: 0,
   pointerEvents: 'none',
+};
+const miniMapStyle: React.CSSProperties = {
+  width: 140,
+  height: 96,
+  margin: 12,
+  border: '1px solid rgba(26,46,59,0.16)',
+  borderRadius: 8,
+  boxShadow: '0 8px 24px rgba(26,46,59,0.14)',
+  overflow: 'hidden',
 };
 
 type LewisCanvasProps = {
@@ -83,6 +94,14 @@ function CenteredConnectionLine({
   );
 }
 
+function getMiniMapNodeColor(node: AtomNodeType) {
+  return ELEMENTS[node.data.element]?.bg ?? '#EFF3F6';
+}
+
+function getMiniMapNodeStrokeColor(node: AtomNodeType) {
+  return node.selected ? '#E2603F' : ELEMENTS[node.data.element]?.border ?? '#A8BEC9';
+}
+
 export function LewisCanvas({ resetKey }: LewisCanvasProps) {
   const isFirstRender = useRef(true);
   const canvasRef = useRef<HTMLDivElement | null>(null);
@@ -95,7 +114,7 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
     onEdgesChange,
     onConnect,
     isValidConnection,
-    cycleEdgeOrder,
+    selectOrCycleEdgeOrder,
     selectOnlyNode,
     onDrop,
     onDragOver,
@@ -262,7 +281,7 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
             onConnect={onConnect}
             isValidConnection={isValidConnection}
             onNodeClick={selectOnlyNode}
-            onEdgeClick={cycleEdgeOrder}
+            onEdgeClick={selectOrCycleEdgeOrder}
             onDrop={onDrop}
             onDragOver={onDragOver}
             nodeTypes={nodeTypes}
@@ -280,6 +299,21 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
               gap={24}
               size={1}
               color="rgba(26,46,59,0.1)"
+            />
+            <MiniMap<AtomNodeType>
+              ariaLabel="Lewis structure canvas preview"
+              bgColor="rgba(253,250,245,0.94)"
+              maskColor="rgba(26,46,59,0.12)"
+              maskStrokeColor="#E2603F"
+              maskStrokeWidth={1.5}
+              nodeBorderRadius={22}
+              nodeColor={getMiniMapNodeColor}
+              nodeStrokeColor={getMiniMapNodeStrokeColor}
+              nodeStrokeWidth={2}
+              offsetScale={12}
+              pannable
+              style={miniMapStyle}
+              zoomable
             />
             <div
               style={{
@@ -395,7 +429,7 @@ function HintBox() {
         <li>Drag atoms from the palette onto the canvas</li>
         <li>Start bonds from the edge of an atom</li>
         <li>Release on an atom to complete the bond</li>
-        <li>Click a bond to toggle single/double</li>
+        <li>Select a bond, then click it again to toggle single/double</li>
         <li>Right-drag to box select atoms</li>
         <li>Delete key removes selected items</li>
       </ul>
