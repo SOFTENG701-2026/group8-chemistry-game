@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import { RootLayout } from './layouts/RootLayout';
 import { Home } from './pages/Home';
 import { Lessons } from './pages/Lessons';
@@ -12,6 +12,7 @@ export default function App() {
       <Routes>
         <Route element={<RootLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/levels" element={<Navigate to="/lessons" replace />} />
           <Route path="/lessons" element={<Lessons />} />
           <Route path="/lesson" element={<LessonPage />} />
           <Route path="/sandbox" element={<ChemAssembler />} />

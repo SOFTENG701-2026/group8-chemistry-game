@@ -22,6 +22,9 @@ logs/
 *.log
 npm-debug.log*
 
+# Runtime data
+server-application/data/
+
 # OS
 .DS_Store
 Thumbs.db
