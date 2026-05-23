@@ -146,8 +146,6 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
       );
     };
 
-    const drawnCount = (edges as BondEdgeType[]).filter(e => !e.data?.isHint).length;
-
     return (
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
         <style>{`
@@ -198,9 +196,6 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
             <li>Drag a handle to another atom to bond</li>
             <li>Click a bond to toggle single/double</li>
           </ul>
-          <div style={{ marginTop: 6, color: '#1A2E3B', fontWeight: 600 }}>
-            {drawnCount} / {graph.bonds.length} bonds drawn
-          </div>
         </div>
       </div>
     );
