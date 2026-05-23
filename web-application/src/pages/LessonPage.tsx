@@ -227,6 +227,11 @@ function Level1Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
     if (ok) onCorrect();
   }
 
+  function handleReset() {
+    reset();
+    setLocalFeedback(null);
+  }
+
   const fb = (feedback ?? localFeedback) as Feedback;
 
   return (
@@ -253,7 +258,7 @@ function Level1Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
       />
       <LessonControls
         onCheck={handleCheck}
-        onReset={reset}
+        onReset={handleReset}
         onHint={giveHint}
         onNextLevel={onNextLevel}
         checkDisabled={built.length === 0}
@@ -294,6 +299,7 @@ function Level2Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
     canvasRef.current?.reset();
     setFeedback(null);
     setShake(false);
+    setHintLevel(0);
     setResetKey(k => k + 1);
   }
 
@@ -349,6 +355,7 @@ function Level3Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
     setResetKey(k => k + 1);
     setFeedback(null);
     setShake(false);
+    setHintLevel(0);
     setDrawnName(null);
   }
 
