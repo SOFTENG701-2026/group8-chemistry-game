@@ -5,7 +5,7 @@ import {
   addEdge,
   useReactFlow,
   type OnConnect,
-  type OnEdgeClick,
+  type EdgeMouseHandler,
   type NodeMouseHandler,
   type IsValidConnection,
 } from '@xyflow/react';
@@ -15,6 +15,19 @@ import { ELEMENTS } from '../data/elements';
 import type { BondOrder } from '@app/shared';
 
 const uid = () => Math.random().toString(36).slice(2, 9);
+const ATOM_NODE_SIZE = 44;
+
+type ScreenRect = {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+};
+
+type DragOffset = {
+  x: number;
+  y: number;
+};
 
 function usedBonds(nodeId: string, edgeList: BondEdgeType[], excludeEdgeId?: string): number {
   return edgeList.reduce((sum, e) => {
@@ -28,6 +41,21 @@ function valenceOf(nodeId: string, nodeList: AtomNodeType[]): number {
   const node = nodeList.find((n) => n.id === nodeId);
   const element = node?.data.element;
   return element ? (ELEMENTS[element]?.valence ?? Infinity) : Infinity;
+}
+
+function getDragOffset(event: React.DragEvent<HTMLDivElement>): DragOffset {
+  try {
+    const rawOffset = event.dataTransfer.getData('application/lewis-atom-offset');
+    if (!rawOffset) throw new Error('Missing atom drag offset');
+    const offset = JSON.parse(rawOffset) as Partial<DragOffset>;
+
+    return {
+      x: typeof offset.x === 'number' ? offset.x : ATOM_NODE_SIZE / 2,
+      y: typeof offset.y === 'number' ? offset.y : ATOM_NODE_SIZE / 2,
+    };
+  } catch {
+    return { x: ATOM_NODE_SIZE / 2, y: ATOM_NODE_SIZE / 2 };
+  }
 }
 
 export function useLewisEditor() {
@@ -60,11 +88,11 @@ export function useLewisEditor() {
     [setEdges],
   );
 
-  const cycleEdgeOrder: OnEdgeClick = useCallback(
-    (_event, edge) => {
+  const toggleSelectedEdgeOrder = useCallback(
+    (edgeId: string) => {
       setEdges((eds) =>
         eds.map((e) => {
-          if (e.id !== edge.id) return e;
+          if (e.id !== edgeId) return e;
           const current: BondOrder = e.data?.order ?? 1;
           const proposed: BondOrder = current === 2 ? 1 : 2;
           // Only need to validate increases; decreasing to 1 is always safe
@@ -82,12 +110,41 @@ export function useLewisEditor() {
     [setEdges, nodes],
   );
 
+  const selectOrCycleEdgeOrder: EdgeMouseHandler<BondEdgeType> = useCallback(
+    (event, edge) => {
+      event.stopPropagation();
+
+      if (edge.selected) {
+        toggleSelectedEdgeOrder(edge.id);
+        return;
+      }
+
+      setNodes((nds) =>
+        nds.map((node) => ({
+          ...node,
+          selected: false,
+        })),
+      );
+      setEdges((eds) =>
+        eds.map((e) => ({
+          ...e,
+          selected: e.id === edge.id,
+        })),
+      );
+    },
+    [setEdges, setNodes, toggleSelectedEdgeOrder],
+  );
+
   const onDrop = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault();
       const element = event.dataTransfer.getData('application/lewis-atom');
       if (!element) return;
-      const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+      const offset = getDragOffset(event);
+      const position = screenToFlowPosition({
+        x: event.clientX - offset.x,
+        y: event.clientY - offset.y,
+      });
       const newNode: AtomNodeType = {
         id: uid(),
         type: 'atom',
@@ -106,6 +163,69 @@ export function useLewisEditor() {
 
   const deleteSelected: NodeMouseHandler = useCallback(() => {}, []);
 
+  const selectOnlyNode: NodeMouseHandler<AtomNodeType> = useCallback(
+    (_event, clickedNode) => {
+      const selectedCount = nodes.filter((node) => node.selected).length;
+      if (selectedCount <= 1 || !clickedNode.selected) return;
+
+      setNodes((nds) =>
+        nds.map((node) => ({
+          ...node,
+          selected: node.id === clickedNode.id,
+        })),
+      );
+      setEdges((eds) =>
+        eds.map((edge) => ({
+          ...edge,
+          selected: false,
+        })),
+      );
+    },
+    [nodes, setEdges, setNodes],
+  );
+
+  const selectNodesInScreenRect = useCallback(
+    ({ x1, y1, x2, y2 }: ScreenRect) => {
+      const start = screenToFlowPosition({ x: Math.min(x1, x2), y: Math.min(y1, y2) });
+      const end = screenToFlowPosition({ x: Math.max(x1, x2), y: Math.max(y1, y2) });
+      const left = Math.min(start.x, end.x);
+      const right = Math.max(start.x, end.x);
+      const top = Math.min(start.y, end.y);
+      const bottom = Math.max(start.y, end.y);
+
+      const selectedNodeIds = new Set<string>();
+      for (const node of nodes as AtomNodeType[]) {
+        const width = node.measured?.width ?? node.width ?? ATOM_NODE_SIZE;
+        const height = node.measured?.height ?? node.height ?? ATOM_NODE_SIZE;
+        const nodeLeft = node.position.x;
+        const nodeRight = node.position.x + width;
+        const nodeTop = node.position.y;
+        const nodeBottom = node.position.y + height;
+        const overlaps =
+          nodeRight >= left &&
+          nodeLeft <= right &&
+          nodeBottom >= top &&
+          nodeTop <= bottom;
+
+        if (overlaps) selectedNodeIds.add(node.id);
+      }
+
+      setNodes((nds) =>
+        nds.map((node) => ({
+          ...node,
+          selected: selectedNodeIds.has(node.id),
+        })),
+      );
+      setEdges((eds) =>
+        eds.map((edge) => ({
+          ...edge,
+          selected: selectedNodeIds.has(edge.source) && selectedNodeIds.has(edge.target),
+        })),
+      );
+    },
+    [nodes, screenToFlowPosition, setEdges, setNodes],
+  );
+
   function clearAll() {
     setNodes([]);
     setEdges([]);
@@ -123,7 +243,7 @@ export function useLewisEditor() {
     });
   }
 
-  const selectedNode = nodes.find((n) => n.selected) as AtomNodeType | undefined;
+  const selectedNodes = nodes.filter((n) => n.selected) as AtomNodeType[];
 
   return {
     nodes,
@@ -132,12 +252,14 @@ export function useLewisEditor() {
     onEdgesChange,
     onConnect,
     isValidConnection,
-    cycleEdgeOrder,
+    selectOrCycleEdgeOrder,
     onDrop,
     onDragOver,
     clearAll,
     deleteSelectedElements,
     deleteSelected,
-    selectedNode,
+    selectOnlyNode,
+    selectNodesInScreenRect,
+    selectedNodes,
   };
 }
