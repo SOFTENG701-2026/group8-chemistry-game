@@ -8,7 +8,7 @@ import {
   FAMILY_LABEL,
   FILTER_CHIP_LABEL,
   getPrimaryFamily,
-  levelData,
+  lessonGroupData,
 } from '../features/chem-assembler/data/lessonLibrary';
 import {
   completeMasteries,
@@ -22,18 +22,19 @@ type FilterValue = 'all' | FamilyName | 'unsolved';
 
 const MASTERED_BUILDS = 3;
 
-function getBuildCount(progress: ProgressStore | null, molecule: string) {
-  return Math.min(progress?.molecules[molecule]?.successfulBuilds ?? 0, MASTERED_BUILDS);
-}
-
-function getStatusLabel(builds: number) {
-  if (builds >= MASTERED_BUILDS) return 'Mastered';
-  if (builds > 0) return 'In progress';
-  return 'Not mastered';
+function getLevelBuilds(progress: ProgressStore | null, molecule: string, level: 1 | 2 | 3): number {
+  const m = progress?.molecules[molecule];
+  if (!m) return 0;
+  const key = `level${level}Builds` as const;
+  return Math.min(m[key] ?? 0, MASTERED_BUILDS);
 }
 
 function isMastered(progress: ProgressStore | null, molecule: string) {
-  return getBuildCount(progress, molecule) >= MASTERED_BUILDS;
+  return (
+    getLevelBuilds(progress, molecule, 1) >= MASTERED_BUILDS &&
+    getLevelBuilds(progress, molecule, 2) >= MASTERED_BUILDS &&
+    getLevelBuilds(progress, molecule, 3) >= MASTERED_BUILDS
+  );
 }
 
 function MasteryBadge({
@@ -118,49 +119,49 @@ function MasteryBadge({
   );
 }
 
-function ProgressBar({ builds }: { builds: number }) {
-  const ratio = Math.min(builds / MASTERED_BUILDS, 1);
-  const color = builds >= MASTERED_BUILDS ? '#3C8D6A' : builds > 0 ? '#E2603F' : '#C9C5BB';
+const LEVEL_LABELS = ['L1', 'L2', 'L3'] as const;
 
+function LevelPips({ level1, level2, level3 }: { level1: number; level2: number; level3: number }) {
+  const counts = [level1, level2, level3];
   return (
-    <div style={{ display: 'grid', gap: 6 }}>
-      <div
-        aria-label={`${builds} of ${MASTERED_BUILDS} successful builds`}
-        style={{
-          height: 8,
-          borderRadius: 999,
-          background: '#EEE9DF',
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          style={{
-            width: `${ratio * 100}%`,
-            height: '100%',
-            background: color,
-            transition: 'width 0.2s ease',
-          }}
-        />
-      </div>
-      <Group justify="space-between" gap={8}>
-        <Text style={{ fontSize: 11, color: '#4A6275', fontFamily: '"DM Sans", system-ui, sans-serif' }}>
-          {getStatusLabel(builds)}
-        </Text>
-        <Text style={{ fontSize: 11, color: '#4A6275', fontFamily: '"DM Sans", system-ui, sans-serif' }}>
-          {builds}/{MASTERED_BUILDS}
-        </Text>
-      </Group>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+      {counts.map((builds, i) => {
+        const label = LEVEL_LABELS[i];
+        const color = builds >= MASTERED_BUILDS ? '#3C8D6A' : builds > 0 ? '#E2603F' : '#C9C5BB';
+        const ratio = Math.min(builds / MASTERED_BUILDS, 1);
+        return (
+          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{
+              fontFamily: '"DM Sans", system-ui, sans-serif',
+              fontSize: 10,
+              fontWeight: 700,
+              color: '#4A6275',
+              width: 14,
+              flexShrink: 0,
+            }}>
+              {label}
+            </span>
+            <div style={{ flex: 1, height: 6, borderRadius: 999, background: '#EEE9DF', overflow: 'hidden' }}>
+              <div style={{ width: `${ratio * 100}%`, height: '100%', background: color, transition: 'width 0.2s ease' }} />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
 function MoleculeProgressCard({
   molecule,
-  builds,
+  level1Builds,
+  level2Builds,
+  level3Builds,
   onClick,
 }: {
   molecule: string;
-  builds: number;
+  level1Builds: number;
+  level2Builds: number;
+  level3Builds: number;
   onClick: () => void;
 }) {
   const problem = PROBLEMS.find(p => p.name === molecule);
@@ -249,7 +250,7 @@ function MoleculeProgressCard({
         </Group>
       )}
 
-      <ProgressBar builds={builds} />
+      <LevelPips level1={level1Builds} level2={level2Builds} level3={level3Builds} />
     </div>
   );
 }
@@ -262,7 +263,7 @@ export function Progress() {
   const [debugActionPending, setDebugActionPending] = useState(false);
   const navigate = useNavigate();
 
-  const allMolecules = useMemo(() => levelData.flatMap(l => l.molecules), []);
+  const allMolecules = useMemo(() => lessonGroupData.flatMap(l => l.molecules), []);
   const presentFamilies = useMemo<FamilyName[]>(() => {
     const families = new Set<FamilyName>();
     allMolecules.forEach(m => families.add(getPrimaryFamily(m)));
@@ -280,14 +281,21 @@ export function Progress() {
 
   function shouldShow(molecule: string): boolean {
     if (activeFilter === 'all') return true;
-    if (activeFilter === 'unsolved') return getBuildCount(progress, molecule) === 0;
+    if (activeFilter === 'unsolved') return (
+      getLevelBuilds(progress, molecule, 1) === 0 &&
+      getLevelBuilds(progress, molecule, 2) === 0 &&
+      getLevelBuilds(progress, molecule, 3) === 0
+    );
     return getPrimaryFamily(molecule) === activeFilter;
   }
 
   const visibleMolecules = allMolecules.filter(shouldShow);
-  const totalBuilds = visibleMolecules.reduce((sum, molecule) => sum + getBuildCount(progress, molecule), 0);
-  const possibleBuilds = visibleMolecules.length * MASTERED_BUILDS;
   const masteredCount = visibleMolecules.filter(molecule => isMastered(progress, molecule)).length;
+  const totalBuilds = visibleMolecules.reduce(
+    (sum, molecule) => sum + getLevelBuilds(progress, molecule, 1) + getLevelBuilds(progress, molecule, 2) + getLevelBuilds(progress, molecule, 3),
+    0,
+  );
+  const possibleBuilds = visibleMolecules.length * MASTERED_BUILDS * 3;
   const completion = possibleBuilds === 0 ? 0 : totalBuilds / possibleBuilds;
   const globalProgressColor = completion >= 1 ? '#3C8D6A' : '#E2603F';
   const ultimateUnlocked = allMolecules.every(molecule => isMastered(progress, molecule));
@@ -556,12 +564,12 @@ export function Progress() {
           </Text>
         )}
 
-        {levelData.map(level => {
+        {lessonGroupData.map(level => {
           const visible = level.molecules.filter(shouldShow);
           if (visible.length === 0) return null;
 
           return (
-            <section key={level.levelId} style={{ marginBottom: 56 }}>
+            <section key={level.groupId} style={{ marginBottom: 56 }}>
               <Group justify="space-between" align="baseline" mb={16}>
                 <Text style={{
                   fontSize: 11,
@@ -591,8 +599,10 @@ export function Progress() {
                   <MoleculeProgressCard
                     key={molecule}
                     molecule={molecule}
-                    builds={getBuildCount(progress, molecule)}
-                    onClick={() => navigate(`/sandbox?molecule=${encodeURIComponent(molecule)}`)}
+                    level1Builds={getLevelBuilds(progress, molecule, 1)}
+                    level2Builds={getLevelBuilds(progress, molecule, 2)}
+                    level3Builds={getLevelBuilds(progress, molecule, 3)}
+                    onClick={() => navigate(`/lesson?molecule=${encodeURIComponent(molecule)}`)}
                   />
                 ))}
               </div>

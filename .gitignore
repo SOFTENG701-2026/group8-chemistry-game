@@ -22,6 +22,9 @@ logs/
 *.log
 npm-debug.log*
 
+# Runtime data
+server-application/data/
+
 # OS
 .DS_Store
 Thumbs.db
@@ -34,3 +37,5 @@ Thumbs.db
 *.njsproj
 *.sln
 local
+
+**/progress.json

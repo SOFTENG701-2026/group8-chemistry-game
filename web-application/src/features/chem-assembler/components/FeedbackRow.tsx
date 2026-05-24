@@ -2,7 +2,7 @@ import type { Feedback } from '../types';
 
 type FeedbackRowProps = {
   feedback: Feedback;
-  onNext: () => void;
+  onNext?: () => void;
 };
 
 export function FeedbackRow({ feedback, onNext }: FeedbackRowProps) {
@@ -35,7 +35,7 @@ export function FeedbackRow({ feedback, onNext }: FeedbackRowProps) {
             : 'Check the order or the functional groups.'}
         </span>
       </div>
-      {feedback === 'right' && (
+      {feedback === 'right' && onNext && (
         <button
           onClick={onNext}
           style={{

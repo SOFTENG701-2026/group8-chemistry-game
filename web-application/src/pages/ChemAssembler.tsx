@@ -10,6 +10,7 @@ import { Controls } from '../features/chem-assembler/components/Controls';
 import { Legend } from '../features/chem-assembler/components/Legend';
 import { LewisCanvas } from '../features/lewis-editor/components/LewisCanvas';
 import { PROBLEMS } from '../features/chem-assembler/data/problems';
+
 function MoleculeReadoutPanel({ moleculeName }: { moleculeName: string | null }) {
   const isKnown = moleculeName !== null;
 
@@ -162,7 +163,6 @@ export function ChemAssembler() {
 
         {!isSandbox && problem && <PromptCard problem={problem} idx={idx} hintLevel={hintLevel} />}
 
-        {/* Mode toggle */}
         <div style={{ display: 'flex', gap: 6, marginTop: 16 }}>
           {(['cards', 'lewis'] as const).map((m) => {
             const active = (m === 'lewis') === lewisMode;

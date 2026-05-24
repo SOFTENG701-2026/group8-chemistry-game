@@ -6,8 +6,9 @@ export const PROBLEMS: Problem[] = [
     name: 'Methane',
     sub: 'simplest hydrocarbon',
     formula: 'CH₄',
-    correct: ['CH4'],
-    extras: ['CH3-', 'H-'],
+    correct: ['CH3-', '-H'],
+    extras: ['-CH3', 'H-'],
+    symmetric: true,
   },
   {
     name: 'Ethane',
@@ -39,6 +40,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃OH',
     correct: ['CH3-', '-OH'],
     extras: ['-CH2-', '-NH2'],
+    symmetric: true,
   },
   {
     name: 'Ethanol',
@@ -46,6 +48,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃CH₂OH',
     correct: ['CH3-', '-CH2-', '-OH'],
     extras: ['-CHO', '-COOH'],
+    symmetric: true,
   },
   {
     name: 'Propan-1-ol',
@@ -53,6 +56,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃CH₂CH₂OH',
     correct: ['CH3-', '-CH2-', '-CH2-', '-OH'],
     extras: ['-CH(OH)-', '-NH2'],
+    symmetric: true,
   },
   {
     name: 'Ethene',
@@ -68,6 +72,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'C₃H₆',
     correct: ['CH2=', '=CH-', '-CH3'],
     extras: ['-CH2-', '-OH'],
+    symmetric: true,
   },
   {
     name: 'Chloroethane',
@@ -75,6 +80,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃CH₂Cl',
     correct: ['CH3-', '-CH2-', '-Cl'],
     extras: ['-OH', '-NH2'],
+    symmetric: true,
   },
 
   // Level 2: Branching & New Groups
@@ -84,6 +90,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃COOH',
     correct: ['CH3-', '-COOH'],
     extras: ['-OH', '-CHO'],
+    symmetric: true,
   },
   {
     name: 'Propanoic Acid',
@@ -91,6 +98,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃CH₂COOH',
     correct: ['CH3-', '-CH2-', '-COOH'],
     extras: ['-OH', '-CHO'],
+    symmetric: true,
   },
   {
     name: 'Ethanamine',
@@ -98,6 +106,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃CH₂NH₂',
     correct: ['CH3-', '-CH2-', '-NH2'],
     extras: ['-OH', '-Cl'],
+    symmetric: true,
   },
   {
     name: 'Propan-1-amine',
@@ -105,6 +114,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃CH₂CH₂NH₂',
     correct: ['CH3-', '-CH2-', '-CH2-', '-NH2'],
     extras: ['-OH', '-COOH'],
+    symmetric: true,
   },
   {
     name: '2-methylpropane',
@@ -128,6 +138,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃CH(OH)CH₂CH₃',
     correct: ['CH3-', '-CH(OH)-', '-CH2-', '-CH3'],
     extras: ['-CH2-', '-OH'],
+    symmetric: true,
   },
   {
     name: '1-chloropropane',
@@ -135,6 +146,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃CH₂CH₂Cl',
     correct: ['CH3-', '-CH2-', '-CH2-', '-Cl'],
     extras: ['-CH(Cl)-', '-OH'],
+    symmetric: true,
   },
   {
     name: '2-chloropropane',
@@ -160,6 +172,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃COOCH₃',
     correct: ['CH3-', '-COO-', '-CH3'],
     extras: ['-CH2-', '-O-'],
+    symmetric: true,
   },
   {
     name: 'Ethyl ethanoate',
@@ -167,6 +180,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃COOCH₂CH₃',
     correct: ['CH3-', '-COO-', '-CH2-', '-CH3'],
     extras: ['-OH', '-CO-'],
+    symmetric: true,
   },
   {
     name: 'Propyl methanoate',
@@ -174,6 +188,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'HCOOCH₂CH₂CH₃',
     correct: ['H-COO-', '-CH2-', '-CH2-', '-CH3'],
     extras: ['CH3-', '-COO-'],
+    symmetric: true,
   },
   {
     name: 'Butyl ethanoate',
@@ -181,6 +196,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃COOCH₂CH₂CH₂CH₃',
     correct: ['CH3-', '-COO-', '-CH2-', '-CH2-', '-CH2-', '-CH3'],
     extras: ['-OH', '-O-'],
+    symmetric: true,
   },
   {
     name: 'Propanamide',
@@ -188,6 +204,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃CH₂CONH₂',
     correct: ['CH3-', '-CH2-', '-CONH2'],
     extras: ['-COOH', '-NH2'],
+    symmetric: true,
   },
   {
     name: 'Ethanoyl chloride',
@@ -195,6 +212,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃COCl',
     correct: ['CH3-', '-COCl'],
     extras: ['-COOH', '-Cl'],
+    symmetric: true,
   },
   {
     name: 'Ethan-1,2-diol',
@@ -210,6 +228,7 @@ export const PROBLEMS: Problem[] = [
     formula: '(CH₃)₃CCl',
     correct: ['(CH3)3C-', '-Cl'],
     extras: ['CH3-', '-CH(Cl)-'],
+    symmetric: true,
   },
   {
     name: '2-hydroxypropanoic acid (Lactic Acid)',
@@ -217,6 +236,7 @@ export const PROBLEMS: Problem[] = [
     formula: 'CH₃CH(OH)COOH',
     correct: ['CH3-', '-CH(OH)-', '-COOH'],
     extras: ['-CH2-', '-OH'],
+    symmetric: true,
   },
   {
     name: 'Glycine (Amino Acid)',
@@ -224,5 +244,6 @@ export const PROBLEMS: Problem[] = [
     formula: 'NH₂CH₂COOH',
     correct: ['NH2-', '-CH2-', '-COOH'],
     extras: ['CH3-', '-OH'],
+    symmetric: true,
   },
 ];

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { IconMaximize, IconMinimize } from '@tabler/icons-react';
 import {
   ReactFlow,
@@ -20,6 +20,8 @@ import { useLewisEditor } from '../hooks/useLewisEditor';
 import { AtomPalette } from './AtomPalette';
 import { AtomInfoPanel } from './AtomInfoPanel';
 import { MoleculeReadout } from './MoleculeReadout';
+import { hillFormula, isConnected, allValencesSatisfied } from '../utils/moleculeUtils';
+import { FORMULA_TO_NAME } from '../data/elements';
 import type { AtomNodeType } from './AtomNode';
 import type { BondEdgeType } from './BondEdge';
 
@@ -33,6 +35,7 @@ const connectionLineContainerStyle: React.CSSProperties = {
 
 type LewisCanvasProps = {
   resetKey?: number;
+  onMoleculeChange?: (name: string | null) => void;
 };
 
 type SelectionBox = {
@@ -93,7 +96,7 @@ function CenteredConnectionLine({
   );
 }
 
-export function LewisCanvas({ resetKey }: LewisCanvasProps) {
+export function LewisCanvas({ resetKey, onMoleculeChange }: LewisCanvasProps) {
   const isFirstRender = useRef(true);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const paletteColumnRef = useRef<HTMLDivElement | null>(null);
@@ -278,6 +281,18 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
 
   const typedNodes = nodes as AtomNodeType[];
   const typedEdges = edges as BondEdgeType[];
+
+  const derivedName = useMemo(() => {
+    if (typedNodes.length === 0) return null;
+    if (!isConnected(typedNodes, typedEdges)) return null;
+    if (!allValencesSatisfied(typedNodes, typedEdges)) return null;
+    return FORMULA_TO_NAME[hillFormula(typedNodes)] ?? null;
+  }, [typedNodes, typedEdges]);
+
+  useEffect(() => {
+    onMoleculeChange?.(derivedName);
+  }, [derivedName, onMoleculeChange]);
+
   const displayNodes = typedNodes.map((node) => ({
     ...node,
     data: {

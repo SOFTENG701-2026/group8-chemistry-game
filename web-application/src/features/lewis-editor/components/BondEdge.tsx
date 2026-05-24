@@ -1,7 +1,7 @@
 import { useNodes, getStraightPath, type EdgeProps, type Edge } from '@xyflow/react';
 import type { BondOrder } from '@app/shared';
 
-export type BondEdgeData = { order: BondOrder };
+export type BondEdgeData = { order: BondOrder; isHint?: boolean };
 export type BondEdgeType = Edge<BondEdgeData, 'bond'>;
 
 const ATOM_RADIUS = 22; // half of the 44px atom node diameter
@@ -21,11 +21,31 @@ export function BondEdge({ id, source, target, data, selected }: EdgeProps<BondE
   const ty = targetNode.position.y + ATOM_RADIUS;
 
   const order: BondOrder = data?.order ?? 1;
+  const isHint = data?.isHint ?? false;
+
+  const [centerPath] = getStraightPath({ sourceX: sx, sourceY: sy, targetX: tx, targetY: ty });
+
+  if (isHint) {
+    return (
+      <g style={{ pointerEvents: 'none' }}>
+        <path
+          d={centerPath}
+          fill="none"
+          stroke="#E2603F"
+          strokeWidth={4}
+          strokeLinecap="round"
+          strokeDasharray="8 5"
+          opacity={0.85}
+          style={{ animation: 'hintPulse 0.9s ease-in-out infinite alternate' }}
+        />
+        <style>{`@keyframes hintPulse { from { opacity: 0.4 } to { opacity: 1 } }`}</style>
+      </g>
+    );
+  }
 
   const dx = tx - sx;
   const dy = ty - sy;
   const len = Math.sqrt(dx * dx + dy * dy) || 1;
-  // Perpendicular unit vector for parallel-line offsets
   const px = (-dy / len) * 5;
   const py = (dx / len) * 5;
 
@@ -33,11 +53,9 @@ export function BondEdge({ id, source, target, data, selected }: EdgeProps<BondE
     order === 1 ? [0] : order === 2 ? [-0.5, 0.5] : [-1, 0, 1];
 
   const stroke = selected ? '#E2603F' : '#1A2E3B';
-  const [centerPath] = getStraightPath({ sourceX: sx, sourceY: sy, targetX: tx, targetY: ty });
 
   return (
     <g>
-      {/* Wide invisible path for click detection */}
       <path
         id={`${id}-hit`}
         d={centerPath}

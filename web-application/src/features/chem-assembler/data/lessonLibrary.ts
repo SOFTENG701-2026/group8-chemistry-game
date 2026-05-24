@@ -2,9 +2,9 @@ import { PROBLEMS } from './problems';
 import { CARD_DEF } from './cards';
 import type { FamilyName } from '../types';
 
-export const levelData = [
+export const lessonGroupData = [
   {
-    levelId: 1,
+    groupId: 1,
     title: 'The Basics',
     molecules: [
       'Methane', 'Ethane', 'Propane', 'Butane',
@@ -13,7 +13,7 @@ export const levelData = [
     ],
   },
   {
-    levelId: 2,
+    groupId: 2,
     title: 'Branching & New Groups',
     molecules: [
       'Ethanoic Acid', 'Propanoic Acid', 'Ethanamine', 'Propan-1-amine',
@@ -22,7 +22,7 @@ export const levelData = [
     ],
   },
   {
-    levelId: 3,
+    groupId: 3,
     title: 'Esters & Complex Chains',
     molecules: [
       'Methyl ethanoate', 'Ethyl ethanoate', 'Propyl methanoate', 'Butyl ethanoate',
@@ -75,5 +75,5 @@ export function getPrimaryFamily(moleculeName: string): FamilyName {
 }
 
 export function getAllLessonMolecules() {
-  return levelData.flatMap(level => level.molecules);
+  return lessonGroupData.flatMap(level => level.molecules);
 }

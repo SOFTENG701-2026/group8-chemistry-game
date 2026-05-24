@@ -17,7 +17,7 @@ export function AtomPalette() {
   return (
     <div
       style={{
-        width: 72,
+        width: 96,
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
@@ -27,6 +27,8 @@ export function AtomPalette() {
         border: '1.5px solid rgba(26,46,59,0.14)',
         borderRadius: 12,
         alignSelf: 'flex-start',
+        maxHeight: '100%',
+        overflowY: 'auto',
       }}
     >
       <div

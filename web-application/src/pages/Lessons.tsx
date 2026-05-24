@@ -8,7 +8,7 @@ import {
   FAMILY_LABEL,
   FILTER_CHIP_LABEL,
   getPrimaryFamily,
-  levelData,
+  lessonGroupData,
 } from '../features/chem-assembler/data/lessonLibrary';
 import type { FamilyName } from '../features/chem-assembler/types';
 
@@ -38,7 +38,6 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
         transition: 'box-shadow 0.15s ease',
       }}
     >
-      {/* Category */}
       <Group gap={6} mb={4}>
         <div style={{
           width: 8,
@@ -59,7 +58,6 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
         </Text>
       </Group>
 
-      {/* Name */}
       <Text style={{
         fontFamily: '"Fraunces", Georgia, serif',
         fontWeight: 600,
@@ -70,7 +68,6 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
         {molecule}
       </Text>
 
-      {/* Formula */}
       {problem && (
         <Text style={{
           fontFamily: "'JetBrains Mono', monospace",
@@ -82,7 +79,6 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
         </Text>
       )}
 
-      {/* Piece squares + count */}
       {problem && (
         <Group gap={4} mt="auto" pt={10} align="center">
           {problem.correct.map((cardId, i) => {
@@ -117,11 +113,11 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
   );
 }
 
-export function Levels() {
+export function Lessons() {
   const [activeFilter, setActiveFilter] = useState<FilterValue>('all');
   const navigate = useNavigate();
 
-  const allMolecules = levelData.flatMap(l => l.molecules);
+  const allMolecules = lessonGroupData.flatMap(l => l.molecules);
   const totalCount = allMolecules.length;
 
   const presentFamilies = useMemo<FamilyName[]>(() => {
@@ -152,7 +148,6 @@ export function Levels() {
   return (
     <div style={{ paddingBottom: '60px' }}>
       <Container size="xl">
-        {/* Page header */}
         <Text style={{
           color: '#E2603F',
           fontSize: 11,
@@ -177,7 +172,6 @@ export function Levels() {
           {totalCount} molecules, ordered by difficulty.
         </Text>
 
-        {/* Filter chips */}
         <Flex gap={8} mb={48} wrap="wrap" align="center">
           <button style={chipStyle(activeFilter === 'all')} onClick={() => setActiveFilter('all')}>
             All
@@ -196,13 +190,12 @@ export function Levels() {
           </button>
         </Flex>
 
-        {/* Level sections */}
-        {levelData.map(level => {
-          const visible = level.molecules.filter(shouldShow);
+        {lessonGroupData.map(group => {
+          const visible = group.molecules.filter(shouldShow);
           if (visible.length === 0) return null;
 
           return (
-            <section key={level.levelId} style={{ marginBottom: 56 }}>
+            <section key={group.groupId} style={{ marginBottom: 56 }}>
               <Group justify="space-between" align="baseline" mb={16}>
                 <Text style={{
                   fontSize: 11,
@@ -212,7 +205,7 @@ export function Levels() {
                   color: '#4A6275',
                   fontFamily: '"DM Sans", system-ui, sans-serif',
                 }}>
-                  {level.title}
+                  {group.title}
                 </Text>
                 <Text style={{
                   fontSize: 12,
@@ -232,7 +225,7 @@ export function Levels() {
                   <MoleculeCard
                     key={molecule}
                     molecule={molecule}
-                    onClick={() => navigate(`/sandbox?molecule=${encodeURIComponent(molecule)}`)}
+                    onClick={() => navigate(`/lesson?molecule=${encodeURIComponent(molecule)}`)}
                   />
                 ))}
               </div>

@@ -1,5 +1,7 @@
 export type MoleculeProgress = {
-  successfulBuilds: number;
+  level1Builds: number;
+  level2Builds: number;
+  level3Builds: number;
   updatedAt: string | null;
 };
 
@@ -13,8 +15,8 @@ export async function fetchProgress(): Promise<ProgressStore> {
   return response.json();
 }
 
-export async function recordSuccessfulBuild(moleculeName: string): Promise<MoleculeProgress> {
-  const response = await fetch(`/api/progress/${encodeURIComponent(moleculeName)}/builds`, {
+export async function recordSuccessfulBuild(moleculeName: string, level: 1 | 2 | 3 = 1): Promise<MoleculeProgress> {
+  const response = await fetch(`/api/progress/${encodeURIComponent(moleculeName)}/builds?level=${level}`, {
     method: 'POST',
   });
   if (!response.ok) throw new Error('Unable to save progress');
