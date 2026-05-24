@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { DragEvent } from 'react';
+import { useSearchParams } from 'react-router';
 import type { CardInstance, Feedback, DragSource } from '../types';
 import { PROBLEMS } from '../data/problems';
 import { CARD_DEF } from '../data/cards';
@@ -36,8 +37,10 @@ function buildSandboxCards(): CardInstance[] {
   return Object.keys(CARD_DEF).map(k => ({ key: k, instanceId: uid() }));
 }
 
-export function useChemAssembler(moleculeName: string | null = null) {
-  const foundIdx = moleculeName ? PROBLEMS.findIndex(p => p.name === moleculeName) : -1;
+export function useChemAssembler(moleculeName?: string | null) {
+  const [searchParams] = useSearchParams();
+  const moleculeQuery = moleculeName === undefined ? searchParams.get('molecule') : moleculeName;
+  const foundIdx = moleculeQuery ? PROBLEMS.findIndex(p => p.name === moleculeQuery) : -1;
   const isSandbox = foundIdx === -1;
 
   const [idx, setIdx] = useState(isSandbox ? 0 : foundIdx);
@@ -59,6 +62,12 @@ export function useChemAssembler(moleculeName: string | null = null) {
     setFeedback(null);
     setHintLevel(0);
   }, [idx, isSandbox, resetKey]);
+
+  useEffect(() => {
+    if (!isSandbox && foundIdx !== -1) {
+      setIdx(foundIdx);
+    }
+  }, [foundIdx, isSandbox]);
 
   function moveToBuild(instanceId: string) {
     const card = pool.find((c) => c.instanceId === instanceId);

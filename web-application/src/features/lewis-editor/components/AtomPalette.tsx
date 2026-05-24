@@ -2,7 +2,15 @@ import { ELEMENTS, PALETTE_ELEMENTS } from '../data/elements';
 
 export function AtomPalette() {
   function onDragStart(event: React.DragEvent<HTMLDivElement>, element: string) {
+    const bounds = event.currentTarget.getBoundingClientRect();
     event.dataTransfer.setData('application/lewis-atom', element);
+    event.dataTransfer.setData(
+      'application/lewis-atom-offset',
+      JSON.stringify({
+        x: event.clientX - bounds.left,
+        y: event.clientY - bounds.top,
+      }),
+    );
     event.dataTransfer.effectAllowed = 'move';
   }
 
