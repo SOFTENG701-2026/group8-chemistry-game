@@ -140,6 +140,10 @@ export function MoleculeReadout({ nodes, edges }: Props) {
     if (selectedSummary) setLastSummary(selectedSummary);
   }, [selectedSummary]);
 
+  useEffect(() => {
+    if (nodes.length === 0) setLastSummary(null);
+  }, [nodes.length]);
+
   const summary = selectedSummary ?? lastSummary ?? summarizeMolecule([], []);
 
   return (
