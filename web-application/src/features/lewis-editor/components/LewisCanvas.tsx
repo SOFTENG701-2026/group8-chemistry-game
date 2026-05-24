@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { IconMaximize, IconMinimize } from '@tabler/icons-react';
 import {
   ReactFlow,
   Background,
   BackgroundVariant,
-  MiniMap,
+  useReactFlow,
   ConnectionMode,
   ConnectionLineType,
   getStraightPath,
@@ -19,7 +20,6 @@ import { useLewisEditor } from '../hooks/useLewisEditor';
 import { AtomPalette } from './AtomPalette';
 import { AtomInfoPanel } from './AtomInfoPanel';
 import { MoleculeReadout } from './MoleculeReadout';
-import { ELEMENTS } from '../data/elements';
 import type { AtomNodeType } from './AtomNode';
 import type { BondEdgeType } from './BondEdge';
 
@@ -29,15 +29,6 @@ const ATOM_NODE_SIZE = 44;
 const connectionLineContainerStyle: React.CSSProperties = {
   zIndex: 0,
   pointerEvents: 'none',
-};
-const miniMapStyle: React.CSSProperties = {
-  width: 140,
-  height: 96,
-  margin: 12,
-  border: '1px solid rgba(26,46,59,0.16)',
-  borderRadius: 8,
-  boxShadow: '0 8px 24px rgba(26,46,59,0.14)',
-  overflow: 'hidden',
 };
 
 type LewisCanvasProps = {
@@ -49,6 +40,14 @@ type SelectionBox = {
   startY: number;
   currentX: number;
   currentY: number;
+};
+
+type PendingAbsoluteViewport = {
+  canvasLeft: number;
+  canvasTop: number;
+  viewportX: number;
+  viewportY: number;
+  zoom: number;
 };
 
 function CenteredConnectionLine({
@@ -94,19 +93,17 @@ function CenteredConnectionLine({
   );
 }
 
-function getMiniMapNodeColor(node: AtomNodeType) {
-  return ELEMENTS[node.data.element]?.bg ?? '#EFF3F6';
-}
-
-function getMiniMapNodeStrokeColor(node: AtomNodeType) {
-  return node.selected ? '#E2603F' : ELEMENTS[node.data.element]?.border ?? '#A8BEC9';
-}
-
 export function LewisCanvas({ resetKey }: LewisCanvasProps) {
   const isFirstRender = useRef(true);
   const canvasRef = useRef<HTMLDivElement | null>(null);
+  const paletteColumnRef = useRef<HTMLDivElement | null>(null);
+  const sideColumnRef = useRef<HTMLDivElement | null>(null);
+  const pendingAbsoluteViewport = useRef<PendingAbsoluteViewport | null>(null);
   const [selectionBox, setSelectionBox] = useState<SelectionBox | null>(null);
   const [previewedAtomId, setPreviewedAtomId] = useState<string | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [columnHeight, setColumnHeight] = useState<number | null>(null);
+  const { setViewport } = useReactFlow();
   const {
     nodes,
     edges,
@@ -124,11 +121,160 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
     selectedNodes,
   } = useLewisEditor();
 
+  function getRenderedViewport() {
+    const viewport = canvasRef.current?.querySelector('.react-flow__viewport');
+    const transform = viewport ? getComputedStyle(viewport).transform : 'none';
+    const matrix = transform.match(/matrix\(([^)]+)\)/);
+    if (!matrix) return { x: 0, y: 0, zoom: 1 };
+
+    const parts = matrix[1].split(',').map((part) => Number(part.trim()));
+    return {
+      x: parts[4] || 0,
+      y: parts[5] || 0,
+      zoom: parts[0] || 1,
+    };
+  }
+
+  function setFullscreenKeepingAtomScreenPositions(nextIsFullscreen: boolean) {
+    if (canvasRef.current) {
+      const bounds = canvasRef.current.getBoundingClientRect();
+      const viewport = getRenderedViewport();
+
+      pendingAbsoluteViewport.current = {
+        canvasLeft: bounds.left,
+        canvasTop: bounds.top,
+        viewportX: viewport.x,
+        viewportY: viewport.y,
+        zoom: viewport.zoom,
+      };
+    }
+
+    setIsFullscreen(nextIsFullscreen);
+  }
+
   useEffect(() => {
     if (isFirstRender.current) { isFirstRender.current = false; return; }
     clearAll();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetKey]);
+
+  useEffect(() => {
+    if (!isFullscreen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setFullscreenKeepingAtomScreenPositions(false);
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isFullscreen]);
+
+  useLayoutEffect(() => {
+    if (!pendingAbsoluteViewport.current) return;
+
+    let nextFrame = 0;
+    const firstFrame = window.requestAnimationFrame(() => {
+      nextFrame = window.requestAnimationFrame(() => {
+        const pending = pendingAbsoluteViewport.current;
+        const bounds = canvasRef.current?.getBoundingClientRect();
+        if (!pending || !bounds) return;
+
+        setViewport(
+          {
+            x: pending.viewportX + pending.canvasLeft - bounds.left,
+            y: pending.viewportY + pending.canvasTop - bounds.top,
+            zoom: pending.zoom,
+          },
+          { duration: 0 },
+        );
+        pendingAbsoluteViewport.current = null;
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      window.cancelAnimationFrame(nextFrame);
+    };
+  }, [isFullscreen, setViewport]);
+
+  useLayoutEffect(() => {
+    if (isFullscreen) return;
+
+    function updateColumnHeight() {
+      const measuredColumns = [paletteColumnRef.current, sideColumnRef.current].filter(
+        Boolean,
+      ) as HTMLDivElement[];
+      if (measuredColumns.length === 0) return;
+
+      const nextHeight = Math.ceil(
+        Math.max(
+          ...measuredColumns.map((column) => {
+            const content = column.firstElementChild;
+            const contentHeight = content?.getBoundingClientRect().height ?? 0;
+            return Math.max(column.getBoundingClientRect().height, column.scrollHeight, contentHeight);
+          }),
+        ),
+      );
+
+      setColumnHeight((current) => (current === nextHeight ? current : nextHeight));
+    }
+
+    updateColumnHeight();
+    window.addEventListener('resize', updateColumnHeight);
+
+    return () => window.removeEventListener('resize', updateColumnHeight);
+  }, [edges.length, isFullscreen, selectedNodes.length]);
+
+  useEffect(() => {
+    if (!pendingAbsoluteViewport.current) return;
+
+    const timeouts = [0, 80, 180].map((delay) =>
+      window.setTimeout(() => {
+        const pending = pendingAbsoluteViewport.current;
+        const bounds = canvasRef.current?.getBoundingClientRect();
+        if (!pending || !bounds) return;
+
+        setViewport(
+          {
+            x: pending.viewportX + pending.canvasLeft - bounds.left,
+            y: pending.viewportY + pending.canvasTop - bounds.top,
+            zoom: pending.zoom,
+          },
+          { duration: 0 },
+        );
+
+        if (delay === 180) pendingAbsoluteViewport.current = null;
+      }, delay),
+    );
+
+    return () => {
+      for (const timeout of timeouts) window.clearTimeout(timeout);
+    };
+  }, [isFullscreen, setViewport]);
+
+  useLayoutEffect(() => {
+    if (!pendingAbsoluteViewport.current) return;
+
+    const pending = pendingAbsoluteViewport.current;
+    const bounds = canvasRef.current?.getBoundingClientRect();
+    if (!bounds) return;
+
+    setViewport(
+      {
+        x: pending.viewportX + pending.canvasLeft - bounds.left,
+        y: pending.viewportY + pending.canvasTop - bounds.top,
+        zoom: pending.zoom,
+      },
+      { duration: 0 },
+    );
+  }, [isFullscreen, setViewport]);
 
   const typedNodes = nodes as AtomNodeType[];
   const typedEdges = edges as BondEdgeType[];
@@ -251,27 +397,100 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
         }
         /* Remove default React Flow handle background so ours shows */
         .react-flow__handle { background: transparent; }
+        .lewis-editor-shell {
+          display: flex;
+          flex: 1;
+          min-height: 0;
+          width: 100%;
+          height: 100%;
+        }
+        .lewis-editor-shell.is-fullscreen {
+          position: fixed;
+          inset: 0;
+          z-index: 1000;
+          box-sizing: border-box;
+          padding: 16px;
+          background-color: #F5EFE1;
+          background-image:
+            linear-gradient(to right, rgba(26,46,59,0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(26,46,59,0.05) 1px, transparent 1px);
+          background-size: 28px 28px;
+        }
+        .lewis-editor-main {
+          display: flex;
+          gap: 12px;
+          flex: 1;
+          min-height: 0;
+          min-width: 0;
+        }
+        .lewis-editor-shell:not(.is-fullscreen) .lewis-editor-main {
+          min-height: var(--lewis-editor-column-height, 100%);
+        }
+        .lewis-editor-palette {
+          display: flex;
+          flex-shrink: 0;
+        }
+        .lewis-editor-canvas {
+          flex: 1;
+          position: relative;
+          border-radius: 12px;
+          overflow: hidden;
+          border: 1.5px solid rgba(26,46,59,0.14);
+          background: #FDFAF5;
+          min-height: 0;
+          min-width: 0;
+        }
+        .lewis-editor-side {
+          width: 180px;
+          flex-shrink: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          overflow: auto;
+        }
+        .lewis-editor-side > :last-child {
+          flex: 1;
+        }
+        .lewis-editor-shell.is-fullscreen .lewis-editor-side {
+          width: clamp(180px, 18vw, 240px);
+        }
+        .lewis-editor-shell.is-fullscreen .lewis-editor-canvas {
+          border-radius: 10px;
+        }
+        @media (max-width: 720px) {
+          .lewis-editor-shell.is-fullscreen {
+            padding: 10px;
+          }
+          .lewis-editor-shell.is-fullscreen .lewis-editor-main {
+            gap: 8px;
+          }
+          .lewis-editor-shell.is-fullscreen .lewis-editor-side {
+            width: 160px;
+          }
+        }
       `}</style>
 
-      <div style={{ display: 'flex', gap: 12, flex: 1, minHeight: 0 }}>
-        <AtomPalette />
+      <div
+        className={`lewis-editor-shell${isFullscreen ? ' is-fullscreen' : ''}`}
+        style={
+          !isFullscreen && columnHeight
+            ? ({ '--lewis-editor-column-height': `${columnHeight}px` } as React.CSSProperties)
+            : undefined
+        }
+      >
+      <div className="lewis-editor-main">
+        <div className="lewis-editor-palette" ref={paletteColumnRef}>
+          <AtomPalette />
+        </div>
 
         <div
+          className="lewis-editor-canvas"
           ref={canvasRef}
           onPointerDownCapture={beginRightClickSelection}
           onPointerMoveCapture={updateRightClickSelection}
           onPointerUpCapture={finishRightClickSelection}
           onPointerCancelCapture={() => setSelectionBox(null)}
           onContextMenu={(event) => event.preventDefault()}
-          style={{
-            flex: 1,
-            position: 'relative',
-            borderRadius: 12,
-            overflow: 'hidden',
-            border: '1.5px solid rgba(26,46,59,0.14)',
-            background: '#FDFAF5',
-            minHeight: 0,
-          }}
         >
           <ReactFlow
             nodes={displayNodes}
@@ -300,21 +519,6 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
               size={1}
               color="rgba(26,46,59,0.1)"
             />
-            <MiniMap<AtomNodeType>
-              ariaLabel="Lewis structure canvas preview"
-              bgColor="rgba(253,250,245,0.94)"
-              maskColor="rgba(26,46,59,0.12)"
-              maskStrokeColor="#E2603F"
-              maskStrokeWidth={1.5}
-              nodeBorderRadius={22}
-              nodeColor={getMiniMapNodeColor}
-              nodeStrokeColor={getMiniMapNodeStrokeColor}
-              nodeStrokeWidth={2}
-              offsetScale={12}
-              pannable
-              style={miniMapStyle}
-              zoomable
-            />
             <div
               style={{
                 position: 'absolute',
@@ -334,6 +538,21 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
                 Clear
               </ToolButton>
             </div>
+            <div
+              style={{
+                position: 'absolute',
+                right: 12,
+                bottom: 12,
+                zIndex: 10,
+              }}
+            >
+              <IconToolButton
+                label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                onClick={() => setFullscreenKeepingAtomScreenPositions(!isFullscreen)}
+              >
+                {isFullscreen ? <IconMinimize size={16} /> : <IconMaximize size={16} />}
+              </IconToolButton>
+            </div>
           </ReactFlow>
           {selectionBoxStyle && (
             <div
@@ -350,15 +569,7 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
           )}
         </div>
 
-        <div
-          style={{
-            width: 180,
-            flexShrink: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 10,
-          }}
-        >
+        <div className="lewis-editor-side" ref={sideColumnRef}>
           <AtomInfoPanel
             selectedNodes={selectedNodes}
             edges={typedEdges}
@@ -367,6 +578,7 @@ export function LewisCanvas({ resetKey }: LewisCanvasProps) {
           <MoleculeReadout nodes={typedNodes} edges={typedEdges} />
           <HintBox />
         </div>
+      </div>
       </div>
     </>
   );
@@ -410,6 +622,43 @@ function ToolButton({
   );
 }
 
+function IconToolButton({
+  label,
+  onClick,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <button
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        width: 29,
+        height: 29,
+        border: 'none',
+        borderRadius: 6,
+        background: hovered ? '#3a5060' : '#4A6275',
+        color: 'white',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        transition: 'background 0.15s',
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
 function HintBox() {
   return (
     <div
@@ -418,6 +667,7 @@ function HintBox() {
         border: '1px solid rgba(26,46,59,0.1)',
         borderRadius: 8,
         padding: '10px 12px',
+        boxSizing: 'border-box',
         fontFamily: '"DM Sans", system-ui, sans-serif',
         fontSize: '0.72rem',
         color: '#4A6275',

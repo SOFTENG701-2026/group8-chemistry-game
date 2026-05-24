@@ -200,7 +200,7 @@ export function ChemAssembler() {
 
         {isSandbox ? (
           <>
-            <div style={{ display: lewisMode ? 'block' : 'none', marginTop: 24, height: 480 }}>
+            <div style={{ display: lewisMode ? 'block' : 'none', marginTop: 24, minHeight: 480 }}>
               <ReactFlowProvider>
                 <LewisCanvas resetKey={lewisResetKey} />
               </ReactFlowProvider>
@@ -219,7 +219,7 @@ export function ChemAssembler() {
             )}
           </>
         ) : lewisMode ? (
-          <div style={{ marginTop: 24, height: 480 }}>
+          <div style={{ marginTop: 24, minHeight: 480 }}>
             <ReactFlowProvider>
               <LewisCanvas resetKey={lewisResetKey} />
             </ReactFlowProvider>
