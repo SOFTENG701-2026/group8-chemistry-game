@@ -11,13 +11,24 @@ const uid = () => Math.random().toString(36).slice(2, 9);
 const arraysEqual = (a: string[], b: string[]) =>
   a.length === b.length && a.every((x, i) => x === b[i]);
 
+function flipCard(key: string): string {
+  if (key.startsWith('-') && !key.endsWith('-')) return key.slice(1) + '-';
+  if (key.endsWith('-') && !key.startsWith('-')) return '-' + key.slice(0, -1);
+  return key;
+}
+
 function getMatchingProblemName(cardKeys: string[]) {
   if (cardKeys.length === 0) return null;
 
-  const match = PROBLEMS.find((candidate) =>
-    arraysEqual(cardKeys, candidate.correct) ||
-    (candidate.symmetric === true && arraysEqual(cardKeys, [...candidate.correct].reverse())),
-  );
+  const match = PROBLEMS.find((candidate) => {
+    const sym = candidate.symmetric === true;
+    const flipReversed = [...candidate.correct].reverse().map(flipCard);
+    return (
+      arraysEqual(cardKeys, candidate.correct) ||
+      (sym && arraysEqual(cardKeys, [...candidate.correct].reverse())) ||
+      (sym && arraysEqual(cardKeys, flipReversed))
+    );
+  });
 
   return match?.name ?? null;
 }
@@ -123,9 +134,11 @@ export function useChemAssembler(moleculeName?: string | null) {
   function check(level: 1 | 2 | 3 = 1) {
     if (built.length === 0 || isSandbox || !problem) return false;
     const seq = built.map((c) => c.key);
+    const flipReversed = [...problem.correct].reverse().map(flipCard);
     const ok =
       arraysEqual(seq, problem.correct) ||
-      (problem.symmetric === true && arraysEqual(seq, [...problem.correct].reverse()));
+      (problem.symmetric === true && arraysEqual(seq, [...problem.correct].reverse())) ||
+      (problem.symmetric === true && arraysEqual(seq, flipReversed));
     if (ok) {
       setFeedback('right');
       setStreak((s) => s + 1);

@@ -1,4 +1,10 @@
 {
   "molecules": {
+    "Methane": {
+      "level1Builds": 1,
+      "level2Builds": 0,
+      "level3Builds": 0,
+      "updatedAt": "2026-05-25T01:43:25.899Z"
+    }
   }
 }
