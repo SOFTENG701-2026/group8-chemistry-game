@@ -1,4 +1,10 @@
 {
   "molecules": {
+    "Propane": {
+      "level1Builds": 1,
+      "level2Builds": 1,
+      "level3Builds": 0,
+      "updatedAt": "2026-05-25T11:49:53.222Z"
+    }
   }
 }

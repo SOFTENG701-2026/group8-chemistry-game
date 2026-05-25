@@ -12,6 +12,7 @@ import { buildMolecularGraph } from '../features/chem-assembler/data/molecularGr
 import { LewisCanvas } from '../features/lewis-editor/components/LewisCanvas';
 import { BondsOnlyCanvas, type BondsOnlyCanvasHandle } from '../features/lewis-editor/components/BondsOnlyCanvas';
 import { recordSuccessfulBuild } from '../features/chem-assembler/api/progress';
+import { FunFactCard } from '../features/chem-assembler/components/FunFactCard';
 import type { Feedback } from '../features/chem-assembler/types';
 
 type Level = 1 | 2 | 3;
@@ -249,6 +250,7 @@ function Level1Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
         onCardClick={moveToPool}
       />
       <FeedbackRow feedback={fb} />
+      {fb === 'right' && <FunFactCard moleculeName={problem.name} level={level} />}
       <ReagentTray
         pool={pool}
         feedback={fb}
@@ -315,6 +317,7 @@ function Level2Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
         </ReactFlowProvider>
       </div>
       <FeedbackRow feedback={feedback} />
+      {feedback === 'right' && <FunFactCard moleculeName={problem.name} level={level} />}
       <LessonControls
         onCheck={handleCheck}
         onReset={handleReset}
@@ -375,6 +378,7 @@ function Level3Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
         </ReactFlowProvider>
       </div>
       <FeedbackRow feedback={feedback} />
+      {feedback === 'right' && <FunFactCard moleculeName={problem.name} level={level} />}
       <LessonControls
         onCheck={handleCheck}
         onReset={handleReset}
