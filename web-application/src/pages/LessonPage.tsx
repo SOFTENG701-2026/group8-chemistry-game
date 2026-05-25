@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useViewportSize } from '@mantine/hooks';
 import { useSearchParams, useNavigate, Link } from 'react-router';
 import { ReactFlowProvider } from '@xyflow/react';
 import { PROBLEMS } from '../features/chem-assembler/data/problems';
@@ -279,6 +280,8 @@ function Level2Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [shake, setShake] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const { height: viewportHeight } = useViewportSize();
+  const canvasHeight = Math.max(240, Math.min(480, viewportHeight - 470));
 
   const graph = buildMolecularGraph(problem.correct);
 
@@ -306,7 +309,7 @@ function Level2Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
   return (
     <>
       <LessonPrompt problem={problem} hintLevel={hintLevel} level={level} bondCount={graph.bonds.length} />
-      <div className={shake ? 'shake' : ''} style={{ height: 480, borderRadius: 10, overflow: 'hidden', border: '1.5px solid rgba(26,46,59,0.14)', background: '#FDFAF5' }}>
+      <div className={shake ? 'shake' : ''} style={{ height: canvasHeight, borderRadius: 10, overflow: 'hidden', border: '1.5px solid rgba(26,46,59,0.14)', background: '#FDFAF5' }}>
         <ReactFlowProvider>
           <BondsOnlyCanvas ref={canvasRef} graph={graph} resetKey={resetKey} />
         </ReactFlowProvider>
@@ -338,6 +341,8 @@ function Level3Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
   const [shake, setShake] = useState(false);
   const [drawnName, setDrawnName] = useState<string | null>(null);
   const [resetKey, setResetKey] = useState(0);
+  const { height: viewportHeight } = useViewportSize();
+  const canvasHeight = Math.max(240, Math.min(480, viewportHeight - 470));
 
   function handleCheck() {
     const ok = drawnName === problem.name;
@@ -362,10 +367,10 @@ function Level3Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
   return (
     <>
       <LessonPrompt problem={problem} hintLevel={hintLevel} level={level} />
-      <div className={shake ? 'shake' : ''} style={{ height: 480, marginTop: 16, position: 'relative' }}>
+      <div className={shake ? 'shake' : ''} style={{ height: canvasHeight, marginTop: 16, position: 'relative', overflow: 'hidden' }}>
         <ReactFlowProvider>
           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
-            <LewisCanvas resetKey={resetKey} onMoleculeChange={setDrawnName} />
+            <LewisCanvas resetKey={resetKey} onMoleculeChange={setDrawnName} showFullscreen={false} maxSideHeight={canvasHeight} />
           </div>
         </ReactFlowProvider>
       </div>
@@ -415,7 +420,7 @@ export function LessonPage() {
   }
 
   return (
-    <div style={{ background: '#F5EFE1', minHeight: '100vh', color: '#1A2E3B', padding: '24px 16px 60px', position: 'relative', overflow: 'hidden' }}>
+    <div style={{ background: '#F5EFE1', minHeight: '100vh', color: '#1A2E3B', padding: '24px 16px 60px', position: 'relative', overflowX: 'hidden' }}>
       <LessonStyles />
       <div className="lesson-grid-bg" style={{ position: 'absolute', inset: 0 }} />
 
