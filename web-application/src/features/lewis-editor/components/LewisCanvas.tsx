@@ -36,6 +36,8 @@ const connectionLineContainerStyle: React.CSSProperties = {
 type LewisCanvasProps = {
   resetKey?: number;
   onMoleculeChange?: (name: string | null) => void;
+  showFullscreen?: boolean;
+  maxSideHeight?: number;
 };
 
 type SelectionBox = {
@@ -96,7 +98,7 @@ function CenteredConnectionLine({
   );
 }
 
-export function LewisCanvas({ resetKey, onMoleculeChange }: LewisCanvasProps) {
+export function LewisCanvas({ resetKey, onMoleculeChange, showFullscreen = true, maxSideHeight }: LewisCanvasProps) {
   const isFirstRender = useRef(true);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const paletteColumnRef = useRef<HTMLDivElement | null>(null);
@@ -462,9 +464,13 @@ export function LewisCanvas({ resetKey, onMoleculeChange }: LewisCanvasProps) {
           flex-direction: column;
           gap: 10px;
           overflow: auto;
+          max-height: var(--lewis-editor-max-side-height, none);
+        }
+        .lewis-editor-side > * {
+          flex-shrink: 0;
         }
         .lewis-editor-side > :last-child {
-          flex: 1;
+          flex: 1 0 auto;
         }
         .lewis-editor-shell.is-fullscreen .lewis-editor-side {
           width: clamp(180px, 18vw, 240px);
@@ -488,8 +494,11 @@ export function LewisCanvas({ resetKey, onMoleculeChange }: LewisCanvasProps) {
       <div
         className={`lewis-editor-shell${isFullscreen ? ' is-fullscreen' : ''}`}
         style={
-          !isFullscreen && columnHeight
-            ? ({ '--lewis-editor-column-height': `${columnHeight}px` } as React.CSSProperties)
+          !isFullscreen && (columnHeight || maxSideHeight)
+            ? ({
+                ...(columnHeight ? { '--lewis-editor-column-height': `${columnHeight}px` } : {}),
+                ...(maxSideHeight ? { '--lewis-editor-max-side-height': `${maxSideHeight}px` } : {}),
+              } as React.CSSProperties)
             : undefined
         }
       >
@@ -553,21 +562,23 @@ export function LewisCanvas({ resetKey, onMoleculeChange }: LewisCanvasProps) {
                 Clear
               </ToolButton>
             </div>
-            <div
-              style={{
-                position: 'absolute',
-                right: 12,
-                bottom: 12,
-                zIndex: 10,
-              }}
-            >
-              <IconToolButton
-                label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-                onClick={() => setFullscreenKeepingAtomScreenPositions(!isFullscreen)}
+            {showFullscreen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  right: 12,
+                  bottom: 12,
+                  zIndex: 10,
+                }}
               >
-                {isFullscreen ? <IconMinimize size={16} /> : <IconMaximize size={16} />}
-              </IconToolButton>
-            </div>
+                <IconToolButton
+                  label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                  onClick={() => setFullscreenKeepingAtomScreenPositions(!isFullscreen)}
+                >
+                  {isFullscreen ? <IconMinimize size={16} /> : <IconMaximize size={16} />}
+                </IconToolButton>
+              </div>
+            )}
           </ReactFlow>
           {selectionBoxStyle && (
             <div
