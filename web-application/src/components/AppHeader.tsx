@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Group, Text, Avatar, UnstyledButton, ActionIcon } from '@mantine/core';
+import { Group, Text, UnstyledButton, ActionIcon } from '@mantine/core';
 import { NavLink as RouterNavLink, useLocation } from 'react-router';
 import { IconAtom, IconHelp } from '@tabler/icons-react';
 import { HowToPlayModal } from './HowToPlayModal';
@@ -71,9 +71,6 @@ export function AppHeader() {
             >
               <IconHelp size={22} stroke={1.5} color="#4A6275" />
             </ActionIcon>
-            <Avatar radius="xl" size={36} style={{ backgroundColor: '#E2603F', color: 'white', fontFamily: '"DM Sans", sans-serif', fontWeight: 600, fontSize: '0.8rem' }}>
-              AN
-            </Avatar>
           </Group>
         </Group>
       </div>
