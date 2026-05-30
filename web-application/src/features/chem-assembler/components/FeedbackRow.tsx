@@ -1,11 +1,32 @@
-import type { Feedback } from '../types';
+import type { Feedback, LessonErrorType } from '../types';
 
 type FeedbackRowProps = {
   feedback: Feedback;
   onNext?: () => void;
+  errorType?: LessonErrorType;
+  drawnName?: string | null;
 };
 
-export function FeedbackRow({ feedback, onNext }: FeedbackRowProps) {
+function getWrongMessage(errorType: LessonErrorType | undefined, drawnName?: string | null): string {
+  switch (errorType) {
+    case 'wrong_order':       return 'Right pieces, wrong order — try rearranging.';
+    case 'wrong_length_low':  return 'You need more pieces.';
+    case 'wrong_length_high': return 'Too many pieces — remove some.';
+    case 'wrong_family':      return 'Wrong functional group — check the card families.';
+    case 'wrong_card':        return 'One or more cards are incorrect.';
+    case 'too_few_bonds':     return 'More bonds are needed.';
+    case 'too_many_bonds':    return 'Too many bonds — remove some.';
+    case 'wrong_bond_order':  return 'Check bond types — some should be double bonds.';
+    case 'wrong_structure':   return 'Bond count is right but the connections are wrong.';
+    case 'wrong_formula':
+      return drawnName
+        ? `You drew ${drawnName} — that's not the target molecule.`
+        : 'Wrong molecule. Check the formula.';
+    default: return 'Check the order or the functional groups.';
+  }
+}
+
+export function FeedbackRow({ feedback, onNext, errorType, drawnName }: FeedbackRowProps) {
   if (!feedback) return null;
 
   return (
@@ -32,7 +53,7 @@ export function FeedbackRow({ feedback, onNext }: FeedbackRowProps) {
         <span style={{ fontStyle: 'italic', opacity: 0.9 }}>
           {feedback === 'right'
             ? 'Bonds satisfied. Onward.'
-            : 'Check the order or the functional groups.'}
+            : getWrongMessage(errorType, drawnName)}
         </span>
       </div>
       {feedback === 'right' && onNext && (

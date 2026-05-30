@@ -13,7 +13,8 @@ import { LewisCanvas } from '../features/lewis-editor/components/LewisCanvas';
 import { BondsOnlyCanvas, type BondsOnlyCanvasHandle } from '../features/lewis-editor/components/BondsOnlyCanvas';
 import { recordSuccessfulBuild } from '../features/chem-assembler/api/progress';
 import { FunFactCard } from '../features/chem-assembler/components/FunFactCard';
-import type { Feedback } from '../features/chem-assembler/types';
+import type { Feedback, LessonErrorType, Level2ErrorType, Level3ErrorType } from '../features/chem-assembler/types';
+import { CARD_DEF } from '../features/chem-assembler/data/cards';
 
 type Level = 1 | 2 | 3;
 
@@ -117,11 +118,13 @@ function LessonPrompt({
   hintLevel,
   level,
   bondCount,
+  errorType,
 }: {
   problem: (typeof PROBLEMS)[0];
   hintLevel: number;
   level: Level;
   bondCount?: number;
+  errorType?: LessonErrorType;
 }) {
   return (
     <section
@@ -143,7 +146,15 @@ function LessonPrompt({
       )}
       {hintLevel >= 2 && (
         <div className="pop-in" style={{ marginTop: 8, fontFamily: '"DM Sans", system-ui, sans-serif', fontSize: '0.85rem', fontStyle: 'italic', color: '#A03E2E' }}>
-          {level === 1 && `${problem.correct.length} cards needed`}
+          {level === 1 && (() => {
+            if (errorType === 'wrong_order')
+              return `Rearrange — try starting with "${CARD_DEF[problem.correct[0]]?.name}"`;
+            if (errorType === 'wrong_family') {
+              const needed = [...new Set(problem.correct.map(k => CARD_DEF[k]?.family).filter((f): f is string => Boolean(f)))];
+              return `Functional groups needed: ${needed.join(', ')}`;
+            }
+            return `${problem.correct.length} cards needed`;
+          })()}
           {level === 2 && `${bondCount ?? '?'} bonds needed`}
           {level === 3 && `Atoms: ${problem.formula}`}
         </div>
@@ -215,7 +226,7 @@ function LessonControls({
 
 function Level1Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (typeof PROBLEMS)[0]; level: Level; onCorrect: () => void; onNextLevel: () => void }) {
   const {
-    pool, built, feedback, shake, hintLevel,
+    pool, built, feedback, shake, hintLevel, errorType,
     assembledFormula, moveToBuild, moveToPool,
     onDragStart, onDragOver, onDropBuild, onDropPool,
     check, reset, giveHint,
@@ -238,7 +249,7 @@ function Level1Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
 
   return (
     <>
-      <LessonPrompt problem={problem} hintLevel={hintLevel} level={level} />
+      <LessonPrompt problem={problem} hintLevel={hintLevel} level={level} errorType={errorType} />
       <BuildArea
         built={built}
         feedback={fb}
@@ -249,7 +260,7 @@ function Level1Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
         onDragStart={onDragStart}
         onCardClick={moveToPool}
       />
-      <FeedbackRow feedback={fb} />
+      <FeedbackRow feedback={fb} errorType={errorType} />
       {fb === 'right' && <FunFactCard moleculeName={problem.name} level={level} />}
       <ReagentTray
         pool={pool}
@@ -282,6 +293,7 @@ function Level2Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [shake, setShake] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const [errorType, setErrorType] = useState<Level2ErrorType>(null);
   const { height: viewportHeight } = useViewportSize();
   const canvasHeight = Math.max(240, Math.min(480, viewportHeight - 470));
 
@@ -297,6 +309,7 @@ function Level2Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
     } else {
       setShake(true);
       setTimeout(() => setShake(false), 500);
+      setErrorType(canvasRef.current.diagnose());
     }
   }
 
@@ -306,17 +319,18 @@ function Level2Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
     setShake(false);
     setHintLevel(0);
     setResetKey(k => k + 1);
+    setErrorType(null);
   }
 
   return (
     <>
-      <LessonPrompt problem={problem} hintLevel={hintLevel} level={level} bondCount={graph.bonds.length} />
+      <LessonPrompt problem={problem} hintLevel={hintLevel} level={level} bondCount={graph.bonds.length} errorType={errorType} />
       <div className={shake ? 'shake' : ''} style={{ height: canvasHeight, borderRadius: 10, overflow: 'hidden', border: '1.5px solid rgba(26,46,59,0.14)', background: '#FDFAF5' }}>
         <ReactFlowProvider>
           <BondsOnlyCanvas ref={canvasRef} graph={graph} resetKey={resetKey} />
         </ReactFlowProvider>
       </div>
-      <FeedbackRow feedback={feedback} />
+      <FeedbackRow feedback={feedback} errorType={errorType} />
       {feedback === 'right' && <FunFactCard moleculeName={problem.name} level={level} />}
       <LessonControls
         onCheck={handleCheck}
@@ -344,6 +358,7 @@ function Level3Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
   const [shake, setShake] = useState(false);
   const [drawnName, setDrawnName] = useState<string | null>(null);
   const [resetKey, setResetKey] = useState(0);
+  const [errorType, setErrorType] = useState<Level3ErrorType>(null);
   const { height: viewportHeight } = useViewportSize();
   const canvasHeight = Math.max(240, Math.min(480, viewportHeight - 470));
 
@@ -356,6 +371,7 @@ function Level3Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
     } else {
       setShake(true);
       setTimeout(() => setShake(false), 500);
+      setErrorType('wrong_formula');
     }
   }
 
@@ -365,11 +381,12 @@ function Level3Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
     setShake(false);
     setHintLevel(0);
     setDrawnName(null);
+    setErrorType(null);
   }
 
   return (
     <>
-      <LessonPrompt problem={problem} hintLevel={hintLevel} level={level} />
+      <LessonPrompt problem={problem} hintLevel={hintLevel} level={level} errorType={errorType} />
       <div className={shake ? 'shake' : ''} style={{ height: canvasHeight, marginTop: 16, position: 'relative', overflow: 'hidden' }}>
         <ReactFlowProvider>
           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
@@ -377,7 +394,7 @@ function Level3Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
           </div>
         </ReactFlowProvider>
       </div>
-      <FeedbackRow feedback={feedback} />
+      <FeedbackRow feedback={feedback} errorType={errorType} drawnName={drawnName} />
       {feedback === 'right' && <FunFactCard moleculeName={problem.name} level={level} />}
       <LessonControls
         onCheck={handleCheck}

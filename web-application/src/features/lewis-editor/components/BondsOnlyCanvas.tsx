@@ -10,7 +10,7 @@ import {
   type NodeTypes,
   type EdgeTypes,
   type OnConnect,
-  type OnEdgeClick,
+  type EdgeMouseHandler,
   type IsValidConnection,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -20,6 +20,7 @@ import { BondEdge } from './BondEdge';
 import type { AtomNodeType } from './AtomNode';
 import type { BondEdgeType } from './BondEdge';
 import type { MolGraph, MolBond } from '../../chem-assembler/data/molecularGraph';
+import type { Level2ErrorType } from '../../chem-assembler/types';
 import { ELEMENTS } from '../data/elements';
 import type { BondOrder } from '@app/shared';
 
@@ -52,6 +53,7 @@ export type BondsOnlyCanvasHandle = {
   validate: () => boolean;
   reset: () => void;
   flashNextHint: () => void;
+  diagnose: () => Level2ErrorType;
 };
 
 type Props = {
@@ -84,6 +86,16 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
     useImperativeHandle(ref, () => ({
       validate: () => validateBonds(edges as BondEdgeType[], graph.bonds),
       reset: () => setEdges([]),
+      diagnose: (): Level2ErrorType => {
+        const real = (edges as BondEdgeType[]).filter(e => !e.data?.isHint);
+        const expected = graph.bonds;
+        if (real.length < expected.length) return 'too_few_bonds';
+        if (real.length > expected.length) return 'too_many_bonds';
+        const drawnOrders = real.map(e => e.data?.order ?? 1).sort();
+        const expectedOrders = expected.map(b => b.order).sort();
+        const orderMatch = drawnOrders.every((o, i) => o === expectedOrders[i]);
+        return orderMatch ? 'wrong_structure' : 'wrong_bond_order';
+      },
       flashNextHint: () => {
         if (graph.bonds.length === 0) return;
 
@@ -127,7 +139,7 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
       setEdges((eds) => addEdge<BondEdgeType>({ ...connection, type: 'bond', data: { order: 1 } }, eds));
     };
 
-    const cycleEdgeOrder: OnEdgeClick = (_event, edge) => {
+    const cycleEdgeOrder: EdgeMouseHandler<BondEdgeType> = (_event, edge) => {
       if (edge.data?.isHint) return;
       setEdges((eds) =>
         eds.map((e) => {
