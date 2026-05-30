@@ -139,21 +139,24 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
       setEdges((eds) => addEdge<BondEdgeType>({ ...connection, type: 'bond', data: { order: 1 } }, eds));
     };
 
-    const cycleEdgeOrder: EdgeMouseHandler<BondEdgeType> = (_event, edge) => {
-      if (edge.data?.isHint) return;
+    const selectedEdge = (edges as BondEdgeType[]).find(e => e.selected && !e.data?.isHint) ?? null;
+
+    const deleteSelectedEdge = () => {
+      if (!selectedEdge) return;
+      setEdges(eds => eds.filter(e => e.id !== selectedEdge.id));
+    };
+
+    const upgradeEdgeOrder: EdgeMouseHandler<BondEdgeType> = (_event, edge) => {
+      if (edge.data?.isHint || (edge.data?.order ?? 1) >= 2) return;
       setEdges((eds) =>
         eds.map((e) => {
           if (e.id !== edge.id) return e;
-          const current: BondOrder = e.data?.order ?? 1;
-          const proposed: BondOrder = current === 2 ? 1 : 2;
-          if (proposed > current) {
-            const typedEds = eds as BondEdgeType[];
-            const typedNodes = nodes as AtomNodeType[];
-            const srcFree = (ELEMENTS[typedNodes.find(n => n.id === e.source)?.data.element ?? '']?.valence ?? Infinity) - usedBonds(e.source, typedEds, e.id);
-            const tgtFree = (ELEMENTS[typedNodes.find(n => n.id === e.target)?.data.element ?? '']?.valence ?? Infinity) - usedBonds(e.target, typedEds, e.id);
-            if (proposed > srcFree || proposed > tgtFree) return e;
-          }
-          return { ...e, data: { order: proposed } };
+          const typedEds = eds as BondEdgeType[];
+          const typedNodes = nodes as AtomNodeType[];
+          const srcFree = (ELEMENTS[typedNodes.find(n => n.id === e.source)?.data.element ?? '']?.valence ?? Infinity) - usedBonds(e.source, typedEds, e.id);
+          const tgtFree = (ELEMENTS[typedNodes.find(n => n.id === e.target)?.data.element ?? '']?.valence ?? Infinity) - usedBonds(e.target, typedEds, e.id);
+          if (2 > srcFree || 2 > tgtFree) return e;
+          return { ...e, data: { order: 2 as BondOrder } };
         }),
       );
     };
@@ -177,7 +180,7 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           isValidConnection={isValidConnection}
-          onEdgeClick={cycleEdgeOrder}
+          onEdgeDoubleClick={upgradeEdgeOrder}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           connectionMode={ConnectionMode.Loose}
@@ -206,8 +209,29 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
           <ul style={{ margin: '4px 0 0', paddingLeft: 14 }}>
             <li>Hover an atom to reveal handles</li>
             <li>Drag a handle to another atom to bond</li>
-            <li>Click a bond to toggle single/double</li>
+            <li>Click a bond to select it</li>
+            <li>Double-click a bond to upgrade to double</li>
           </ul>
+          <button
+            onClick={deleteSelectedEdge}
+            disabled={!selectedEdge}
+            style={{
+              marginTop: 8,
+              width: '100%',
+              padding: '4px 0',
+              borderRadius: 6,
+              border: '1px solid',
+              borderColor: selectedEdge ? '#E2603F' : 'rgba(26,46,59,0.2)',
+              background: selectedEdge ? '#E2603F' : 'transparent',
+              color: selectedEdge ? '#fff' : 'rgba(26,46,59,0.35)',
+              fontSize: '0.75rem',
+              fontFamily: 'inherit',
+              cursor: selectedEdge ? 'pointer' : 'default',
+              transition: 'all 0.15s',
+            }}
+          >
+            Delete bond
+          </button>
         </div>
       </div>
     );
