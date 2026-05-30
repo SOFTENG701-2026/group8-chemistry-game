@@ -1,9 +1,12 @@
-import { Group, Text, Avatar, UnstyledButton } from '@mantine/core';
+import { useState } from 'react';
+import { Group, Text, Avatar, UnstyledButton, ActionIcon } from '@mantine/core';
 import { NavLink as RouterNavLink, useLocation } from 'react-router';
-import { IconAtom } from '@tabler/icons-react';
+import { IconAtom, IconHelp } from '@tabler/icons-react';
+import { HowToPlayModal } from './HowToPlayModal';
 
 export function AppHeader() {
   const location = useLocation();
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const links = [
     { label: 'Lessons', path: '/lessons' },
@@ -58,12 +61,24 @@ export function AppHeader() {
                 </UnstyledButton>
               );
             })}
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              size={36}
+              radius="xl"
+              aria-label="How to play"
+              onClick={() => setHelpOpen(true)}
+            >
+              <IconHelp size={22} stroke={1.5} color="#4A6275" />
+            </ActionIcon>
             <Avatar radius="xl" size={36} style={{ backgroundColor: '#E2603F', color: 'white', fontFamily: '"DM Sans", sans-serif', fontWeight: 600, fontSize: '0.8rem' }}>
               AN
             </Avatar>
           </Group>
         </Group>
       </div>
+
+      <HowToPlayModal opened={helpOpen} onClose={() => setHelpOpen(false)} />
     </header>
   );
 }
