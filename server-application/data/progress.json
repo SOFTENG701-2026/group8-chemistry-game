@@ -5,6 +5,28 @@
       "level2Builds": 1,
       "level3Builds": 0,
       "updatedAt": "2026-05-25T11:49:53.222Z"
+    },
+    "Methane": {
+      "level1Builds": 2,
+      "level2Builds": 0,
+      "level3Builds": 0,
+      "updatedAt": "2026-05-30T10:46:27.943Z"
+    },
+    "Ethanoic Acid": {
+      "level1Builds": 1,
+      "level2Builds": 0,
+      "level3Builds": 0,
+      "updatedAt": "2026-05-30T10:44:54.611Z"
+    },
+    "Methyl ethanoate": {
+      "level1Builds": 1,
+      "level2Builds": 0,
+      "level3Builds": 0,
+      "updatedAt": "2026-05-30T10:46:03.413Z"
     }
+  },
+  "diagnostic": {
+    "recommendedGroup": 3,
+    "completedAt": "2026-05-30T10:46:13.916Z"
   }
 }
