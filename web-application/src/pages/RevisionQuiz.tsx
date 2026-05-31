@@ -81,6 +81,7 @@ export function RevisionQuiz() {
     setAnswers({});
     setSubmitted(false);
     setShuffleSeed(seed => seed + 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   return (
@@ -290,21 +291,38 @@ export function RevisionQuiz() {
             })}
 
             {submitted ? (
-              <Link
-                to="/lessons"
-                style={{
-                  ...buttonBase,
-                  border: '1.5px solid #1A2E3B',
-                  background: '#1A2E3B',
-                  color: '#FFFFFF',
-                  padding: '12px 18px',
-                  fontSize: '0.9rem',
-                  textDecoration: 'none',
-                }}
-              >
-                <IconArrowLeft size={17} stroke={2.2} />
-                Back
-              </Link>
+              <Group gap={10}>
+                <Link
+                  to="/lessons"
+                  style={{
+                    ...buttonBase,
+                    border: '1.5px solid #1A2E3B',
+                    background: '#1A2E3B',
+                    color: '#FFFFFF',
+                    padding: '12px 18px',
+                    fontSize: '0.9rem',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <IconArrowLeft size={17} stroke={2.2} />
+                  Back
+                </Link>
+                <button
+                  type="button"
+                  onClick={resetQuiz}
+                  style={{
+                    ...buttonBase,
+                    border: '1.5px solid #C9C5BB',
+                    background: '#FFFFFF',
+                    color: '#1A2E3B',
+                    padding: '12px 18px',
+                    fontSize: '0.9rem',
+                  }}
+                >
+                  <IconRotateClockwise2 size={17} stroke={2.2} />
+                  Reset
+                </button>
+              </Group>
             ) : (
               <button
                 type="button"
