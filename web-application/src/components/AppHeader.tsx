@@ -33,7 +33,7 @@ export function AppHeader() {
               letterSpacing: '-0.01em',
               color: '#1A2E3B',
             }}>
-              Untitled Chemistry Game
+              Lewis Lab
             </Text>
           </RouterNavLink>
 

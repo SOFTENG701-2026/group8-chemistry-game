@@ -1,45 +1,93 @@
-# Organic Chemistry Molecule Builder
+# Lewis Lab
 
-A drag-and-drop organic chemistry molecule builder built with React + Express.
+An interactive organic chemistry learning app built with React + Express.
+
+## How to Run the Application
+
+Lewis Lab has two parts:
+
+- `server-application/`: Express backend API
+- `web-application/`: React + Vite frontend
+
+Run the backend and frontend in two separate terminals.
 
 ## Prerequisites
 
 - Node.js 18+
 - npm 8+ (workspaces support)
 
-## Setup
+## 1. Install Dependencies
 
-Install all dependencies from the repo root:
+From the project root, install all workspace dependencies:
 
 ```bash
 npm install
 ```
 
-## Running
+## 2. Start the Backend
 
-Start the backend and frontend in separate terminals.
+In the first terminal:
 
-**Backend** (port 3001):
 ```bash
 cd server-application
 npm run dev
 ```
 
-**Frontend** (port 5173):
+The backend runs at:
+
+```text
+http://localhost:3001
+```
+
+You can check that it is running by opening:
+
+```text
+http://localhost:3001/health
+```
+
+## 3. Start the Frontend
+
+In a second terminal:
+
 ```bash
 cd web-application
 npm run dev
 ```
 
-## Other Commands
+The frontend runs at:
 
-| Command | Location | Description |
+```text
+http://localhost:5173
+```
+
+Open that URL in your browser to use Lewis Lab.
+
+## Useful Commands
+
+Run these commands from inside the listed folder.
+
+| Folder | Command | Description |
 |---|---|---|
-| `npm run build` | `server-application/` | Compile server to `dist/` |
-| `npm start` | `server-application/` | Run compiled server |
-| `npm run typecheck` | `server-application/` | Type-check without emitting |
-| `npm run build` | `web-application/` | Production Vite build |
-| `npm run lint` | `web-application/` | Run ESLint |
+| `server-application/` | `npm run dev` | Start the backend in development mode |
+| `server-application/` | `npm run build` | Compile the backend to `dist/` |
+| `server-application/` | `npm start` | Run the compiled backend |
+| `server-application/` | `npm run typecheck` | Type-check the backend |
+| `web-application/` | `npm run dev` | Start the frontend development server |
+| `web-application/` | `npm run build` | Build the frontend for production |
+| `web-application/` | `npm run preview` | Preview the production frontend build |
+| `web-application/` | `npm run lint` | Run frontend linting |
+
+## Troubleshooting
+
+If `npm install` fails, check that you are using Node.js 18 or newer:
+
+```bash
+node --version
+```
+
+If the frontend opens but progress or molecule API features do not work, make sure the backend is also running on port `3001`.
+
+If port `5173` is already in use, Vite may choose another port. Use the URL printed in the frontend terminal.
 
 ## API
 
