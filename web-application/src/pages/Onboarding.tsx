@@ -97,10 +97,6 @@ function DiagnosticTask({
   function handleCheck() {
     const ok = check(1);
     setFeedback(ok ? 'right' : 'wrong');
-    if (ok) {
-      // Brief pause so the learner sees the success state before advancing.
-      setTimeout(onSolved, 650);
-    }
   }
 
   function handleReset() {
@@ -143,9 +139,15 @@ function DiagnosticTask({
       />
 
       <footer style={{ marginTop: 24, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-        <button onClick={handleCheck} disabled={built.length === 0 || solved} style={{ ...primaryBtn, opacity: built.length === 0 || solved ? 0.4 : 1, cursor: built.length === 0 || solved ? 'not-allowed' : 'pointer' }}>
-          check
-        </button>
+        {solved ? (
+          <button onClick={onSolved} style={primaryBtn}>
+            {step === total - 1 ? 'see results ->' : 'next task ->'}
+          </button>
+        ) : (
+          <button onClick={handleCheck} disabled={built.length === 0} style={{ ...primaryBtn, opacity: built.length === 0 ? 0.4 : 1, cursor: built.length === 0 ? 'not-allowed' : 'pointer' }}>
+            check
+          </button>
+        )}
         <button onClick={handleReset} disabled={solved} style={{ ...ghostBtn, opacity: solved ? 0.4 : 1 }}>reset</button>
         <button onClick={onSkip} disabled={solved} style={{ ...skipLinkStyle, marginLeft: 'auto', opacity: solved ? 0.4 : 1 }}>
           Can't get this one? Skip ahead →
