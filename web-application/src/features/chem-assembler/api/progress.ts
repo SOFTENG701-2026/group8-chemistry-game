@@ -5,8 +5,14 @@ export type MoleculeProgress = {
   updatedAt: string | null;
 };
 
+export type DiagnosticResult = {
+  recommendedGroup: 1 | 2 | 3;
+  completedAt: string;
+};
+
 export type ProgressStore = {
   molecules: Record<string, MoleculeProgress>;
+  diagnostic?: DiagnosticResult;
 };
 
 export async function fetchProgress(): Promise<ProgressStore> {
@@ -20,6 +26,16 @@ export async function recordSuccessfulBuild(moleculeName: string, level: 1 | 2 |
     method: 'POST',
   });
   if (!response.ok) throw new Error('Unable to save progress');
+  return response.json();
+}
+
+export async function recordDiagnostic(recommendedGroup: 1 | 2 | 3): Promise<ProgressStore> {
+  const response = await fetch('/api/progress/diagnostic', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ recommendedGroup }),
+  });
+  if (!response.ok) throw new Error('Unable to save diagnostic');
   return response.json();
 }
 
