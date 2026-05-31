@@ -142,7 +142,22 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
     };
 
     const onConnect: OnConnect = (connection) => {
-      setEdges((eds) => addEdge<BondEdgeType>({ ...connection, type: 'bond', data: { order: 1 } }, eds));
+      setEdges((eds) => {
+        const typedEds = eds as BondEdgeType[];
+        const typedNodes = nodes as AtomNodeType[];
+        const alreadyConnected = typedEds.some(
+          e => !e.data?.isHint &&
+            ((e.source === connection.source && e.target === connection.target) ||
+             (e.source === connection.target && e.target === connection.source))
+        );
+        if (alreadyConnected) return eds;
+        const srcUsed = usedBonds(connection.source, typedEds);
+        const tgtUsed = usedBonds(connection.target, typedEds);
+        const srcValence = ELEMENTS[typedNodes.find(n => n.id === connection.source)?.data.element ?? '']?.valence ?? Infinity;
+        const tgtValence = ELEMENTS[typedNodes.find(n => n.id === connection.target)?.data.element ?? '']?.valence ?? Infinity;
+        if (srcUsed >= srcValence || tgtUsed >= tgtValence) return eds;
+        return addEdge<BondEdgeType>({ ...connection, type: 'bond', data: { order: 1 } }, eds);
+      });
     };
 
     const selectedEdge = (edges as BondEdgeType[]).find(e => e.selected && !e.data?.isHint) ?? null;
@@ -193,6 +208,8 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
           fitView
           nodesDraggable={false}
           edgesReconnectable={false}
+          connectionDragThreshold={5}
+          connectOnClick={false}
           style={{ width: '100%', height: '100%' }}
         >
           <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="rgba(26,46,59,0.1)" />
