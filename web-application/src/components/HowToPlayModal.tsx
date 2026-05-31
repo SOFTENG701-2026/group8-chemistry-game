@@ -73,14 +73,14 @@ export function HowToPlayModal({ opened, onClose }: { opened: boolean; onClose: 
       centered
       title="How to play"
       styles={{
-        title: { fontFamily: SERIF, fontWeight: 700, fontSize: '1.5rem', color: INK },
-        body: { paddingTop: 8 },
+        title: { fontFamily: SERIF, fontWeight: 700, fontSize: '2rem', color: INK },
+        body: { padding: '24px 32px 32px' },
       }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
         {/* Section A — Reagent cards */}
         <section>
-          <div style={sectionLabel}>Building with reagent cards</div>
+          <div style={sectionLabel}>Reagent card builder</div>
           <h3 style={heading}>Snap functional-group pieces together</h3>
           <ul style={list}>
             <li>
@@ -110,7 +110,7 @@ export function HowToPlayModal({ opened, onClose }: { opened: boolean; onClose: 
 
         {/* Section B — Lewis builder */}
         <section>
-          <div style={sectionLabel}>The Lewis builder</div>
+          <div style={sectionLabel}>Lewis builder</div>
           <h3 style={heading}>Place atoms and draw bonds</h3>
           <ul style={list}>
             <li>
