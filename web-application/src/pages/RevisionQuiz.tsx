@@ -22,6 +22,15 @@ const buttonBase: CSSProperties = {
   gap: 8,
 };
 
+function shuffleChoices(choices: string[]) {
+  const shuffled = [...choices];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+  return shuffled;
+}
+
 export function RevisionQuiz() {
   const [searchParams] = useSearchParams();
   const groupId = Number(searchParams.get('group') ?? 1);
@@ -31,6 +40,7 @@ export function RevisionQuiz() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [shuffleSeed, setShuffleSeed] = useState(0);
 
   useEffect(() => {
     fetchProgress()
@@ -45,6 +55,10 @@ export function RevisionQuiz() {
     if (!group) return 0;
     return group.molecules.filter(molecule => isMoleculeMastered(progress, molecule)).length;
   }, [group, progress]);
+
+  const shuffledChoices = useMemo(() => (
+    quiz?.questions.map(question => shuffleChoices(question.choices)) ?? []
+  ), [quiz, shuffleSeed]);
 
   if (!group || !quiz) {
     return (
@@ -66,6 +80,7 @@ export function RevisionQuiz() {
   function resetQuiz() {
     setAnswers({});
     setSubmitted(false);
+    setShuffleSeed(seed => seed + 1);
   }
 
   return (
@@ -223,7 +238,7 @@ export function RevisionQuiz() {
                   </Text>
 
                   <div style={{ display: 'grid', gap: 10 }}>
-                    {question.choices.map((choice) => {
+                    {(shuffledChoices[questionIndex] ?? question.choices).map((choice) => {
                       const choiceIsSelected = selected === choice;
                       const revealCorrect = submitted && choice === question.answer;
                       const revealWrong = submitted && choiceIsSelected && choice !== question.answer;
@@ -274,24 +289,42 @@ export function RevisionQuiz() {
               );
             })}
 
-            <button
-              type="button"
-              onClick={() => setSubmitted(true)}
-              disabled={!allAnswered || submitted}
-              style={{
-                ...buttonBase,
-                border: '1.5px solid #1A2E3B',
-                background: '#1A2E3B',
-                color: '#FFFFFF',
-                padding: '12px 18px',
-                fontSize: '0.9rem',
-                opacity: !allAnswered || submitted ? 0.55 : 1,
-                cursor: !allAnswered || submitted ? 'not-allowed' : 'pointer',
-              }}
-            >
-              <IconCheck size={17} stroke={2.2} />
-              Check answers
-            </button>
+            {submitted ? (
+              <Link
+                to="/lessons"
+                style={{
+                  ...buttonBase,
+                  border: '1.5px solid #1A2E3B',
+                  background: '#1A2E3B',
+                  color: '#FFFFFF',
+                  padding: '12px 18px',
+                  fontSize: '0.9rem',
+                  textDecoration: 'none',
+                }}
+              >
+                <IconArrowLeft size={17} stroke={2.2} />
+                Back
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setSubmitted(true)}
+                disabled={!allAnswered}
+                style={{
+                  ...buttonBase,
+                  border: '1.5px solid #1A2E3B',
+                  background: '#1A2E3B',
+                  color: '#FFFFFF',
+                  padding: '12px 18px',
+                  fontSize: '0.9rem',
+                  opacity: !allAnswered ? 0.55 : 1,
+                  cursor: !allAnswered ? 'not-allowed' : 'pointer',
+                }}
+              >
+                <IconCheck size={17} stroke={2.2} />
+                Check answers
+              </button>
+            )}
           </>
         )}
       </Container>
