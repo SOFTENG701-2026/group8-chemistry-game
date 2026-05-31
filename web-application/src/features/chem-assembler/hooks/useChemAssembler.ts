@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { DragEvent } from 'react';
 import { useSearchParams } from 'react-router';
-import type { CardInstance, Feedback, DragSource } from '../types';
+import type { CardInstance, Feedback, DragSource, Level1ErrorType, Problem } from '../types';
 import { PROBLEMS } from '../data/problems';
 import { CARD_DEF } from '../data/cards';
 import { recordSuccessfulBuild } from '../api/progress';
@@ -31,6 +31,20 @@ function getMatchingProblemName(cardKeys: string[]) {
   });
 
   return match?.name ?? null;
+}
+
+function detectLevel1Error(builtKeys: string[], problem: Problem): Level1ErrorType {
+  const { correct } = problem;
+  if (builtKeys.length < correct.length) return 'wrong_length_low';
+  if (builtKeys.length > correct.length) return 'wrong_length_high';
+  const canon = (k: string) => { const f = flipCard(k); return k < f ? k : f; };
+  const builtNorm = builtKeys.map(canon).sort();
+  const correctNorm = correct.map(canon).sort();
+  if (arraysEqual(builtNorm, correctNorm)) return 'wrong_order';
+  const builtFams = builtKeys.map(k => CARD_DEF[k]?.family ?? '').sort();
+  const correctFams = correct.map(k => CARD_DEF[k]?.family ?? '').sort();
+  if (!arraysEqual(builtFams, correctFams)) return 'wrong_family';
+  return 'wrong_card';
 }
 
 function buildCards(idx: number): CardInstance[] {
@@ -63,6 +77,7 @@ export function useChemAssembler(moleculeName?: string | null) {
   const [solved, setSolved] = useState<Set<number>>(new Set());
   const [shake, setShake] = useState(false);
   const [hintLevel, setHintLevel] = useState(0);
+  const [errorType, setErrorType] = useState<Level1ErrorType>(null);
 
   const problem = isSandbox ? null : PROBLEMS[idx];
 
@@ -72,6 +87,7 @@ export function useChemAssembler(moleculeName?: string | null) {
     setBuilt([]);
     setFeedback(null);
     setHintLevel(0);
+    setErrorType(null);
   }, [idx, isSandbox, resetKey]);
 
   useEffect(() => {
@@ -92,6 +108,7 @@ export function useChemAssembler(moleculeName?: string | null) {
 
     setBuilt([...built, card]);
     setFeedback(null);
+    setErrorType(null);
   }
 
   function moveToPool(instanceId: string) {
@@ -103,6 +120,7 @@ export function useChemAssembler(moleculeName?: string | null) {
       setPool([...pool, card]);
     }
     setFeedback(null);
+    setErrorType(null);
   }
 
   function onDragStart(e: DragEvent<HTMLElement>, instanceId: string, source: DragSource) {
@@ -151,6 +169,7 @@ export function useChemAssembler(moleculeName?: string | null) {
       setStreak(0);
       setShake(true);
       setTimeout(() => setShake(false), 500);
+      setErrorType(detectLevel1Error(seq, problem));
     }
     return ok;
   }
@@ -183,7 +202,7 @@ export function useChemAssembler(moleculeName?: string | null) {
 
   return {
     isSandbox, idx, problem, pool, built, feedback, streak,
-    solved, shake, hintLevel, assembledFormula, assembledMoleculeName,
+    solved, shake, hintLevel, errorType, assembledFormula, assembledMoleculeName,
     progress: solved.size,
     moveToBuild, moveToPool,
     onDragStart, onDragOver, onDropBuild, onDropPool,

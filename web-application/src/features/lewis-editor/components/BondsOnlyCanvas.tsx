@@ -10,7 +10,7 @@ import {
   type NodeTypes,
   type EdgeTypes,
   type OnConnect,
-  type OnEdgeClick,
+  type EdgeMouseHandler,
   type IsValidConnection,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -20,6 +20,7 @@ import { BondEdge } from './BondEdge';
 import type { AtomNodeType } from './AtomNode';
 import type { BondEdgeType } from './BondEdge';
 import type { MolGraph, MolBond } from '../../chem-assembler/data/molecularGraph';
+import type { Level2ErrorType } from '../../chem-assembler/types';
 import { ELEMENTS } from '../data/elements';
 import type { BondOrder } from '@app/shared';
 
@@ -52,6 +53,7 @@ export type BondsOnlyCanvasHandle = {
   validate: () => boolean;
   reset: () => void;
   flashNextHint: () => void;
+  diagnose: () => Level2ErrorType;
 };
 
 type Props = {
@@ -84,6 +86,16 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
     useImperativeHandle(ref, () => ({
       validate: () => validateBonds(edges as BondEdgeType[], graph.bonds),
       reset: () => setEdges([]),
+      diagnose: (): Level2ErrorType => {
+        const real = (edges as BondEdgeType[]).filter(e => !e.data?.isHint);
+        const expected = graph.bonds;
+        if (real.length < expected.length) return 'too_few_bonds';
+        if (real.length > expected.length) return 'too_many_bonds';
+        const drawnOrders = real.map(e => e.data?.order ?? 1).sort();
+        const expectedOrders = expected.map(b => b.order).sort();
+        const orderMatch = drawnOrders.every((o, i) => o === expectedOrders[i]);
+        return orderMatch ? 'wrong_structure' : 'wrong_bond_order';
+      },
       flashNextHint: () => {
         if (graph.bonds.length === 0) return;
 
@@ -116,6 +128,12 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
       if (connection.source === connection.target) return false;
       const typedEdges = edges as BondEdgeType[];
       const typedNodes = nodes as AtomNodeType[];
+      const alreadyConnected = typedEdges.some(
+        e => !e.data?.isHint &&
+          ((e.source === connection.source && e.target === connection.target) ||
+           (e.source === connection.target && e.target === connection.source))
+      );
+      if (alreadyConnected) return false;
       const srcUsed = usedBonds(connection.source, typedEdges);
       const tgtUsed = usedBonds(connection.target, typedEdges);
       const srcValence = ELEMENTS[typedNodes.find(n => n.id === connection.source)?.data.element ?? '']?.valence ?? Infinity;
@@ -124,24 +142,42 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
     };
 
     const onConnect: OnConnect = (connection) => {
-      setEdges((eds) => addEdge<BondEdgeType>({ ...connection, type: 'bond', data: { order: 1 } }, eds));
+      setEdges((eds) => {
+        const typedEds = eds as BondEdgeType[];
+        const typedNodes = nodes as AtomNodeType[];
+        const alreadyConnected = typedEds.some(
+          e => !e.data?.isHint &&
+            ((e.source === connection.source && e.target === connection.target) ||
+             (e.source === connection.target && e.target === connection.source))
+        );
+        if (alreadyConnected) return eds;
+        const srcUsed = usedBonds(connection.source, typedEds);
+        const tgtUsed = usedBonds(connection.target, typedEds);
+        const srcValence = ELEMENTS[typedNodes.find(n => n.id === connection.source)?.data.element ?? '']?.valence ?? Infinity;
+        const tgtValence = ELEMENTS[typedNodes.find(n => n.id === connection.target)?.data.element ?? '']?.valence ?? Infinity;
+        if (srcUsed >= srcValence || tgtUsed >= tgtValence) return eds;
+        return addEdge<BondEdgeType>({ ...connection, type: 'bond', data: { order: 1 } }, eds);
+      });
     };
 
-    const cycleEdgeOrder: OnEdgeClick = (_event, edge) => {
-      if (edge.data?.isHint) return;
+    const selectedEdge = (edges as BondEdgeType[]).find(e => e.selected && !e.data?.isHint) ?? null;
+
+    const deleteSelectedEdge = () => {
+      if (!selectedEdge) return;
+      setEdges(eds => eds.filter(e => e.id !== selectedEdge.id));
+    };
+
+    const upgradeEdgeOrder: EdgeMouseHandler<BondEdgeType> = (_event, edge) => {
+      if (edge.data?.isHint || (edge.data?.order ?? 1) >= 2) return;
       setEdges((eds) =>
         eds.map((e) => {
           if (e.id !== edge.id) return e;
-          const current: BondOrder = e.data?.order ?? 1;
-          const proposed: BondOrder = current === 2 ? 1 : 2;
-          if (proposed > current) {
-            const typedEds = eds as BondEdgeType[];
-            const typedNodes = nodes as AtomNodeType[];
-            const srcFree = (ELEMENTS[typedNodes.find(n => n.id === e.source)?.data.element ?? '']?.valence ?? Infinity) - usedBonds(e.source, typedEds, e.id);
-            const tgtFree = (ELEMENTS[typedNodes.find(n => n.id === e.target)?.data.element ?? '']?.valence ?? Infinity) - usedBonds(e.target, typedEds, e.id);
-            if (proposed > srcFree || proposed > tgtFree) return e;
-          }
-          return { ...e, data: { order: proposed } };
+          const typedEds = eds as BondEdgeType[];
+          const typedNodes = nodes as AtomNodeType[];
+          const srcFree = (ELEMENTS[typedNodes.find(n => n.id === e.source)?.data.element ?? '']?.valence ?? Infinity) - usedBonds(e.source, typedEds, e.id);
+          const tgtFree = (ELEMENTS[typedNodes.find(n => n.id === e.target)?.data.element ?? '']?.valence ?? Infinity) - usedBonds(e.target, typedEds, e.id);
+          if (2 > srcFree || 2 > tgtFree) return e;
+          return { ...e, data: { order: 2 as BondOrder } };
         }),
       );
     };
@@ -165,12 +201,15 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           isValidConnection={isValidConnection}
-          onEdgeClick={cycleEdgeOrder}
+          onEdgeDoubleClick={upgradeEdgeOrder}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           connectionMode={ConnectionMode.Loose}
           fitView
           nodesDraggable={false}
+          edgesReconnectable={false}
+          connectionDragThreshold={5}
+          connectOnClick={false}
           style={{ width: '100%', height: '100%' }}
         >
           <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="rgba(26,46,59,0.1)" />
@@ -194,8 +233,29 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
           <ul style={{ margin: '4px 0 0', paddingLeft: 14 }}>
             <li>Hover an atom to reveal handles</li>
             <li>Drag a handle to another atom to bond</li>
-            <li>Click a bond to toggle single/double</li>
+            <li>Click a bond to select it</li>
+            <li>Double-click a bond to upgrade to double</li>
           </ul>
+          <button
+            onClick={deleteSelectedEdge}
+            disabled={!selectedEdge}
+            style={{
+              marginTop: 8,
+              width: '100%',
+              padding: '4px 0',
+              borderRadius: 6,
+              border: '1px solid',
+              borderColor: selectedEdge ? '#E2603F' : 'rgba(26,46,59,0.2)',
+              background: selectedEdge ? '#E2603F' : 'transparent',
+              color: selectedEdge ? '#fff' : 'rgba(26,46,59,0.35)',
+              fontSize: '0.75rem',
+              fontFamily: 'inherit',
+              cursor: selectedEdge ? 'pointer' : 'default',
+              transition: 'all 0.15s',
+            }}
+          >
+            Delete bond
+          </button>
         </div>
       </div>
     );
