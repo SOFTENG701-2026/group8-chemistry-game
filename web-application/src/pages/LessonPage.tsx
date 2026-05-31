@@ -150,7 +150,10 @@ function LessonPrompt({
             if (errorType === 'wrong_order')
               return `Rearrange — try starting with "${CARD_DEF[problem.correct[0]]?.name}"`;
             if (errorType === 'wrong_family') {
-              const needed = [...new Set(problem.correct.map(k => CARD_DEF[k]?.family).filter((f): f is string => Boolean(f)))];
+              const needed = [...new Set(problem.correct.flatMap(k => {
+                const family = CARD_DEF[k]?.family;
+                return family ? [family] : [];
+              }))];
               return `Functional groups needed: ${needed.join(', ')}`;
             }
             return `${problem.correct.length} cards needed`;

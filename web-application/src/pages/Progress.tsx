@@ -13,29 +13,15 @@ import {
 import {
   completeMasteries,
   fetchProgress,
+  getLevelBuilds,
+  isMoleculeMastered,
+  MASTERED_BUILDS,
   resetProgress,
   type ProgressStore,
 } from '../features/chem-assembler/api/progress';
 import type { FamilyName } from '../features/chem-assembler/types';
 
 type FilterValue = 'all' | FamilyName | 'unsolved';
-
-const MASTERED_BUILDS = 3;
-
-function getLevelBuilds(progress: ProgressStore | null, molecule: string, level: 1 | 2 | 3): number {
-  const m = progress?.molecules[molecule];
-  if (!m) return 0;
-  const key = `level${level}Builds` as const;
-  return Math.min(m[key] ?? 0, MASTERED_BUILDS);
-}
-
-function isMastered(progress: ProgressStore | null, molecule: string) {
-  return (
-    getLevelBuilds(progress, molecule, 1) >= MASTERED_BUILDS &&
-    getLevelBuilds(progress, molecule, 2) >= MASTERED_BUILDS &&
-    getLevelBuilds(progress, molecule, 3) >= MASTERED_BUILDS
-  );
-}
 
 function MasteryBadge({
   label,
@@ -290,7 +276,7 @@ export function Progress() {
   }
 
   const visibleMolecules = allMolecules.filter(shouldShow);
-  const masteredCount = visibleMolecules.filter(molecule => isMastered(progress, molecule)).length;
+  const masteredCount = visibleMolecules.filter(molecule => isMoleculeMastered(progress, molecule)).length;
   const totalBuilds = visibleMolecules.reduce(
     (sum, molecule) => sum + getLevelBuilds(progress, molecule, 1) + getLevelBuilds(progress, molecule, 2) + getLevelBuilds(progress, molecule, 3),
     0,
@@ -298,11 +284,11 @@ export function Progress() {
   const possibleBuilds = visibleMolecules.length * MASTERED_BUILDS * 3;
   const completion = possibleBuilds === 0 ? 0 : totalBuilds / possibleBuilds;
   const globalProgressColor = completion >= 1 ? '#3C8D6A' : '#E2603F';
-  const ultimateUnlocked = allMolecules.every(molecule => isMastered(progress, molecule));
+  const ultimateUnlocked = allMolecules.every(molecule => isMoleculeMastered(progress, molecule));
 
   const familyBadges = presentFamilies.map((family) => {
     const molecules = allMolecules.filter(molecule => getPrimaryFamily(molecule) === family);
-    const familyMasteredCount = molecules.filter(molecule => isMastered(progress, molecule)).length;
+    const familyMasteredCount = molecules.filter(molecule => isMoleculeMastered(progress, molecule)).length;
     const unlocked = molecules.length > 0 && familyMasteredCount === molecules.length;
 
     return {
@@ -485,7 +471,7 @@ export function Progress() {
               label="Ultimate mastery"
               unlocked={ultimateUnlocked}
               color="#B8860B"
-              detail={`${allMolecules.filter(molecule => isMastered(progress, molecule)).length}/${allMolecules.length} mastered`}
+              detail={`${allMolecules.filter(molecule => isMoleculeMastered(progress, molecule)).length}/${allMolecules.length} mastered`}
               onClick={() => setActiveFilter('all')}
             />
             {familyBadges.map(badge => (

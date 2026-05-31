@@ -1,9 +1,14 @@
 import type { CSSProperties } from 'react';
 import { useState, useMemo, useEffect } from 'react';
 import { Container, Text, Group, Flex } from '@mantine/core';
+import { IconClipboardCheck, IconLock, IconLockOpen } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 import { PROBLEMS } from '../features/chem-assembler/data/problems';
-import { fetchProgress } from '../features/chem-assembler/api/progress';
+import {
+  fetchProgress,
+  isMoleculeMastered,
+  type ProgressStore,
+} from '../features/chem-assembler/api/progress';
 import { CARD_DEF, FAMILY } from '../features/chem-assembler/data/cards';
 import {
   FAMILY_LABEL,
@@ -11,6 +16,7 @@ import {
   getPrimaryFamily,
   lessonGroupData,
 } from '../features/chem-assembler/data/lessonLibrary';
+import { getRevisionQuiz } from '../features/chem-assembler/data/revisionQuizzes';
 import type { FamilyName } from '../features/chem-assembler/types';
 
 type FilterValue = 'all' | FamilyName | 'unsolved';
@@ -114,25 +120,130 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
   );
 }
 
+function RevisionQuizCard({
+  groupId,
+  groupTitle,
+  masteredCount,
+  totalCount,
+  unlocked,
+  onClick,
+}: {
+  groupId: number;
+  groupTitle: string;
+  masteredCount: number;
+  totalCount: number;
+  unlocked: boolean;
+  onClick: () => void;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        width: '100%',
+        minHeight: 142,
+        backgroundColor: unlocked ? '#FFFFFF' : '#F0EEE9',
+        border: `1.5px solid ${unlocked ? '#3C8D6A' : '#D3D1CB'}`,
+        borderRadius: 8,
+        padding: 16,
+        cursor: 'pointer',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10,
+        textAlign: 'left',
+        opacity: unlocked ? 1 : 0.86,
+        boxShadow: hovered ? '0 2px 12px rgba(26,46,59,0.1)' : 'none',
+        transition: 'box-shadow 0.15s ease',
+      }}
+      aria-label={`${groupTitle} revision quiz, ${unlocked ? 'unlocked' : 'locked'}`}
+    >
+      <Group gap={8} align="center">
+        <div style={{
+          width: 30,
+          height: 30,
+          borderRadius: '50%',
+          display: 'grid',
+          placeItems: 'center',
+          backgroundColor: unlocked ? '#E1F1E9' : '#E0DED8',
+          color: unlocked ? '#3C8D6A' : '#777C78',
+          flexShrink: 0,
+        }}>
+          {unlocked ? <IconLockOpen size={17} stroke={2.2} /> : <IconLock size={17} stroke={2.2} />}
+        </div>
+        <Text style={{
+          color: unlocked ? '#3C8D6A' : '#777C78',
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          fontFamily: '"DM Sans", system-ui, sans-serif',
+        }}>
+          {unlocked ? 'Revision unlocked' : 'Revision locked'}
+        </Text>
+      </Group>
+
+      <Text style={{
+        fontFamily: '"Fraunces", Georgia, serif',
+        fontWeight: 650,
+        fontSize: '1.08rem',
+        lineHeight: 1.2,
+        color: '#1A2E3B',
+      }}>
+        {groupTitle} quiz
+      </Text>
+
+      <Text style={{
+        fontFamily: '"DM Sans", system-ui, sans-serif',
+        fontSize: '0.78rem',
+        color: '#4A6275',
+        lineHeight: 1.35,
+      }}>
+        {unlocked
+          ? 'Review the key functional groups, chain patterns, and naming clues from this set.'
+          : `Master every molecule in this group to unlock: ${masteredCount}/${totalCount} mastered.`}
+      </Text>
+
+      <Group gap={6} mt="auto" align="center" style={{ color: unlocked ? '#1A2E3B' : '#777C78' }}>
+        <IconClipboardCheck size={16} stroke={2.2} />
+        <Text style={{
+          fontSize: 12,
+          fontWeight: 700,
+          fontFamily: '"DM Sans", system-ui, sans-serif',
+        }}>
+          Group {groupId} revision
+        </Text>
+      </Group>
+    </button>
+  );
+}
+
 export function Lessons() {
   const [activeFilter, setActiveFilter] = useState<FilterValue>('all');
   const [recommendedGroup, setRecommendedGroup] = useState<number | null>(null);
+  const [progress, setProgress] = useState<ProgressStore | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchProgress()
-      .then(store => setRecommendedGroup(store.diagnostic?.recommendedGroup ?? null))
+      .then((store) => {
+        setProgress(store);
+        setRecommendedGroup(store.diagnostic?.recommendedGroup ?? null);
+      })
       .catch(console.error);
   }, []);
 
-  const allMolecules = lessonGroupData.flatMap(l => l.molecules);
+  const allMolecules = useMemo(() => lessonGroupData.flatMap(l => l.molecules), []);
   const totalCount = allMolecules.length;
 
   const presentFamilies = useMemo<FamilyName[]>(() => {
     const families = new Set<FamilyName>();
     allMolecules.forEach(m => families.add(getPrimaryFamily(m)));
     return [...families];
-  }, []);
+  }, [allMolecules]);
 
   function shouldShow(molecule: string): boolean {
     if (activeFilter === 'all' || activeFilter === 'unsolved') return true;
@@ -259,6 +370,21 @@ export function Lessons() {
                 gridTemplateColumns: 'repeat(4, 1fr)',
                 gap: 14,
               }}>
+                {getRevisionQuiz(group.groupId) && (() => {
+                  const masteredCount = group.molecules.filter(molecule => isMoleculeMastered(progress, molecule)).length;
+                  const unlocked = masteredCount === group.molecules.length;
+
+                  return (
+                    <RevisionQuizCard
+                      groupId={group.groupId}
+                      groupTitle={group.title}
+                      masteredCount={masteredCount}
+                      totalCount={group.molecules.length}
+                      unlocked={unlocked}
+                      onClick={() => navigate(`/revision-quiz?group=${group.groupId}`)}
+                    />
+                  );
+                })()}
                 {visible.map(molecule => (
                   <MoleculeCard
                     key={molecule}

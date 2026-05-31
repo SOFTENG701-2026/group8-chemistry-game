@@ -117,27 +117,31 @@ export function Home() {
             padding: '18px 24px',
             marginBottom: 24,
             borderRadius: 12,
-            backgroundColor: '#E2603F',
-            color: 'white',
+            backgroundColor: 'white',
+            color: '#1A2E3B',
+            border: '1.5px solid rgba(26,46,59,0.18)',
+            borderLeft: '6px solid #E2603F',
             textDecoration: 'none',
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <CardLabel>
-              <span style={{ color: 'rgba(255,255,255,0.85)' }}>New here?</span>
+              <span>New here?</span>
             </CardLabel>
             <Text style={{
               fontFamily: '"Fraunces", Georgia, serif',
               fontWeight: 600,
               fontSize: '1.15rem',
-              color: 'white',
+              color: '#1A2E3B',
             }}>
               Find your level — build a few molecules, we'll point you to the right lessons.
             </Text>
           </div>
           <span style={{
             padding: '10px 20px',
-            border: '1.5px solid rgba(255,255,255,0.7)',
+            backgroundColor: '#1A2E3B',
+            color: 'white',
+            border: '1.5px solid #1A2E3B',
             borderRadius: 8,
             fontFamily: '"DM Sans", sans-serif',
             fontWeight: 600,
@@ -197,12 +201,12 @@ export function Home() {
           </div>
 
           {/* Sandbox card */}
-          <div style={{ ...cardBase, backgroundColor: '#1A2E3B', border: '1.5px solid #1A2E3B' }}>
-            <Group justify="space-between" align="center" mb={20} style={{ color: 'rgba(255,255,255,0.7)' }}>
+          <div style={{ ...cardBase, backgroundColor: 'white' }}>
+            <Group justify="space-between" align="center" mb={20} style={{ color: '#1A2E3B' }}>
               <CardLabel>Open · No target</CardLabel>
               <span style={{
                 width: 28, height: 28,
-                border: '1.5px solid rgba(255,255,255,0.4)',
+                border: '1.5px solid currentColor',
                 borderRadius: '50%',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -210,15 +214,14 @@ export function Home() {
                 fontFamily: '"DM Sans", sans-serif',
                 fontSize: '0.75rem',
                 fontWeight: 600,
-                color: 'rgba(255,255,255,0.6)',
                 flexShrink: 0,
               }}>
                 02
               </span>
             </Group>
 
-            <h2 style={{ margin: '0 0 8px', color: 'white' }}>Sandbox</h2>
-            <Text style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: 24 }}>
+            <h2 style={{ margin: '0 0 8px' }}>Sandbox</h2>
+            <Text style={{ color: '#4A6275', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: 24 }}>
               Free build. Assemble anything from the full pantry — we'll name it if it's a valid compound.
             </Text>
 
@@ -228,16 +231,16 @@ export function Home() {
               ))}
             </Group>
 
-            <div style={{ marginTop: 28, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ marginTop: 28, paddingTop: 20, borderTop: '1px solid rgba(26,46,59,0.1)' }}>
               <RouterNavLink
                 to="/sandbox"
                 style={{
                   display: 'block',
                   width: '100%',
                   padding: '10px 20px',
-                  backgroundColor: 'transparent',
+                  backgroundColor: '#1A2E3B',
                   color: 'white',
-                  border: '1.5px solid rgba(255,255,255,0.4)',
+                  border: '1.5px solid #1A2E3B',
                   borderRadius: 8,
                   textAlign: 'center',
                   fontFamily: '"DM Sans", sans-serif',
@@ -264,21 +267,20 @@ export function Home() {
               Mastery per functional-group family, streaks, attempt history, and the heatmap.
             </Text>
 
-            <div style={{ flex: 1 }} />
+            <Text style={{ color: '#4A6275', fontSize: '0.8rem', marginTop: 'auto' }}>
+              12 families tracked
+            </Text>
 
             <div style={{ marginTop: 28, paddingTop: 20, borderTop: '1px solid rgba(26,46,59,0.1)' }}>
-              <Text style={{ color: '#4A6275', fontSize: '0.8rem', marginBottom: 12 }}>
-                12 families tracked
-              </Text>
               <RouterNavLink
                 to="/progress"
                 style={{
                   display: 'block',
                   width: '100%',
                   padding: '10px 20px',
-                  backgroundColor: 'transparent',
-                  color: '#1A2E3B',
-                  border: '1.5px solid rgba(26,46,59,0.3)',
+                  backgroundColor: '#1A2E3B',
+                  color: 'white',
+                  border: '1.5px solid #1A2E3B',
                   borderRadius: 8,
                   textAlign: 'center',
                   fontFamily: '"DM Sans", sans-serif',
