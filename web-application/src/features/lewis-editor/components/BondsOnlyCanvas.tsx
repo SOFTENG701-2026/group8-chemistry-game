@@ -128,6 +128,12 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
       if (connection.source === connection.target) return false;
       const typedEdges = edges as BondEdgeType[];
       const typedNodes = nodes as AtomNodeType[];
+      const alreadyConnected = typedEdges.some(
+        e => !e.data?.isHint &&
+          ((e.source === connection.source && e.target === connection.target) ||
+           (e.source === connection.target && e.target === connection.source))
+      );
+      if (alreadyConnected) return false;
       const srcUsed = usedBonds(connection.source, typedEdges);
       const tgtUsed = usedBonds(connection.target, typedEdges);
       const srcValence = ELEMENTS[typedNodes.find(n => n.id === connection.source)?.data.element ?? '']?.valence ?? Infinity;
@@ -186,6 +192,7 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
           connectionMode={ConnectionMode.Loose}
           fitView
           nodesDraggable={false}
+          edgesReconnectable={false}
           style={{ width: '100%', height: '100%' }}
         >
           <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="rgba(26,46,59,0.1)" />
