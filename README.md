@@ -1,6 +1,6 @@
-# Organic Chemistry Molecule Builder
+# Lewis Lab
 
-A drag-and-drop organic chemistry molecule builder built with React + Express.
+An interactive organic chemistry learning app built with React + Express.
 
 ## Prerequisites
 
