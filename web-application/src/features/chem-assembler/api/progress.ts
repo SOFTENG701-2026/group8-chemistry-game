@@ -15,6 +15,23 @@ export type ProgressStore = {
   diagnostic?: DiagnosticResult;
 };
 
+export const MASTERED_BUILDS = 3;
+
+export function getLevelBuilds(progress: ProgressStore | null, molecule: string, level: 1 | 2 | 3): number {
+  const moleculeProgress = progress?.molecules[molecule];
+  if (!moleculeProgress) return 0;
+  const key = `level${level}Builds` as const;
+  return Math.min(moleculeProgress[key] ?? 0, MASTERED_BUILDS);
+}
+
+export function isMoleculeMastered(progress: ProgressStore | null, molecule: string) {
+  return (
+    getLevelBuilds(progress, molecule, 1) >= MASTERED_BUILDS &&
+    getLevelBuilds(progress, molecule, 2) >= MASTERED_BUILDS &&
+    getLevelBuilds(progress, molecule, 3) >= MASTERED_BUILDS
+  );
+}
+
 export async function fetchProgress(): Promise<ProgressStore> {
   const response = await fetch('/api/progress');
   if (!response.ok) throw new Error('Unable to load progress');

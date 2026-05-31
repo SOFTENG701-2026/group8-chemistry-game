@@ -1,20 +1,184 @@
 {
   "molecules": {
-    "Propane": {
-      "level1Builds": 1,
-      "level2Builds": 1,
-      "level3Builds": 0,
-      "updatedAt": "2026-05-25T11:49:53.222Z"
-    },
     "Methane": {
-      "level1Builds": 1,
-      "level2Builds": 1,
-      "level3Builds": 0,
-      "updatedAt": "2026-05-30T04:46:07.598Z"
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Ethane": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Propane": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Butane": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Methanol": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Ethanol": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Propan-1-ol": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Ethene": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Propene": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Chloroethane": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Ethanoic Acid": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Propanoic Acid": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Ethanamine": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Propan-1-amine": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "2-methylpropane": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Propan-2-ol": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Butan-2-ol": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "1-chloropropane": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "2-chloropropane": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "But-2-ene": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Methyl ethanoate": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Ethyl ethanoate": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Propyl methanoate": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Butyl ethanoate": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Propanamide": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Ethanoyl chloride": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Ethan-1,2-diol": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "2-chloro-2-methylpropane": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "2-hydroxypropanoic acid (Lactic Acid)": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
+    },
+    "Glycine (Amino Acid)": {
+      "level1Builds": 3,
+      "level2Builds": 3,
+      "level3Builds": 3,
+      "updatedAt": "2026-05-31T07:59:52.495Z"
     }
-  },
-  "diagnostic": {
-    "recommendedGroup": 3,
-    "completedAt": "2026-05-30T10:46:13.916Z"
   }
 }
