@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import { RootLayout } from './layouts/RootLayout';
 import { Home } from './pages/Home';
+import { Onboarding } from './pages/Onboarding';
 import { Lessons } from './pages/Lessons';
 import { LessonPage } from './pages/LessonPage';
 import { ChemAssembler } from './pages/ChemAssembler';
@@ -12,6 +13,7 @@ export default function App() {
       <Routes>
         <Route element={<RootLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/levels" element={<Navigate to="/lessons" replace />} />
           <Route path="/lessons" element={<Lessons />} />
           <Route path="/lesson" element={<LessonPage />} />

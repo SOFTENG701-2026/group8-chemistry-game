@@ -14,13 +14,26 @@ type LegacyMoleculeProgress = {
   updatedAt: string | null;
 };
 
+type DiagnosticResult = {
+  recommendedGroup: 1 | 2 | 3;
+  completedAt: string;
+};
+
 type ProgressStore = {
   molecules: Record<string, MoleculeProgress>;
+  diagnostic?: DiagnosticResult;
 };
 
 const DATA_FILE = path.resolve(process.cwd(), 'data/progress.json');
 const EMPTY_PROGRESS: MoleculeProgress = { level1Builds: 0, level2Builds: 0, level3Builds: 0, updatedAt: null };
 const EMPTY_STORE: ProgressStore = { molecules: {} };
+
+function parseDiagnostic(raw: unknown): DiagnosticResult | undefined {
+  if (typeof raw !== 'object' || raw === null) return undefined;
+  const r = raw as Partial<DiagnosticResult>;
+  if (r.recommendedGroup !== 1 && r.recommendedGroup !== 2 && r.recommendedGroup !== 3) return undefined;
+  return { recommendedGroup: r.recommendedGroup, completedAt: r.completedAt ?? new Date().toISOString() };
+}
 
 export const progressRouter: Router = Router();
 
@@ -46,12 +59,13 @@ function migrateMolecule(raw: unknown): MoleculeProgress {
 async function readProgress(): Promise<ProgressStore> {
   try {
     const data = await readFile(DATA_FILE, 'utf8');
-    const parsed = JSON.parse(data) as { molecules?: Record<string, unknown> };
+    const parsed = JSON.parse(data) as { molecules?: Record<string, unknown>; diagnostic?: unknown };
     const molecules: Record<string, MoleculeProgress> = {};
     for (const [name, value] of Object.entries(parsed.molecules ?? {})) {
       molecules[name] = migrateMolecule(value);
     }
-    return { molecules };
+    const diagnostic = parseDiagnostic(parsed.diagnostic);
+    return diagnostic ? { molecules, diagnostic } : { molecules };
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code;
     if (code !== 'ENOENT') throw error;
@@ -77,6 +91,23 @@ progressRouter.delete('/', async (_req, res, next) => {
   try {
     await writeProgress(EMPTY_STORE);
     res.json(EMPTY_STORE);
+  } catch (error) {
+    next(error);
+  }
+});
+
+progressRouter.post('/diagnostic', async (req, res, next) => {
+  try {
+    const group = Number(req.body?.recommendedGroup);
+    if (group !== 1 && group !== 2 && group !== 3) {
+      res.status(400).json({ error: 'recommendedGroup must be 1, 2, or 3' });
+      return;
+    }
+
+    const store = await readProgress();
+    store.diagnostic = { recommendedGroup: group, completedAt: new Date().toISOString() };
+    await writeProgress(store);
+    res.json(store);
   } catch (error) {
     next(error);
   }

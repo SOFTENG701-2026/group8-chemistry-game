@@ -1,8 +1,9 @@
 import type { CSSProperties } from 'react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Container, Text, Group, Flex } from '@mantine/core';
 import { useNavigate } from 'react-router';
 import { PROBLEMS } from '../features/chem-assembler/data/problems';
+import { fetchProgress } from '../features/chem-assembler/api/progress';
 import { CARD_DEF, FAMILY } from '../features/chem-assembler/data/cards';
 import {
   FAMILY_LABEL,
@@ -115,7 +116,14 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
 
 export function Lessons() {
   const [activeFilter, setActiveFilter] = useState<FilterValue>('all');
+  const [recommendedGroup, setRecommendedGroup] = useState<number | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchProgress()
+      .then(store => setRecommendedGroup(store.diagnostic?.recommendedGroup ?? null))
+      .catch(console.error);
+  }, []);
 
   const allMolecules = lessonGroupData.flatMap(l => l.molecules);
   const totalCount = allMolecules.length;
@@ -194,19 +202,49 @@ export function Lessons() {
           const visible = group.molecules.filter(shouldShow);
           if (visible.length === 0) return null;
 
+          const isRecommended = recommendedGroup === group.groupId;
+
           return (
-            <section key={group.groupId} style={{ marginBottom: 56 }}>
+            <section
+              key={group.groupId}
+              style={{
+                marginBottom: 56,
+                ...(isRecommended ? {
+                  border: '1.5px solid #E2603F',
+                  borderRadius: 12,
+                  padding: 20,
+                  backgroundColor: 'rgba(226,96,63,0.04)',
+                } : {}),
+              }}
+            >
               <Group justify="space-between" align="baseline" mb={16}>
-                <Text style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  color: '#4A6275',
-                  fontFamily: '"DM Sans", system-ui, sans-serif',
-                }}>
-                  {group.title}
-                </Text>
+                <Group gap={10} align="baseline">
+                  <Text style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    color: '#4A6275',
+                    fontFamily: '"DM Sans", system-ui, sans-serif',
+                  }}>
+                    {group.title}
+                  </Text>
+                  {isRecommended && (
+                    <Text style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      color: 'white',
+                      backgroundColor: '#E2603F',
+                      borderRadius: 100,
+                      padding: '3px 10px',
+                      fontFamily: '"DM Sans", system-ui, sans-serif',
+                    }}>
+                      Recommended for you
+                    </Text>
+                  )}
+                </Group>
                 <Text style={{
                   fontSize: 12,
                   color: '#4A6275',

@@ -105,6 +105,49 @@ export function Home() {
           </Text>
         </div>
 
+        {/* Find-your-level banner (optional onboarding diagnostic) */}
+        <RouterNavLink
+          to="/onboarding"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 16,
+            flexWrap: 'wrap',
+            padding: '18px 24px',
+            marginBottom: 24,
+            borderRadius: 12,
+            backgroundColor: '#E2603F',
+            color: 'white',
+            textDecoration: 'none',
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <CardLabel>
+              <span style={{ color: 'rgba(255,255,255,0.85)' }}>New here?</span>
+            </CardLabel>
+            <Text style={{
+              fontFamily: '"Fraunces", Georgia, serif',
+              fontWeight: 600,
+              fontSize: '1.15rem',
+              color: 'white',
+            }}>
+              Find your level — build a few molecules, we'll point you to the right lessons.
+            </Text>
+          </div>
+          <span style={{
+            padding: '10px 20px',
+            border: '1.5px solid rgba(255,255,255,0.7)',
+            borderRadius: 8,
+            fontFamily: '"DM Sans", sans-serif',
+            fontWeight: 600,
+            fontSize: '0.9rem',
+            whiteSpace: 'nowrap',
+          }}>
+            find your level →
+          </span>
+        </RouterNavLink>
+
         {/* Cards row */}
         <div style={{
           display: 'grid',
