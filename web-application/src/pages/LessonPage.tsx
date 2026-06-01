@@ -393,7 +393,7 @@ function Level3Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
       <div className={shake ? 'shake' : ''} style={{ height: canvasHeight, marginTop: 16, position: 'relative', overflow: 'hidden' }}>
         <ReactFlowProvider>
           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
-            <LewisCanvas resetKey={resetKey} onMoleculeChange={setDrawnName} showFullscreen={false} maxSideHeight={canvasHeight} />
+            <LewisCanvas resetKey={resetKey} onMoleculeChange={setDrawnName} showFullscreen={false} showInfoPanels={false} maxSideHeight={canvasHeight} />
           </div>
         </ReactFlowProvider>
       </div>
