@@ -432,7 +432,7 @@ export function LessonPage() {
   function handleNextLevel() {
     if (!activeLevel) return;
     if (activeLevel < 3) goToLevel((activeLevel + 1) as Level);
-    // level 3 complete — stay on page (feedback already shown)
+    else navigate('/lessons'); // level 3 complete — back to lessons
   }
 
   if (!problem) {
