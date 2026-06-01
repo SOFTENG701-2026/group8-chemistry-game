@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   useNodesState,
   useEdgesState,
@@ -14,7 +14,6 @@ import type { BondEdgeType } from '../components/BondEdge';
 import { ELEMENTS } from '../data/elements';
 import type { BondOrder } from '@app/shared';
 
-const uid = () => Math.random().toString(36).slice(2, 9);
 const ATOM_NODE_SIZE = 44;
 
 type ScreenRect = {
@@ -61,7 +60,19 @@ function getDragOffset(event: React.DragEvent<HTMLDivElement>): DragOffset {
 export function useLewisEditor() {
   const [nodes, setNodes, onNodesChange] = useNodesState<AtomNodeType>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<BondEdgeType>([]);
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, deleteElements } = useReactFlow();
+  const nextAtomId = useRef(0);
+
+  // Drop any edge whose endpoint atom no longer exists, so the bond counts and
+  // valence checks never report a bond that BondEdge can't draw. Returning the
+  // same array reference when nothing changes keeps this from looping.
+  useEffect(() => {
+    setEdges((eds) => {
+      const ids = new Set(nodes.map((n) => n.id));
+      const pruned = eds.filter((e) => ids.has(e.source) && ids.has(e.target));
+      return pruned.length === eds.length ? eds : pruned;
+    });
+  }, [nodes, setEdges]);
 
   const isValidConnection: IsValidConnection = useCallback(
     (connection) => {
@@ -78,14 +89,22 @@ export function useLewisEditor() {
 
   const onConnect: OnConnect = useCallback(
     (connection) => {
-      setEdges((eds) =>
-        addEdge<BondEdgeType>(
+      if (connection.source === connection.target) return;
+      setEdges((eds) => {
+        // Re-check valence against the freshest edge list so rapid drags can't
+        // push an atom past its valence (isValidConnection sees a stale snapshot).
+        const typedEds = eds as BondEdgeType[];
+        const typedNodes = nodes as AtomNodeType[];
+        const srcFull = usedBonds(connection.source, typedEds) >= valenceOf(connection.source, typedNodes);
+        const tgtFull = usedBonds(connection.target, typedEds) >= valenceOf(connection.target, typedNodes);
+        if (srcFull || tgtFull) return eds;
+        return addEdge<BondEdgeType>(
           { ...connection, type: 'bond', data: { order: 1 } },
           eds,
-        ),
-      );
+        );
+      });
     },
-    [setEdges],
+    [setEdges, nodes],
   );
 
   const toggleSelectedEdgeOrder = useCallback(
@@ -146,7 +165,7 @@ export function useLewisEditor() {
         y: event.clientY - offset.y,
       });
       const newNode: AtomNodeType = {
-        id: uid(),
+        id: `atom-${nextAtomId.current++}`,
         type: 'atom',
         position,
         data: { element },
@@ -232,14 +251,11 @@ export function useLewisEditor() {
   }
 
   function deleteSelectedElements() {
-    setNodes((nds) => nds.filter((n) => !n.selected));
-    setEdges((eds) => {
-      const remainingIds = new Set(
-        nodes.filter((n) => !n.selected).map((n) => n.id),
-      );
-      return eds.filter(
-        (e) => remainingIds.has(e.source) && remainingIds.has(e.target) && !e.selected,
-      );
+    // deleteElements atomically removes the selected nodes, their connected
+    // edges, and any selected edges — so no orphan edge is ever left behind.
+    void deleteElements({
+      nodes: nodes.filter((n) => n.selected),
+      edges: edges.filter((e) => e.selected),
     });
   }
 

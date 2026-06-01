@@ -393,7 +393,7 @@ function Level3Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
       <div className={shake ? 'shake' : ''} style={{ height: canvasHeight, marginTop: 16, position: 'relative', overflow: 'hidden' }}>
         <ReactFlowProvider>
           <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
-            <LewisCanvas resetKey={resetKey} onMoleculeChange={setDrawnName} showFullscreen={false} maxSideHeight={canvasHeight} />
+            <LewisCanvas resetKey={resetKey} onMoleculeChange={setDrawnName} showFullscreen={false} showInfoPanels={false} maxSideHeight={canvasHeight} />
           </div>
         </ReactFlowProvider>
       </div>
@@ -432,7 +432,7 @@ export function LessonPage() {
   function handleNextLevel() {
     if (!activeLevel) return;
     if (activeLevel < 3) goToLevel((activeLevel + 1) as Level);
-    // level 3 complete — stay on page (feedback already shown)
+    else navigate('/lessons'); // level 3 complete — back to lessons
   }
 
   if (!problem) {

@@ -37,6 +37,7 @@ type LewisCanvasProps = {
   resetKey?: number;
   onMoleculeChange?: (name: string | null) => void;
   showFullscreen?: boolean;
+  showInfoPanels?: boolean; // atom-details + molecule-readout panels
   maxSideHeight?: number;
 };
 
@@ -98,7 +99,7 @@ function CenteredConnectionLine({
   );
 }
 
-export function LewisCanvas({ resetKey, onMoleculeChange, showFullscreen = true, maxSideHeight }: LewisCanvasProps) {
+export function LewisCanvas({ resetKey, onMoleculeChange, showFullscreen = true, showInfoPanels = true, maxSideHeight }: LewisCanvasProps) {
   const isFirstRender = useRef(true);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const paletteColumnRef = useRef<HTMLDivElement | null>(null);
@@ -596,12 +597,16 @@ export function LewisCanvas({ resetKey, onMoleculeChange, showFullscreen = true,
         </div>
 
         <div className="lewis-editor-side" ref={sideColumnRef}>
-          <AtomInfoPanel
-            selectedNodes={selectedNodes}
-            edges={typedEdges}
-            onPreviewAtomChange={setPreviewedAtomId}
-          />
-          <MoleculeReadout nodes={typedNodes} edges={typedEdges} />
+          {showInfoPanels && (
+            <>
+              <AtomInfoPanel
+                selectedNodes={selectedNodes}
+                edges={typedEdges}
+                onPreviewAtomChange={setPreviewedAtomId}
+              />
+              <MoleculeReadout nodes={typedNodes} edges={typedEdges} />
+            </>
+          )}
           <HintBox />
         </div>
       </div>
