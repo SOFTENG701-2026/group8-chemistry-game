@@ -4,7 +4,9 @@ import {
   Background,
   BackgroundVariant,
   ConnectionMode,
+  ConnectionLineType,
   addEdge,
+  getStraightPath,
   useNodesState,
   useEdgesState,
   type NodeTypes,
@@ -12,6 +14,7 @@ import {
   type OnConnect,
   type EdgeMouseHandler,
   type IsValidConnection,
+  type ConnectionLineComponentProps,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -26,8 +29,13 @@ import type { BondOrder } from '@app/shared';
 
 const HINT_EDGE_ID = '__hint__';
 const ATOM_RADIUS = 22;
+const ATOM_NODE_SIZE = 44;
 const nodeTypes: NodeTypes = { atom: AtomNode };
 const edgeTypes: EdgeTypes = { bond: BondEdge };
+const connectionLineContainerStyle: React.CSSProperties = {
+  zIndex: 0,
+  pointerEvents: 'none',
+};
 
 function usedBonds(nodeId: string, edgeList: BondEdgeType[], excludeId?: string): number {
   return edgeList.reduce((sum, e) => {
@@ -47,6 +55,49 @@ function validateBonds(drawn: BondEdgeType[], expected: MolBond[]): boolean {
     if (drawnMap.get(key(b.source, b.target)) !== b.order) return false;
   }
   return true;
+}
+
+function CenteredConnectionLine({
+  fromNode,
+  toNode,
+  toHandle,
+  toX,
+  toY,
+  connectionStatus,
+  connectionLineStyle,
+}: ConnectionLineComponentProps<AtomNodeType>) {
+  const sourceX =
+    fromNode.internals.positionAbsolute.x + (fromNode.measured.width ?? ATOM_NODE_SIZE) / 2;
+  const sourceY =
+    fromNode.internals.positionAbsolute.y + (fromNode.measured.height ?? ATOM_NODE_SIZE) / 2;
+  const shouldSnapToTarget =
+    toNode !== null &&
+    toHandle?.type === 'target' &&
+    toHandle.id === 'atom-target' &&
+    connectionStatus === 'valid';
+  const targetX = shouldSnapToTarget
+    ? toNode.internals.positionAbsolute.x + (toNode.measured.width ?? ATOM_NODE_SIZE) / 2
+    : toX;
+  const targetY = shouldSnapToTarget
+    ? toNode.internals.positionAbsolute.y + (toNode.measured.height ?? ATOM_NODE_SIZE) / 2
+    : toY;
+  const [path] = getStraightPath({
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+  });
+
+  return (
+    <path
+      d={path}
+      fill="none"
+      stroke="#1A2E3B"
+      strokeWidth={2}
+      strokeLinecap="round"
+      style={connectionLineStyle}
+    />
+  );
 }
 
 export type BondsOnlyCanvasHandle = {
@@ -167,17 +218,33 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
       setEdges(eds => eds.filter(e => e.id !== selectedEdge.id));
     };
 
-    const upgradeEdgeOrder: EdgeMouseHandler<BondEdgeType> = (_event, edge) => {
-      if (edge.data?.isHint || (edge.data?.order ?? 1) >= 2) return;
+    const selectOrCycleEdgeOrder: EdgeMouseHandler<BondEdgeType> = (event, edge) => {
+      event.stopPropagation();
+      if (edge.data?.isHint) return;
+
+      if (!edge.selected) {
+        setEdges((eds) =>
+          eds.map((e) => ({
+            ...e,
+            selected: e.id === edge.id,
+          })),
+        );
+        return;
+      }
+
       setEdges((eds) =>
         eds.map((e) => {
           if (e.id !== edge.id) return e;
-          const typedEds = eds as BondEdgeType[];
-          const typedNodes = nodes as AtomNodeType[];
-          const srcFree = (ELEMENTS[typedNodes.find(n => n.id === e.source)?.data.element ?? '']?.valence ?? Infinity) - usedBonds(e.source, typedEds, e.id);
-          const tgtFree = (ELEMENTS[typedNodes.find(n => n.id === e.target)?.data.element ?? '']?.valence ?? Infinity) - usedBonds(e.target, typedEds, e.id);
-          if (2 > srcFree || 2 > tgtFree) return e;
-          return { ...e, data: { order: 2 as BondOrder } };
+          const current: BondOrder = e.data?.order ?? 1;
+          const proposed: BondOrder = current === 2 ? 1 : 2;
+          if (proposed > current) {
+            const typedEds = eds as BondEdgeType[];
+            const typedNodes = nodes as AtomNodeType[];
+            const srcFree = (ELEMENTS[typedNodes.find(n => n.id === e.source)?.data.element ?? '']?.valence ?? Infinity) - usedBonds(e.source, typedEds, e.id);
+            const tgtFree = (ELEMENTS[typedNodes.find(n => n.id === e.target)?.data.element ?? '']?.valence ?? Infinity) - usedBonds(e.target, typedEds, e.id);
+            if (proposed > srcFree || proposed > tgtFree) return e;
+          }
+          return { ...e, data: { order: proposed } };
         }),
       );
     };
@@ -185,12 +252,47 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
     return (
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
         <style>{`
-          .lewis-atom-node:hover .react-flow__handle,
-          .react-flow__node.selected .lewis-atom-node .react-flow__handle {
+          .lewis-atom-node:hover .lewis-atom-source,
+          .react-flow__node.selected .lewis-atom-node .lewis-atom-source {
             opacity: 1 !important;
           }
-          .react-flow__handle-connecting,
-          .react-flow__handle-valid { opacity: 1 !important; background: #E2603F !important; border-color: white !important; }
+          .lewis-atom-source.react-flow__handle-connecting,
+          .lewis-atom-source.react-flow__handle-valid {
+            opacity: 1 !important;
+            background: #E2603F !important;
+            border-color: white !important;
+          }
+          .lewis-atom-target.react-flow__handle,
+          .lewis-atom-target.react-flow__handle-connecting,
+          .lewis-atom-target.react-flow__handle-valid {
+            opacity: 1 !important;
+            background: transparent !important;
+            border: none !important;
+          }
+          .lewis-atom-node:has(.lewis-atom-target.react-flow__handle-valid) {
+            box-shadow:
+              0 0 0 3px rgba(226,96,63,0.28),
+              0 0 0 6px rgba(226,96,63,0.12),
+              0 2px 6px rgba(0,0,0,0.12) !important;
+          }
+          .lewis-atom-node:has(.lewis-atom-target.react-flow__handle-valid)::after {
+            content: "";
+            position: absolute;
+            inset: -5px;
+            border: 2px solid #E2603F;
+            border-radius: 50%;
+            pointer-events: none;
+          }
+          .react-flow__connectionline {
+            z-index: 0 !important;
+            pointer-events: none;
+          }
+          .react-flow__nodes {
+            z-index: 5 !important;
+          }
+          .react-flow__node {
+            z-index: 5 !important;
+          }
           .react-flow__handle { background: transparent; }
         `}</style>
 
@@ -201,15 +303,19 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           isValidConnection={isValidConnection}
-          onEdgeDoubleClick={upgradeEdgeOrder}
+          onEdgeClick={selectOrCycleEdgeOrder}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
-          connectionMode={ConnectionMode.Loose}
+          connectionMode={ConnectionMode.Strict}
+          connectionLineType={ConnectionLineType.Straight}
+          connectionLineComponent={CenteredConnectionLine}
+          connectionLineContainerStyle={connectionLineContainerStyle}
           fitView
           nodesDraggable={false}
           edgesReconnectable={false}
           connectionDragThreshold={5}
           connectOnClick={false}
+          deleteKeyCode="Delete"
           style={{ width: '100%', height: '100%' }}
         >
           <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="rgba(26,46,59,0.1)" />
@@ -233,8 +339,8 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
           <ul style={{ margin: '4px 0 0', paddingLeft: 14 }}>
             <li>Hover an atom to reveal handles</li>
             <li>Drag a handle to another atom to bond</li>
-            <li>Click a bond to select it</li>
-            <li>Double-click a bond to upgrade to double</li>
+            <li>Select a bond, then click it again to toggle single/double</li>
+            <li>Delete key removes the selected bond</li>
           </ul>
           <button
             onClick={deleteSelectedEdge}
