@@ -1,3 +1,4 @@
+import { IconCheck, IconX } from '@tabler/icons-react';
 import type { Feedback, LessonErrorType } from '../types';
 
 type FeedbackRowProps = {
@@ -29,14 +30,20 @@ function getWrongMessage(errorType: LessonErrorType | undefined, drawnName?: str
 export function FeedbackRow({ feedback, onNext, errorType, drawnName }: FeedbackRowProps) {
   if (!feedback) return null;
 
+  const isRight = feedback === 'right';
+  const statusLabel = isRight ? 'Correct' : 'Incorrect';
+  const StatusIcon = isRight ? IconCheck : IconX;
+
   return (
     <div
       className="pop-in"
+      role="status"
+      aria-live="polite"
       style={{
         marginTop: '14px',
         padding: '12px 16px',
         borderRadius: '6px',
-        background: feedback === 'right' ? '#3C7530' : '#A03E2E',
+        background: isRight ? '#3C7530' : '#A03E2E',
         color: '#F5EFE1',
         fontFamily: '"Fraunces", Georgia, serif',
         display: 'flex',
@@ -46,17 +53,36 @@ export function FeedbackRow({ feedback, onNext, errorType, drawnName }: Feedback
         flexWrap: 'wrap',
       }}
     >
-      <div>
-        <strong style={{ fontWeight: 700, fontSize: '1.05rem' }}>
-          {feedback === 'right' ? 'Correctly assembled.' : 'Not quite.'}
-        </strong>{' '}
-        <span style={{ fontStyle: 'italic', opacity: 0.9 }}>
-          {feedback === 'right'
-            ? 'Bonds satisfied. Onward.'
-            : getWrongMessage(errorType, drawnName)}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+        <span
+          aria-label={statusLabel}
+          title={statusLabel}
+          style={{
+            width: 30,
+            height: 30,
+            borderRadius: '50%',
+            background: '#F5EFE1',
+            color: isRight ? '#2F7558' : '#A03E2E',
+            display: 'inline-grid',
+            placeItems: 'center',
+            flex: '0 0 auto',
+            boxShadow: '0 0 0 2px rgba(245,239,225,0.35)',
+          }}
+        >
+          <StatusIcon size={20} stroke={3} aria-hidden="true" />
         </span>
+        <div>
+          <strong style={{ fontWeight: 700, fontSize: '1.05rem' }}>
+            {isRight ? 'Correctly assembled.' : 'Not quite.'}
+          </strong>{' '}
+          <span style={{ fontStyle: 'italic', opacity: 0.9 }}>
+            {isRight
+              ? 'Bonds satisfied. Onward.'
+              : getWrongMessage(errorType, drawnName)}
+          </span>
+        </div>
       </div>
-      {feedback === 'right' && onNext && (
+      {isRight && onNext && (
         <button
           onClick={onNext}
           style={{
