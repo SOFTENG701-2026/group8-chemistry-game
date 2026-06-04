@@ -2,6 +2,14 @@
 
 An interactive organic chemistry learning app built with React + Express.
 
+## Repository History
+
+This project was originally developed in [Wroppy/softeng701-as2-3](https://github.com/Wroppy/softeng701-as2-3) and later ported into this repository. Because of that move, some pull request references in older commit history may not link to the original pull requests correctly.
+
+## Changes Since In-Class Presentation
+
+Since the in-class presentation, Lewis Lab has improved icon-button accessibility by adding tooltips and using more pronounced icons so actions are easier to identify at a glance.
+
 ## How to Run the Application
 
 Lewis Lab has two parts:
@@ -100,6 +108,11 @@ Base URL: `http://localhost:3001`
 | GET | `/api/molecules/:id` | Get a molecule |
 | POST | `/api/molecules` | Save a molecule |
 | DELETE | `/api/molecules/:id` | Delete a molecule |
+| GET | `/api/progress` | Get saved progress |
+| DELETE | `/api/progress` | Reset saved progress |
+| POST | `/api/progress/diagnostic` | Save diagnostic quiz recommendation |
+| POST | `/api/progress/masteries` | Mark molecules as mastered |
+| POST | `/api/progress/:moleculeName/builds` | Record a molecule build |
 
 ## Project Structure
 
