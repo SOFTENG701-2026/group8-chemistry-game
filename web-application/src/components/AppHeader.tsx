@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Group, Text, UnstyledButton, ActionIcon } from '@mantine/core';
+import { Group, Text, UnstyledButton, ActionIcon, Tooltip } from '@mantine/core';
 import { NavLink as RouterNavLink, useLocation } from 'react-router';
 import { IconAtom, IconHelp } from '@tabler/icons-react';
 import { HowToPlayModal } from './HowToPlayModal';
@@ -61,16 +61,18 @@ export function AppHeader() {
                 </UnstyledButton>
               );
             })}
-            <ActionIcon
-              variant="subtle"
-              color="gray"
-              size={36}
-              radius="xl"
-              aria-label="How to play"
-              onClick={() => setHelpOpen(true)}
-            >
-              <IconHelp size={22} stroke={1.5} color="#4A6275" />
-            </ActionIcon>
+            <Tooltip label="How to play" position="bottom" withArrow>
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                size={36}
+                radius="xl"
+                aria-label="How to play"
+                onClick={() => setHelpOpen(true)}
+              >
+                <IconHelp size={22} stroke={1.5} color="#4A6275" />
+              </ActionIcon>
+            </Tooltip>
           </Group>
         </Group>
       </div>
