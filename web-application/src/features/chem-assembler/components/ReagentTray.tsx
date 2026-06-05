@@ -31,7 +31,7 @@ export function ReagentTray({
             fontStyle: 'italic',
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: '#4A6275',
+            color: 'var(--muted)',
           }}
         >
           reagent tray
@@ -41,7 +41,7 @@ export function ReagentTray({
             fontFamily: '"Fraunces", Georgia, serif',
             fontSize: '0.75rem',
             fontStyle: 'italic',
-            color: '#8A9BA8',
+            color: 'var(--muted-2)',
           }}
         >
           {pool.length} {pool.length === 1 ? 'piece' : 'pieces'} available
@@ -55,8 +55,8 @@ export function ReagentTray({
           gap: '10px',
           minHeight: '90px',
           padding: '16px',
-          background: 'rgba(26,46,59,0.04)',
-          border: '1.5px solid rgba(26,46,59,0.12)',
+          background: 'var(--ink-soft)',
+          border: '1.5px solid var(--border-subtle)',
           borderRadius: '10px',
         }}
       >
@@ -65,7 +65,7 @@ export function ReagentTray({
             style={{
               flex: 1,
               textAlign: 'center',
-              color: '#8A9BA8',
+              color: 'var(--muted-2)',
               fontFamily: '"Fraunces", Georgia, serif',
               fontStyle: 'italic',
               alignSelf: 'center',

@@ -14,7 +14,7 @@ export function Stat({ label, value, accent }: StatProps) {
           fontStyle: 'italic',
           letterSpacing: '0.18em',
           textTransform: 'uppercase',
-          color: '#4A6275',
+          color: 'var(--muted)',
         }}
       >
         {label}
@@ -24,7 +24,7 @@ export function Stat({ label, value, accent }: StatProps) {
           fontFamily: '"JetBrains Mono", monospace',
           fontWeight: 700,
           fontSize: '1.2rem',
-          color: accent ? '#E2603F' : '#1A2E3B',
+          color: accent ? 'var(--accent)' : 'var(--text)',
           lineHeight: 1,
         }}
       >

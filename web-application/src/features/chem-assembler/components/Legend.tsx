@@ -13,7 +13,7 @@ export function Legend() {
         style={{
           cursor: 'pointer',
           fontStyle: 'italic',
-          color: '#4A6275',
+          color: 'var(--muted)',
           letterSpacing: '0.04em',
         }}
       >
@@ -41,7 +41,7 @@ export function Legend() {
               fontStyle: 'normal',
               fontFamily: '"DM Sans", sans-serif',
               fontSize: '0.78rem',
-              color: '#1A2E3B',
+              color: 'var(--text)',
               textTransform: 'lowercase',
               letterSpacing: '0.02em',
             }}

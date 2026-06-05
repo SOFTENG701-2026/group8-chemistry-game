@@ -92,7 +92,7 @@ function CenteredConnectionLine({
     <path
       d={path}
       fill="none"
-      stroke="#1A2E3B"
+      stroke="var(--text)"
       strokeWidth={2}
       strokeLinecap="round"
       style={connectionLineStyle}
@@ -250,7 +250,7 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
     };
 
     return (
-      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <div className="lewis-bonds-only-canvas" style={{ position: 'relative', width: '100%', height: '100%' }}>
         <style>{`
           .lewis-atom-node:hover .lewis-atom-source,
           .react-flow__node.selected .lewis-atom-node .lewis-atom-source {
@@ -259,7 +259,7 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
           .lewis-atom-source.react-flow__handle-connecting,
           .lewis-atom-source.react-flow__handle-valid {
             opacity: 1 !important;
-            background: #E2603F !important;
+            background: var(--accent) !important;
             border-color: white !important;
           }
           .lewis-atom-target.react-flow__handle,
@@ -279,7 +279,7 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
             content: "";
             position: absolute;
             inset: -5px;
-            border: 2px solid #E2603F;
+            border: 2px solid var(--accent);
             border-radius: 50%;
             pointer-events: none;
           }
@@ -318,24 +318,24 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
           deleteKeyCode="Delete"
           style={{ width: '100%', height: '100%' }}
         >
-          <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="rgba(26,46,59,0.1)" />
+          <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="var(--grid-dot)" />
         </ReactFlow>
 
         <div style={{
           position: 'absolute',
           top: 10,
           right: 10,
-          background: 'rgba(255,255,255,0.85)',
-          border: '1px solid rgba(26,46,59,0.12)',
+          background: 'var(--panel-bg)',
+          border: '1px solid var(--panel-border)',
           borderRadius: 8,
           padding: '10px 14px',
           fontFamily: '"DM Sans", system-ui, sans-serif',
           fontSize: '0.75rem',
-          color: '#4A6275',
+          color: 'var(--muted)',
           zIndex: 10,
           lineHeight: 1.6,
         }}>
-          <strong style={{ color: '#1A2E3B' }}>Tips</strong>
+          <strong style={{ color: 'var(--text)' }}>Tips</strong>
           <ul style={{ margin: '4px 0 0', paddingLeft: 14 }}>
             <li>Hover an atom to reveal handles</li>
             <li>Drag a handle to another atom to bond</li>
@@ -351,9 +351,9 @@ export const BondsOnlyCanvas = forwardRef<BondsOnlyCanvasHandle, Props>(
               padding: '4px 0',
               borderRadius: 6,
               border: '1px solid',
-              borderColor: selectedEdge ? '#E2603F' : 'rgba(26,46,59,0.2)',
-              background: selectedEdge ? '#E2603F' : 'transparent',
-              color: selectedEdge ? '#fff' : 'rgba(26,46,59,0.35)',
+              borderColor: selectedEdge ? 'var(--danger)' : 'var(--panel-border)',
+              background: selectedEdge ? 'var(--danger)' : 'transparent',
+              color: selectedEdge ? '#fff' : 'var(--muted-2)',
               fontSize: '0.75rem',
               fontFamily: 'inherit',
               cursor: selectedEdge ? 'pointer' : 'default',

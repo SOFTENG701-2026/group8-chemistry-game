@@ -37,8 +37,8 @@ function MasteryBadge({
   onClick: () => void;
 }) {
   const badgeColor = unlocked ? color : '#8D948F';
-  const borderColor = unlocked ? color : '#D3D1CB';
-  const background = unlocked ? '#FFFFFF' : '#F0EEE9';
+  const borderColor = unlocked ? color : 'var(--border-subtle)';
+  const background = unlocked ? 'var(--surface)' : 'var(--panel-bg)';
 
   return (
     <button
@@ -53,7 +53,7 @@ function MasteryBadge({
         border: `1.5px solid ${borderColor}`,
         borderRadius: 8,
         background,
-        color: '#1A2E3B',
+        color: 'var(--text)',
         cursor: 'pointer',
         padding: '10px 12px',
         textAlign: 'left',
@@ -94,7 +94,7 @@ function MasteryBadge({
         <Text style={{
           fontFamily: '"DM Sans", system-ui, sans-serif',
           fontSize: '0.72rem',
-          color: '#4A6275',
+          color: 'var(--muted)',
           lineHeight: 1.25,
           marginTop: 4,
         }}>
@@ -121,13 +121,13 @@ function LevelPips({ level1, level2, level3 }: { level1: number; level2: number;
               fontFamily: '"DM Sans", system-ui, sans-serif',
               fontSize: 10,
               fontWeight: 700,
-              color: '#4A6275',
+              color: 'var(--muted)',
               width: 14,
               flexShrink: 0,
             }}>
               {label}
             </span>
-            <div style={{ flex: 1, height: 6, borderRadius: 999, background: '#EEE9DF', overflow: 'hidden' }}>
+            <div style={{ flex: 1, height: 6, borderRadius: 999, background: 'var(--ink-soft-2)', overflow: 'hidden' }}>
               <div style={{ width: `${ratio * 100}%`, height: '100%', background: color, transition: 'width 0.2s ease' }} />
             </div>
           </div>
@@ -161,15 +161,15 @@ function MoleculeProgressCard({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        backgroundColor: 'white',
-        border: '1px solid #E5E1D8',
+        backgroundColor: 'var(--surface)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: 8,
         padding: '16px',
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         gap: 10,
-        boxShadow: hovered ? '0 2px 12px rgba(26,46,59,0.1)' : 'none',
+        boxShadow: hovered ? 'var(--shadow-hover)' : 'none',
         transition: 'box-shadow 0.15s ease',
       }}
     >
@@ -198,7 +198,7 @@ function MoleculeProgressCard({
         fontWeight: 600,
         fontSize: '1rem',
         lineHeight: 1.2,
-        color: '#1A2E3B',
+        color: 'var(--text)',
       }}>
         {molecule}
       </Text>
@@ -207,7 +207,7 @@ function MoleculeProgressCard({
         <Text style={{
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: '0.75rem',
-          color: '#4A6275',
+          color: 'var(--muted)',
           lineHeight: 1.4,
         }}>
           {problem.formula}
@@ -303,9 +303,9 @@ export function Progress() {
   const chipStyle = (isActive: boolean): CSSProperties => ({
     padding: '6px 16px',
     borderRadius: 100,
-    border: `1.5px solid ${isActive ? '#1A2E3B' : '#C9C5BB'}`,
-    backgroundColor: isActive ? '#1A2E3B' : 'transparent',
-    color: isActive ? 'white' : '#1A2E3B',
+    border: `1.5px solid ${isActive ? 'var(--text)' : 'var(--border-subtle)'}`,
+    backgroundColor: isActive ? 'var(--text)' : 'transparent',
+    color: isActive ? 'var(--bg)' : 'var(--text)',
     fontFamily: '"DM Sans", system-ui, sans-serif',
     fontWeight: isActive ? 600 : 500,
     fontSize: '0.875rem',
@@ -315,9 +315,9 @@ export function Progress() {
   });
 
   const debugButtonStyle = (variant: 'primary' | 'danger'): CSSProperties => ({
-    border: `1.5px solid ${variant === 'primary' ? '#1A2E3B' : '#B34A33'}`,
-    backgroundColor: variant === 'primary' ? '#1A2E3B' : 'transparent',
-    color: variant === 'primary' ? '#FFFFFF' : '#B34A33',
+    border: `1.5px solid ${variant === 'primary' ? 'var(--text)' : 'var(--danger)'}`,
+    backgroundColor: variant === 'primary' ? 'var(--text)' : 'transparent',
+    color: variant === 'primary' ? 'var(--bg)' : 'var(--danger)',
     borderRadius: 8,
     padding: '9px 14px',
     fontFamily: '"DM Sans", system-ui, sans-serif',
@@ -355,7 +355,7 @@ export function Progress() {
     <div style={{ paddingBottom: '60px' }}>
       <Container size="xl">
         <Text style={{
-          color: '#E2603F',
+          color: 'var(--accent)',
           fontSize: 11,
           fontWeight: 700,
           letterSpacing: '0.12em',
@@ -371,7 +371,7 @@ export function Progress() {
         <Text style={{
           fontFamily: '"Fraunces", Georgia, serif',
           fontStyle: 'italic',
-          color: '#4A6275',
+          color: 'var(--muted)',
           fontSize: '1rem',
           marginBottom: 28,
         }}>
@@ -398,7 +398,7 @@ export function Progress() {
 
         <section
           style={{
-            border: '1px dashed #C9C5BB',
+            border: '1px dashed var(--border-subtle)',
             borderRadius: 8,
             padding: 14,
             marginBottom: 30,
@@ -410,7 +410,7 @@ export function Progress() {
               fontWeight: 700,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
-              color: '#4A6275',
+              color: 'var(--muted)',
               fontFamily: '"DM Sans", system-ui, sans-serif',
             }}>
               Debug controls
@@ -435,7 +435,7 @@ export function Progress() {
             </Group>
           </Group>
           {debugActionError && (
-            <Text style={{ color: '#B34A33', marginTop: 10, fontFamily: '"DM Sans", system-ui, sans-serif' }}>
+            <Text style={{ color: 'var(--danger)', marginTop: 10, fontFamily: '"DM Sans", system-ui, sans-serif' }}>
               {debugActionError}
             </Text>
           )}
@@ -448,14 +448,14 @@ export function Progress() {
               fontWeight: 700,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
-              color: '#4A6275',
+              color: 'var(--muted)',
               fontFamily: '"DM Sans", system-ui, sans-serif',
             }}>
               Mastery badges
             </Text>
             <Text style={{
               fontSize: 12,
-              color: '#4A6275',
+              color: 'var(--muted)',
               fontFamily: '"DM Sans", system-ui, sans-serif',
             }}>
               {familyBadges.filter(badge => badge.unlocked).length + (ultimateUnlocked ? 1 : 0)}/{familyBadges.length + 1} unlocked
@@ -489,8 +489,8 @@ export function Progress() {
 
         <section
           style={{
-            background: '#FFFFFF',
-            border: '1px solid #E5E1D8',
+            background: 'var(--surface)',
+            border: '1px solid var(--border-subtle)',
             borderRadius: 8,
             padding: 18,
             marginBottom: 40,
@@ -503,7 +503,7 @@ export function Progress() {
                 fontWeight: 700,
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
-                color: '#4A6275',
+                color: 'var(--muted)',
                 fontFamily: '"DM Sans", system-ui, sans-serif',
               }}>
                 Selected filter
@@ -512,7 +512,7 @@ export function Progress() {
                 fontFamily: '"Fraunces", Georgia, serif',
                 fontSize: '1.25rem',
                 fontWeight: 600,
-                color: '#1A2E3B',
+                color: 'var(--text)',
               }}>
                 {activeFilter === 'all'
                   ? 'All molecules'
@@ -524,7 +524,7 @@ export function Progress() {
             <Text style={{
               fontFamily: "'JetBrains Mono', monospace",
               fontSize: '0.8rem',
-              color: '#4A6275',
+              color: 'var(--muted)',
               textAlign: 'right',
             }}>
               {totalBuilds}/{possibleBuilds} builds
@@ -532,7 +532,7 @@ export function Progress() {
               {masteredCount}/{visibleMolecules.length} mastered
             </Text>
           </Group>
-          <div style={{ height: 10, borderRadius: 999, background: '#EEE9DF', overflow: 'hidden' }}>
+          <div style={{ height: 10, borderRadius: 999, background: 'var(--ink-soft-2)', overflow: 'hidden' }}>
             <div
               style={{
                 width: `${completion * 100}%`,
@@ -545,7 +545,7 @@ export function Progress() {
         </section>
 
         {loadError && (
-          <Text style={{ color: '#B34A33', marginBottom: 24, fontFamily: '"DM Sans", system-ui, sans-serif' }}>
+          <Text style={{ color: 'var(--danger)', marginBottom: 24, fontFamily: '"DM Sans", system-ui, sans-serif' }}>
             {loadError}
           </Text>
         )}
@@ -562,14 +562,14 @@ export function Progress() {
                   fontWeight: 700,
                   letterSpacing: '0.1em',
                   textTransform: 'uppercase',
-                  color: '#4A6275',
+                  color: 'var(--muted)',
                   fontFamily: '"DM Sans", system-ui, sans-serif',
                 }}>
                   {level.title}
                 </Text>
                 <Text style={{
                   fontSize: 12,
-                  color: '#4A6275',
+                  color: 'var(--muted)',
                   fontFamily: '"DM Sans", system-ui, sans-serif',
                 }}>
                   {visible.length} {visible.length === 1 ? 'molecule' : 'molecules'}

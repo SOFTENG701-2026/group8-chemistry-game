@@ -3,12 +3,73 @@
 :root {
   --text: #1A2E3B;
   --text-h: #1A2E3B;
+  --muted: #4A6275;
+  --muted-2: #8A9BA8;
   --bg: #F5EFE1;
+  --surface: #ffffff;
+  --surface-2: rgba(255,255,255,0.72);
+  --surface-3: rgba(255,255,255,0.5);
+  --border-subtle: rgba(26,46,59,0.14);
+  --border-mid: rgba(26,46,59,0.18);
   --border: #e5e4e7;
   --code-bg: #f4f3ec;
   --accent: #E2603F;
+  --danger: #A03E2E;
+  --panel-bg: var(--surface-2);
+  --panel-bg-2: var(--surface-3);
+  --panel-border: var(--border-subtle);
+  --canvas-bg: #FDFAF5;
+  --grid-line: rgba(26,46,59,0.05);
+  --grid-dot: rgba(26,46,59,0.1);
+  --ink-soft: rgba(26,46,59,0.06);
+  --ink-soft-2: rgba(26,46,59,0.1);
+  --shadow-hover: 0 2px 12px rgba(26,46,59,0.1);
+  --shadow-tile: 0 4px 10px rgba(26,46,59,0.06);
+  --lewis-status-ok: #3C7530;
+  --lewis-status-bad: #A03E2E;
   --sans: 'DM Sans', system-ui, sans-serif;
   --heading: 'Fraunces', Georgia, serif;
+}
+
+/* App-wide high contrast mode.
+   Uses stronger borders + removes background grid so surfaces stay distinct. */
+body[data-contrast='high'] {
+  --text: #000;
+  --text-h: #000;
+  --muted: #111;
+  --muted-2: #222;
+  /* Keep very high contrast, but avoid flattening all surfaces to the same white */
+  --bg: #f6f6f6;
+  --surface: #fff;
+  --surface-2: #f0f0f0;
+  --surface-3: #e8e8e8;
+  --border-subtle: #000;
+  --border-mid: #000;
+  --border: #000;
+  --code-bg: #fff;
+  --canvas-bg: #fff;
+  --grid-line: transparent;
+  --grid-dot: rgba(0,0,0,0.35);
+  --ink-soft: rgba(0,0,0,0.12);
+  --ink-soft-2: rgba(0,0,0,0.22);
+  --shadow-hover: none;
+  --shadow-tile: none;
+  /* Keep atom colours but enforce strong outline/text */
+  --lewis-atom-border: #000;
+  --lewis-atom-text: #000;
+  /* Keep semantic status colours */
+  --lewis-status-ok: #3C7530;
+  --lewis-status-bad: #A03E2E;
+
+  /* Mantine: ensure base text/body match our tokens */
+  --mantine-color-body: var(--bg);
+  --mantine-color-text: var(--text);
+  --mantine-color-dimmed: var(--muted);
+}
+
+body[data-contrast='high'] :is(a, button, input, select, textarea, [role='button']):focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
 }
 
 #root {
@@ -32,8 +93,8 @@ body::before {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgba(26,46,59,0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(26,46,59,0.05) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
   background-size: 28px 28px;
   pointer-events: none;
   z-index: -1;

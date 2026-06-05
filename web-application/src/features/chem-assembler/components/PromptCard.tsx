@@ -11,12 +11,12 @@ export function PromptCard({ problem, idx, hintLevel }: PromptCardProps) {
   return (
     <section
       style={{
-        background: '#FBFAF4',
-        border: '1.5px solid #1A2E3B',
+        background: 'var(--surface)',
+        border: '1.5px solid var(--text)',
         borderRadius: '4px',
         padding: '22px 26px',
         position: 'relative',
-        boxShadow: '5px 5px 0 #1A2E3B',
+        boxShadow: '5px 5px 0 var(--text)',
       }}
     >
       <div
@@ -29,11 +29,11 @@ export function PromptCard({ problem, idx, hintLevel }: PromptCardProps) {
           fontStyle: 'italic',
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
-          color: '#A03E2E',
+          color: 'var(--danger)',
         }}
       >
         <span>specimen №{String(idx + 1).padStart(2, '0')}</span>
-        <span style={{ flex: 1, borderTop: '1px dashed #C57B6E' }} />
+        <span style={{ flex: 1, borderTop: '1px dashed var(--danger)' }} />
         <span>{problem.correct.length} parts required</span>
       </div>
 
@@ -45,7 +45,7 @@ export function PromptCard({ problem, idx, hintLevel }: PromptCardProps) {
           margin: '10px 0 4px',
           letterSpacing: '-0.01em',
           lineHeight: 1.1,
-          color: '#1A2E3B',
+          color: 'var(--text)',
         }}
       >
         {problem.name}
@@ -54,7 +54,7 @@ export function PromptCard({ problem, idx, hintLevel }: PromptCardProps) {
         style={{
           fontStyle: 'italic',
           fontFamily: '"Fraunces", Georgia, serif',
-          color: '#4A6275',
+          color: 'var(--muted)',
           fontSize: '0.95rem',
           margin: '0 0 14px',
         }}
@@ -67,8 +67,8 @@ export function PromptCard({ problem, idx, hintLevel }: PromptCardProps) {
           display: 'inline-flex',
           alignItems: 'center',
           gap: '8px',
-          background: '#1A2E3B',
-          color: '#F5EFE1',
+          background: 'var(--text)',
+          color: 'var(--bg)',
           padding: '6px 12px',
           borderRadius: '3px',
           fontFamily: '"JetBrains Mono", monospace',
@@ -88,7 +88,7 @@ export function PromptCard({ problem, idx, hintLevel }: PromptCardProps) {
             fontFamily: '"Fraunces", Georgia, serif',
             fontStyle: 'italic',
             fontSize: '0.85rem',
-            color: '#A03E2E',
+            color: 'var(--danger)',
           }}
         >
           hint · begins with the{' '}

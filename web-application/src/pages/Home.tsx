@@ -29,7 +29,7 @@ function ChemChip({ display, family }: { display: string; family: FamilyName }) 
       border: `1px solid ${style.border}`,
       fontFamily: "'JetBrains Mono', monospace",
       fontSize: '0.75rem',
-      color: '#1A2E3B',
+      color: 'var(--text)',
       whiteSpace: 'nowrap',
     }}>
       {display}
@@ -42,7 +42,7 @@ const sandboxChips = getRepresentativeCards(['alkyl', 'alcohol', 'amine', 'acid'
 
 const cardBase: CSSProperties = {
   borderRadius: 12,
-  border: '1.5px solid rgba(26,46,59,0.15)',
+  border: '1.5px solid var(--border-mid)',
   padding: '28px 24px',
   display: 'flex',
   flexDirection: 'column',
@@ -77,7 +77,7 @@ function CardLabel({ children }: { children: ReactNode }) {
       fontSize: '10px',
       letterSpacing: '0.1em',
       textTransform: 'uppercase',
-      color: '#E2603F',
+      color: 'var(--accent)',
     }}>
       {children}
     </Text>
@@ -92,11 +92,11 @@ export function Home() {
         <div style={{ marginBottom: '48px' }}>
           <h1 style={{ margin: '0 0 12px', lineHeight: 1.05 }}>
             Build chemistry,{' '}
-            <span style={{ color: '#E2603F', fontStyle: 'italic' }}>one bond</span>{' '}
+            <span style={{ color: 'var(--accent)', fontStyle: 'italic' }}>one bond</span>{' '}
             at a time.
           </h1>
           <Text style={{
-            color: '#4A6275',
+            color: 'var(--muted)',
             fontSize: '1rem',
             maxWidth: 520,
             lineHeight: 1.6,
@@ -117,10 +117,10 @@ export function Home() {
             padding: '18px 24px',
             marginBottom: 24,
             borderRadius: 12,
-            backgroundColor: 'white',
-            color: '#1A2E3B',
-            border: '1.5px solid rgba(26,46,59,0.18)',
-            borderLeft: '6px solid #E2603F',
+            backgroundColor: 'var(--surface)',
+            color: 'var(--text)',
+            border: '1.5px solid var(--border-mid)',
+            borderLeft: '6px solid var(--accent)',
             textDecoration: 'none',
           }}
         >
@@ -132,16 +132,16 @@ export function Home() {
               fontFamily: '"Fraunces", Georgia, serif',
               fontWeight: 600,
               fontSize: '1.15rem',
-              color: '#1A2E3B',
+              color: 'var(--text)',
             }}>
               Find your level — build a few molecules, we'll point you to the right lessons.
             </Text>
           </div>
           <span style={{
             padding: '10px 20px',
-            backgroundColor: '#1A2E3B',
-            color: 'white',
-            border: '1.5px solid #1A2E3B',
+            backgroundColor: 'var(--text)',
+            color: 'var(--bg)',
+            border: '1.5px solid var(--text)',
             borderRadius: 8,
             fontFamily: '"DM Sans", sans-serif',
             fontWeight: 600,
@@ -160,14 +160,14 @@ export function Home() {
           alignItems: 'stretch',
         }}>
           {/* Lessons card */}
-          <div style={{ ...cardBase, backgroundColor: 'white' }}>
-            <Group justify="space-between" align="center" mb={20} style={{ color: '#1A2E3B' }}>
+          <div style={{ ...cardBase, backgroundColor: 'var(--surface)' }}>
+            <Group justify="space-between" align="center" mb={20} style={{ color: 'var(--text)' }}>
               <CardLabel>Guided · 12 specimens</CardLabel>
               <CounterBadge n="01" />
             </Group>
 
             <h2 style={{ margin: '0 0 8px' }}>Lessons</h2>
-            <Text style={{ color: '#4A6275', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: 24 }}>
+            <Text style={{ color: 'var(--muted)', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: 24 }}>
               Step through molecules from methanol to diethyl ether. Hints, streaks, immediate feedback.
             </Text>
 
@@ -177,15 +177,15 @@ export function Home() {
               ))}
             </Group>
 
-            <div style={{ marginTop: 28, paddingTop: 20, borderTop: '1px solid rgba(26,46,59,0.1)' }}>
+            <div style={{ marginTop: 28, paddingTop: 20, borderTop: '1px solid var(--border-subtle)' }}>
               <RouterNavLink
                 to="/lessons"
                 style={{
                   display: 'block',
                   width: '100%',
                   padding: '10px 20px',
-                  backgroundColor: '#1A2E3B',
-                  color: 'white',
+                  backgroundColor: 'var(--text)',
+                  color: 'var(--bg)',
                   borderRadius: 8,
                   textAlign: 'center',
                   fontFamily: '"DM Sans", sans-serif',
@@ -201,8 +201,8 @@ export function Home() {
           </div>
 
           {/* Sandbox card */}
-          <div style={{ ...cardBase, backgroundColor: 'white' }}>
-            <Group justify="space-between" align="center" mb={20} style={{ color: '#1A2E3B' }}>
+          <div style={{ ...cardBase, backgroundColor: 'var(--surface)' }}>
+            <Group justify="space-between" align="center" mb={20} style={{ color: 'var(--text)' }}>
               <CardLabel>Open · No target</CardLabel>
               <span style={{
                 width: 28, height: 28,
@@ -221,7 +221,7 @@ export function Home() {
             </Group>
 
             <h2 style={{ margin: '0 0 8px' }}>Sandbox</h2>
-            <Text style={{ color: '#4A6275', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: 24 }}>
+            <Text style={{ color: 'var(--muted)', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: 24 }}>
               Free build. Assemble anything from the full pantry — we'll name it if it's a valid compound.
             </Text>
 
@@ -231,16 +231,16 @@ export function Home() {
               ))}
             </Group>
 
-            <div style={{ marginTop: 28, paddingTop: 20, borderTop: '1px solid rgba(26,46,59,0.1)' }}>
+            <div style={{ marginTop: 28, paddingTop: 20, borderTop: '1px solid var(--border-subtle)' }}>
               <RouterNavLink
                 to="/sandbox"
                 style={{
                   display: 'block',
                   width: '100%',
                   padding: '10px 20px',
-                  backgroundColor: '#1A2E3B',
-                  color: 'white',
-                  border: '1.5px solid #1A2E3B',
+                  backgroundColor: 'var(--text)',
+                  color: 'var(--bg)',
+                  border: '1.5px solid var(--text)',
                   borderRadius: 8,
                   textAlign: 'center',
                   fontFamily: '"DM Sans", sans-serif',
@@ -256,31 +256,31 @@ export function Home() {
           </div>
 
           {/* My Progress card */}
-          <div style={{ ...cardBase, backgroundColor: 'white' }}>
-            <Group justify="space-between" align="center" mb={20} style={{ color: '#1A2E3B' }}>
+          <div style={{ ...cardBase, backgroundColor: 'var(--surface)' }}>
+            <Group justify="space-between" align="center" mb={20} style={{ color: 'var(--text)' }}>
               <CardLabel>Your record</CardLabel>
               <CounterBadge n="03" />
             </Group>
 
             <h2 style={{ margin: '0 0 8px' }}>My progress</h2>
-            <Text style={{ color: '#4A6275', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: 24 }}>
+            <Text style={{ color: 'var(--muted)', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: 24 }}>
               Mastery per functional-group family, streaks, attempt history, and the heatmap.
             </Text>
 
-            <Text style={{ color: '#4A6275', fontSize: '0.8rem', marginTop: 'auto' }}>
+            <Text style={{ color: 'var(--muted)', fontSize: '0.8rem', marginTop: 'auto' }}>
               12 families tracked
             </Text>
 
-            <div style={{ marginTop: 28, paddingTop: 20, borderTop: '1px solid rgba(26,46,59,0.1)' }}>
+            <div style={{ marginTop: 28, paddingTop: 20, borderTop: '1px solid var(--border-subtle)' }}>
               <RouterNavLink
                 to="/progress"
                 style={{
                   display: 'block',
                   width: '100%',
                   padding: '10px 20px',
-                  backgroundColor: '#1A2E3B',
-                  color: 'white',
-                  border: '1.5px solid #1A2E3B',
+                  backgroundColor: 'var(--text)',
+                  color: 'var(--bg)',
+                  border: '1.5px solid var(--text)',
                   borderRadius: 8,
                   textAlign: 'center',
                   fontFamily: '"DM Sans", sans-serif',

@@ -33,15 +33,15 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        backgroundColor: 'white',
-        border: '1px solid #E5E1D8',
+        backgroundColor: 'var(--surface)',
+        border: '1px solid var(--border-subtle)',
         borderRadius: 8,
         padding: '16px',
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         gap: 6,
-        boxShadow: hovered ? '0 2px 12px rgba(26,46,59,0.1)' : 'none',
+        boxShadow: hovered ? 'var(--shadow-hover)' : 'none',
         transition: 'box-shadow 0.15s ease',
       }}
     >
@@ -70,7 +70,7 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
         fontWeight: 600,
         fontSize: '1rem',
         lineHeight: 1.2,
-        color: '#1A2E3B',
+        color: 'var(--text)',
       }}>
         {molecule}
       </Text>
@@ -79,7 +79,7 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
         <Text style={{
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: '0.75rem',
-          color: '#4A6275',
+          color: 'var(--muted)',
           lineHeight: 1.4,
         }}>
           {problem.formula}
@@ -107,7 +107,7 @@ function MoleculeCard({ molecule, onClick }: { molecule: string; onClick: () => 
           })}
           <Text style={{
             fontSize: 11,
-            color: '#4A6275',
+            color: 'var(--muted)',
             marginLeft: 4,
             fontFamily: '"DM Sans", system-ui, sans-serif',
             whiteSpace: 'nowrap',
@@ -146,8 +146,8 @@ function RevisionQuizCard({
       style={{
         width: '100%',
         minHeight: 142,
-        backgroundColor: unlocked ? '#FFFFFF' : '#F0EEE9',
-        border: `1.5px solid ${unlocked ? '#3C8D6A' : '#D3D1CB'}`,
+        backgroundColor: unlocked ? 'var(--surface)' : 'var(--panel-bg)',
+        border: `1.5px solid ${unlocked ? '#3C8D6A' : 'var(--border-subtle)'}`,
         borderRadius: 8,
         padding: 16,
         cursor: 'pointer',
@@ -156,7 +156,7 @@ function RevisionQuizCard({
         gap: 10,
         textAlign: 'left',
         opacity: unlocked ? 1 : 0.86,
-        boxShadow: hovered ? '0 2px 12px rgba(26,46,59,0.1)' : 'none',
+        boxShadow: hovered ? 'var(--shadow-hover)' : 'none',
         transition: 'box-shadow 0.15s ease',
       }}
       aria-label={`${groupTitle} revision quiz, ${unlocked ? 'unlocked' : 'locked'}`}
@@ -191,7 +191,7 @@ function RevisionQuizCard({
         fontWeight: 650,
         fontSize: '1.08rem',
         lineHeight: 1.2,
-        color: '#1A2E3B',
+        color: 'var(--text)',
       }}>
         {groupTitle} quiz
       </Text>
@@ -199,7 +199,7 @@ function RevisionQuizCard({
       <Text style={{
         fontFamily: '"DM Sans", system-ui, sans-serif',
         fontSize: '0.78rem',
-        color: '#4A6275',
+        color: 'var(--muted)',
         lineHeight: 1.35,
       }}>
         {unlocked
@@ -207,7 +207,7 @@ function RevisionQuizCard({
           : `Master every molecule in this group to unlock: ${masteredCount}/${totalCount} mastered.`}
       </Text>
 
-      <Group gap={6} mt="auto" align="center" style={{ color: unlocked ? '#1A2E3B' : '#777C78' }}>
+      <Group gap={6} mt="auto" align="center" style={{ color: unlocked ? 'var(--text)' : 'var(--muted-2)' }}>
         <IconClipboardCheck size={16} stroke={2.2} />
         <Text style={{
           fontSize: 12,
@@ -253,9 +253,9 @@ export function Lessons() {
   const chipStyle = (isActive: boolean): CSSProperties => ({
     padding: '6px 16px',
     borderRadius: 100,
-    border: `1.5px solid ${isActive ? '#1A2E3B' : '#C9C5BB'}`,
-    backgroundColor: isActive ? '#1A2E3B' : 'transparent',
-    color: isActive ? 'white' : '#1A2E3B',
+    border: `1.5px solid ${isActive ? 'var(--text)' : 'var(--border-subtle)'}`,
+    backgroundColor: isActive ? 'var(--text)' : 'transparent',
+    color: isActive ? 'var(--bg)' : 'var(--text)',
     fontFamily: '"DM Sans", system-ui, sans-serif',
     fontWeight: isActive ? 600 : 500,
     fontSize: '0.875rem',
@@ -268,7 +268,7 @@ export function Lessons() {
     <div style={{ paddingBottom: '60px' }}>
       <Container size="xl">
         <Text style={{
-          color: '#E2603F',
+          color: 'var(--accent)',
           fontSize: 11,
           fontWeight: 700,
           letterSpacing: '0.12em',
@@ -284,7 +284,7 @@ export function Lessons() {
         <Text style={{
           fontFamily: '"Fraunces", Georgia, serif',
           fontStyle: 'italic',
-          color: '#4A6275',
+          color: 'var(--muted)',
           fontSize: '1rem',
           marginBottom: 32,
         }}>
@@ -321,7 +321,7 @@ export function Lessons() {
               style={{
                 marginBottom: 56,
                 ...(isRecommended ? {
-                  border: '1.5px solid #E2603F',
+                  border: '1.5px solid var(--accent)',
                   borderRadius: 12,
                   padding: 20,
                   backgroundColor: 'rgba(226,96,63,0.04)',
@@ -335,7 +335,7 @@ export function Lessons() {
                     fontWeight: 700,
                     letterSpacing: '0.1em',
                     textTransform: 'uppercase',
-                    color: '#4A6275',
+                    color: 'var(--muted)',
                     fontFamily: '"DM Sans", system-ui, sans-serif',
                   }}>
                     {group.title}
@@ -346,8 +346,8 @@ export function Lessons() {
                       fontWeight: 700,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
-                      color: 'white',
-                      backgroundColor: '#E2603F',
+                      color: 'var(--text)',
+                      backgroundColor: 'var(--accent)',
                       borderRadius: 100,
                       padding: '3px 10px',
                       fontFamily: '"DM Sans", system-ui, sans-serif',
@@ -358,7 +358,7 @@ export function Lessons() {
                 </Group>
                 <Text style={{
                   fontSize: 12,
-                  color: '#4A6275',
+                  color: 'var(--muted)',
                   fontFamily: '"DM Sans", system-ui, sans-serif',
                 }}>
                   {visible.length} {visible.length === 1 ? 'molecule' : 'molecules'}

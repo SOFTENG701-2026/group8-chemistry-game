@@ -21,11 +21,11 @@ export function FunFactCard({ moleculeName, level = 1 }: { moleculeName: string;
       className="pop-in"
       style={{
         marginTop: 16,
-        background: 'rgba(255,255,255,0.72)',
-        border: '1.5px solid rgba(26,46,59,0.14)',
+        background: 'var(--panel-bg)',
+        border: '1.5px solid var(--panel-border)',
         borderRadius: 10,
         overflow: 'hidden',
-        boxShadow: '0 1px 0 rgba(26,46,59,0.04)',
+        boxShadow: '0 1px 0 var(--ink-soft)',
       }}
     >
       <button
@@ -44,7 +44,7 @@ export function FunFactCard({ moleculeName, level = 1 }: { moleculeName: string;
           fontWeight: 700,
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          color: '#E2603F',
+          color: 'var(--accent)',
         }}
       >
         <span>{header}</span>
@@ -53,7 +53,7 @@ export function FunFactCard({ moleculeName, level = 1 }: { moleculeName: string;
             transition: 'transform 0.2s ease',
             transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
             fontSize: '0.7rem',
-            color: '#4A6275',
+            color: 'var(--muted)',
           }}
         >
           ▼
@@ -67,7 +67,7 @@ export function FunFactCard({ moleculeName, level = 1 }: { moleculeName: string;
             fontFamily: '"Fraunces", Georgia, serif',
             fontSize: '0.95rem',
             lineHeight: 1.6,
-            color: '#1A2E3B',
+            color: 'var(--text)',
           }}
         >
           {fact}

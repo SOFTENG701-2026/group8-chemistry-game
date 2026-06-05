@@ -2,9 +2,9 @@ import { Modal } from '@mantine/core';
 import type { CSSProperties, ReactNode } from 'react';
 
 // ── Design tokens (match LessonPage / Onboarding) ───────────────────────────────
-const INK = '#1A2E3B';
-const MUTED = '#4A6275';
-const ACCENT = '#E2603F';
+const INK = 'var(--text)';
+const MUTED = 'var(--muted)';
+const ACCENT = 'var(--accent)';
 const SERIF = '"Fraunces", Georgia, serif';
 const SANS = '"DM Sans", system-ui, sans-serif';
 const MONO = '"JetBrains Mono", monospace';
@@ -50,7 +50,7 @@ function Key({ children }: { children: ReactNode }) {
       fontSize: '0.85em',
       fontWeight: 600,
       color: INK,
-      background: 'rgba(26,46,59,0.06)',
+      background: 'var(--ink-soft)',
       padding: '1px 6px',
       borderRadius: 4,
       whiteSpace: 'nowrap',

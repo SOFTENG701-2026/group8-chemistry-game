@@ -37,7 +37,7 @@ export function FeedbackRow({ feedback, onNext, errorType, drawnName }: Feedback
         padding: '12px 16px',
         borderRadius: '6px',
         background: feedback === 'right' ? '#3C7530' : '#A03E2E',
-        color: '#F5EFE1',
+        color: 'var(--bg)',
         fontFamily: '"Fraunces", Georgia, serif',
         display: 'flex',
         justifyContent: 'space-between',
@@ -60,8 +60,8 @@ export function FeedbackRow({ feedback, onNext, errorType, drawnName }: Feedback
         <button
           onClick={onNext}
           style={{
-            background: '#F5EFE1',
-            color: '#1A2E3B',
+            background: 'var(--bg)',
+            color: 'var(--text)',
             border: 'none',
             padding: '8px 18px',
             fontFamily: '"DM Sans", sans-serif',
