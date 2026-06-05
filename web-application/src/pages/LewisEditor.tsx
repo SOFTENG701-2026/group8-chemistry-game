@@ -5,16 +5,15 @@ export function LewisEditor() {
   return (
     <div
       style={{
-        background: '#F5EFE1',
+        background: 'var(--bg)',
         minHeight: '100vh',
         fontFamily: '"DM Sans", system-ui, sans-serif',
-        color: '#1A2E3B',
+        color: 'var(--text)',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
         .react-flow__edge-interaction { cursor: pointer; }
       `}</style>
 
@@ -37,7 +36,7 @@ export function LewisEditor() {
             justifyContent: 'space-between',
             alignItems: 'flex-end',
             paddingBottom: '16px',
-            borderBottom: '1.5px solid #1A2E3B',
+            borderBottom: '1.5px solid var(--text)',
           }}
         >
           <div>
@@ -48,7 +47,7 @@ export function LewisEditor() {
                 fontStyle: 'italic',
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
-                color: '#4A6275',
+                color: 'var(--muted)',
               }}
             >
               visual · structural
@@ -61,7 +60,7 @@ export function LewisEditor() {
                 lineHeight: 1,
                 letterSpacing: '-0.02em',
                 margin: '2px 0 0',
-                color: '#1A2E3B',
+                color: 'var(--text)',
               }}
             >
               Lewis Editor

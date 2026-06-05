@@ -26,7 +26,7 @@ export function AtomInfoPanel({ selectedNodes, edges, onPreviewAtomChange }: Pro
     return (
       <div style={containerStyle}>
         <div style={labelStyle}>Atom</div>
-        <div style={{ fontFamily: '"Fraunces", Georgia, serif', fontStyle: 'italic', color: '#8A9BA8', fontSize: '0.9rem' }}>
+        <div style={{ fontFamily: '"Fraunces", Georgia, serif', fontStyle: 'italic', color: 'var(--muted-2)', fontSize: '0.9rem' }}>
           Select an atom
         </div>
       </div>
@@ -71,25 +71,25 @@ export function AtomInfoPanel({ selectedNodes, edges, onPreviewAtomChange }: Pro
             width: 40,
             height: 40,
             borderRadius: '50%',
-            backgroundColor: info?.bg ?? '#EFF3F6',
-            border: `2px solid ${info?.border ?? '#A8BEC9'}`,
+            backgroundColor: `var(--lewis-atom-bg, ${info?.bg ?? '#EFF3F6'})`,
+            border: `2px solid var(--lewis-atom-border, ${info?.border ?? '#A8BEC9'})`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontFamily: '"DM Sans", system-ui, sans-serif',
             fontWeight: 700,
             fontSize: el.length > 1 ? '0.7rem' : '0.95rem',
-            color: '#1A2E3B',
+            color: 'var(--lewis-atom-text, var(--text))',
             flexShrink: 0,
           }}
         >
           {el}
         </div>
         <div>
-          <div style={{ fontFamily: '"Fraunces", Georgia, serif', fontWeight: 600, fontSize: '1.1rem', color: '#1A2E3B' }}>
+          <div style={{ fontFamily: '"Fraunces", Georgia, serif', fontWeight: 600, fontSize: '1.1rem', color: 'var(--text)' }}>
             {info?.name ?? el}
           </div>
-          <div style={{ fontFamily: '"DM Sans", sans-serif', fontSize: '0.72rem', color: '#4A6275' }}>
+          <div style={{ fontFamily: '"DM Sans", sans-serif', fontSize: '0.72rem', color: 'var(--muted)' }}>
             #{info?.atomicNumber ?? '—'}
           </div>
         </div>
@@ -99,7 +99,13 @@ export function AtomInfoPanel({ selectedNodes, edges, onPreviewAtomChange }: Pro
         <Row
           label="Bonds used"
           value={`${bondCount} / ${valence}`}
-          accent={isSatisfied ? '#3C7530' : bondCount > (valence as number) ? '#A03E2E' : undefined}
+          accent={
+            isSatisfied
+              ? 'var(--lewis-status-ok)'
+              : bondCount > (valence as number)
+                ? 'var(--lewis-status-bad)'
+                : undefined
+          }
         />
       </div>
     </div>
@@ -125,10 +131,10 @@ function CycleButton({
       style={{
         width: 22,
         height: 22,
-        border: '1px solid rgba(26,46,59,0.22)',
+        border: '1px solid var(--panel-border)',
         borderRadius: '50%',
-        background: 'rgba(255,255,255,0.7)',
-        color: '#1A2E3B',
+        background: 'var(--panel-bg)',
+        color: 'var(--text)',
         fontFamily: '"DM Sans", system-ui, sans-serif',
         fontSize: '0.9rem',
         fontWeight: 700,
@@ -148,13 +154,13 @@ function CycleButton({
 function Row({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <span style={{ fontFamily: '"DM Sans", sans-serif', fontSize: '0.75rem', color: '#4A6275' }}>{label}</span>
+      <span style={{ fontFamily: '"DM Sans", sans-serif', fontSize: '0.75rem', color: 'var(--muted)' }}>{label}</span>
       <span
         style={{
           fontFamily: '"JetBrains Mono", monospace',
           fontSize: '0.8rem',
           fontWeight: 600,
-          color: accent ?? '#1A2E3B',
+          color: accent ?? 'var(--text)',
         }}
       >
         {value}
@@ -164,8 +170,8 @@ function Row({ label, value, accent }: { label: string; value: string; accent?: 
 }
 
 const containerStyle: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.72)',
-  border: '1.5px solid rgba(26,46,59,0.14)',
+  background: 'var(--panel-bg)',
+  border: '1.5px solid var(--panel-border)',
   borderRadius: 10,
   padding: '14px 16px',
 };
@@ -176,7 +182,7 @@ const labelStyle: React.CSSProperties = {
   fontWeight: 700,
   letterSpacing: '0.12em',
   textTransform: 'uppercase',
-  color: '#4A6275',
+  color: 'var(--muted)',
 };
 
 const headerStyle: React.CSSProperties = {
@@ -200,7 +206,7 @@ const cycleControlsStyle: React.CSSProperties = {
 const cycleCountStyle: React.CSSProperties = {
   fontFamily: '"JetBrains Mono", monospace',
   fontSize: '0.68rem',
-  color: '#4A6275',
+  color: 'var(--muted)',
   width: 34,
   textAlign: 'center',
 };

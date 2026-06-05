@@ -97,8 +97,8 @@ export function MoleculeReadout({ nodes, edges }: Props) {
   return (
     <div
       style={{
-        background: 'rgba(255,255,255,0.72)',
-        border: '1.5px solid rgba(26,46,59,0.14)',
+        background: 'var(--panel-bg)',
+        border: '1.5px solid var(--panel-border)',
         borderRadius: 10,
         padding: '14px 16px',
       }}
@@ -110,14 +110,14 @@ export function MoleculeReadout({ nodes, edges }: Props) {
           fontWeight: 700,
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
-          color: '#4A6275',
+          color: 'var(--muted)',
           marginBottom: 6,
         }}
       >
         Molecule
       </div>
       {summary.isEmpty ? (
-        <div style={{ fontFamily: '"Fraunces", Georgia, serif', fontStyle: 'italic', color: '#8A9BA8', fontSize: '0.9rem' }}>
+        <div style={{ fontFamily: '"Fraunces", Georgia, serif', fontStyle: 'italic', color: 'var(--muted-2)', fontSize: '0.9rem' }}>
           Add atoms to begin
         </div>
       ) : (
@@ -127,14 +127,14 @@ export function MoleculeReadout({ nodes, edges }: Props) {
               fontFamily: '"JetBrains Mono", monospace',
               fontSize: '1rem',
               fontWeight: 600,
-              color: '#1A2E3B',
+              color: 'var(--text)',
               marginBottom: 2,
             }}
           >
             {summary.formula}
           </div>
           {summary.statusNote ? (
-            <div style={{ fontFamily: '"Fraunces", Georgia, serif', fontStyle: 'italic', color: '#8A9BA8', fontSize: '0.85rem' }}>
+            <div style={{ fontFamily: '"Fraunces", Georgia, serif', fontStyle: 'italic', color: 'var(--muted-2)', fontSize: '0.85rem' }}>
               {summary.statusNote}
             </div>
           ) : (
@@ -144,7 +144,7 @@ export function MoleculeReadout({ nodes, edges }: Props) {
                 fontSize: '0.95rem',
                 fontWeight: summary.name ? 600 : 400,
                 fontStyle: summary.name ? 'normal' : 'italic',
-                color: summary.name ? '#1A2E3B' : '#8A9BA8',
+                color: summary.name ? 'var(--text)' : 'var(--muted-2)',
               }}
             >
               {summary.name ?? 'Unknown'}

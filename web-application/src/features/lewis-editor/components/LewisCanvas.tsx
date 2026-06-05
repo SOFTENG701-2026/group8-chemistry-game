@@ -91,7 +91,7 @@ function CenteredConnectionLine({
     <path
       d={path}
       fill="none"
-      stroke="#1A2E3B"
+      stroke="var(--text)"
       strokeWidth={2}
       strokeLinecap="round"
       style={connectionLineStyle}
@@ -379,7 +379,7 @@ export function LewisCanvas({ resetKey, onMoleculeChange, showFullscreen = true,
         .lewis-atom-source.react-flow__handle-connecting,
         .lewis-atom-source.react-flow__handle-valid {
           opacity: 1 !important;
-          background: #E2603F !important;
+          background: var(--accent) !important;
           border-color: white !important;
         }
         .lewis-atom-target.react-flow__handle,
@@ -399,7 +399,7 @@ export function LewisCanvas({ resetKey, onMoleculeChange, showFullscreen = true,
           content: "";
           position: absolute;
           inset: -5px;
-          border: 2px solid #E2603F;
+          border: 2px solid var(--accent);
           border-radius: 50%;
           pointer-events: none;
         }
@@ -428,10 +428,10 @@ export function LewisCanvas({ resetKey, onMoleculeChange, showFullscreen = true,
           z-index: 1000;
           box-sizing: border-box;
           padding: 16px;
-          background-color: #F5EFE1;
+          background-color: var(--bg);
           background-image:
-            linear-gradient(to right, rgba(26,46,59,0.05) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(26,46,59,0.05) 1px, transparent 1px);
+            linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+            linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
           background-size: 28px 28px;
         }
         .lewis-editor-main {
@@ -453,8 +453,8 @@ export function LewisCanvas({ resetKey, onMoleculeChange, showFullscreen = true,
           position: relative;
           border-radius: 12px;
           overflow: hidden;
-          border: 1.5px solid rgba(26,46,59,0.14);
-          background: #FDFAF5;
+          border: 1.5px solid var(--panel-border);
+          background: var(--canvas-bg);
           min-height: 0;
           min-width: 0;
         }
@@ -542,7 +542,7 @@ export function LewisCanvas({ resetKey, onMoleculeChange, showFullscreen = true,
               variant={BackgroundVariant.Dots}
               gap={24}
               size={1}
-              color="rgba(26,46,59,0.1)"
+              color="var(--grid-dot)"
             />
             <div
               style={{
@@ -587,7 +587,7 @@ export function LewisCanvas({ resetKey, onMoleculeChange, showFullscreen = true,
                 position: 'absolute',
                 pointerEvents: 'none',
                 zIndex: 20,
-                border: '1.5px solid #E2603F',
+                border: '1.5px solid var(--accent)',
                 background: 'rgba(226,96,63,0.12)',
                 borderRadius: 6,
                 ...selectionBoxStyle,
@@ -627,8 +627,8 @@ function ToolButton({
   const [hovered, setHovered] = useState(false);
   const bg =
     variant === 'danger'
-      ? hovered ? '#c44e3a' : '#A03E2E'
-      : hovered ? '#3a5060' : '#4A6275';
+      ? 'var(--danger)'
+      : hovered ? 'var(--text)' : 'var(--muted)';
 
   return (
     <button
@@ -676,7 +676,7 @@ function IconToolButton({
         height: 29,
         border: 'none',
         borderRadius: 6,
-        background: hovered ? '#3a5060' : '#4A6275',
+        background: hovered ? 'var(--text)' : 'var(--muted)',
         color: 'white',
         display: 'inline-flex',
         alignItems: 'center',
@@ -694,18 +694,18 @@ function HintBox() {
   return (
     <div
       style={{
-        background: 'rgba(255,255,255,0.5)',
-        border: '1px solid rgba(26,46,59,0.1)',
+        background: 'var(--panel-bg-2)',
+        border: '1px solid var(--panel-border)',
         borderRadius: 8,
         padding: '10px 12px',
         boxSizing: 'border-box',
         fontFamily: '"DM Sans", system-ui, sans-serif',
         fontSize: '0.72rem',
-        color: '#4A6275',
+        color: 'var(--muted)',
         lineHeight: 1.6,
       }}
     >
-      <strong style={{ color: '#1A2E3B' }}>Tips</strong>
+      <strong style={{ color: 'var(--text)' }}>Tips</strong>
       <ul style={{ margin: '4px 0 0', paddingLeft: 14 }}>
         <li>Drag atoms from the palette onto the canvas</li>
         <li>Start bonds from the edge of an atom</li>

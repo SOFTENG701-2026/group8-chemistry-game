@@ -8,7 +8,7 @@ This project was originally developed in [Wroppy/softeng701-as2-3](https://githu
 
 ## Changes Since In-Class Presentation
 
-Since the in-class presentation, Lewis Lab has improved icon-button accessibility by adding tooltips and using more pronounced icons so actions are easier to identify at a glance.
+Since the in-class presentation, Lewis Lab has added improved icon-button accessibility (tooltips/clearer icons) and an app-wide high-constrast mode to make the interface easier to read and navigate.
 
 ## How to Run the Application
 

@@ -2,8 +2,8 @@ import type { Feedback } from '../types';
 
 const ghostBtn: React.CSSProperties = {
   background: 'transparent',
-  color: '#1A2E3B',
-  border: '1.5px solid #1A2E3B',
+  color: 'var(--text)',
+  border: '1.5px solid var(--text)',
   padding: '10px 18px',
   fontFamily: '"DM Sans", sans-serif',
   fontWeight: 500,
@@ -50,8 +50,8 @@ export function Controls({
           onMouseUp={(e) => (e.currentTarget.style.transform = '')}
           onMouseLeave={(e) => (e.currentTarget.style.transform = '')}
           style={{
-            background: '#1A2E3B',
-            color: '#F5EFE1',
+            background: 'var(--text)',
+            color: 'var(--bg)',
             border: 'none',
             padding: '12px 24px',
             fontFamily: '"DM Sans", sans-serif',
@@ -62,7 +62,7 @@ export function Controls({
             opacity: checkDisabled ? 0.4 : 1,
             letterSpacing: '0.02em',
             transition: 'transform 0.15s',
-            boxShadow: '3px 3px 0 #E2603F',
+            boxShadow: '3px 3px 0 var(--accent)',
           }}
         >
           check assembly

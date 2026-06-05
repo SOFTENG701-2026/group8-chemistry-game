@@ -18,13 +18,13 @@ export function BuildArea({
   onDragOver, onDrop, onDragStart, onCardClick,
 }: BuildAreaProps) {
   const borderColor =
-    feedback === 'right' ? '#3C7530' : feedback === 'wrong' ? '#A03E2E' : '#8A9BA8';
+    feedback === 'right' ? '#3C7530' : feedback === 'wrong' ? '#A03E2E' : 'var(--muted-2)';
   const bgColor =
     feedback === 'right'
       ? 'rgba(60,117,48,0.10)'
       : feedback === 'wrong'
       ? 'rgba(160,62,46,0.08)'
-      : 'rgba(26,46,59,0.03)';
+      : 'var(--ink-soft)';
 
   return (
     <section
@@ -54,7 +54,7 @@ export function BuildArea({
           fontStyle: 'italic',
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
-          color: '#4A6275',
+          color: 'var(--muted)',
         }}
       >
         <span>assembly bench</span>
@@ -66,7 +66,7 @@ export function BuildArea({
               letterSpacing: 0,
               fontStyle: 'normal',
               fontSize: '0.85rem',
-              color: '#1A2E3B',
+              color: 'var(--text)',
             }}
           >
             {assembledFormula}
@@ -81,7 +81,7 @@ export function BuildArea({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#8A9BA8',
+            color: 'var(--muted-2)',
             fontFamily: '"Fraunces", Georgia, serif',
             fontStyle: 'italic',
             fontSize: '0.95rem',
@@ -112,7 +112,7 @@ export function BuildArea({
                   aria-hidden
                   style={{
                     margin: '0 -2px',
-                    color: '#4A6275',
+                    color: 'var(--muted)',
                     fontFamily: '"JetBrains Mono", monospace',
                     fontSize: '1.3rem',
                     fontWeight: 300,

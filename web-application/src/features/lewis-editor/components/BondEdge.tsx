@@ -31,7 +31,7 @@ export function BondEdge({ id, source, target, data, selected }: EdgeProps<BondE
         <path
           d={centerPath}
           fill="none"
-          stroke="#E2603F"
+          stroke="var(--accent)"
           strokeWidth={4}
           strokeLinecap="round"
           strokeDasharray="8 5"
@@ -52,7 +52,7 @@ export function BondEdge({ id, source, target, data, selected }: EdgeProps<BondE
   const offsets: number[] =
     order === 1 ? [0] : order === 2 ? [-0.5, 0.5] : [-1, 0, 1];
 
-  const stroke = selected ? '#E2603F' : '#1A2E3B';
+  const stroke = selected ? 'var(--accent)' : 'var(--text)';
 
   return (
     <g>

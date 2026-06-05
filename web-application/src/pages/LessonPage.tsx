@@ -38,12 +38,12 @@ function LessonStyles() {
       }
       .lesson-grid-bg::before {
         content:"";position:absolute;inset:0;
-        background-image:linear-gradient(to right,rgba(26,46,59,0.05) 1px,transparent 1px),linear-gradient(to bottom,rgba(26,46,59,0.05) 1px,transparent 1px);
+        background-image:linear-gradient(to right,var(--grid-line) 1px,transparent 1px),linear-gradient(to bottom,var(--grid-line) 1px,transparent 1px);
         background-size:28px 28px;pointer-events:none;z-index:0;
       }
       .shake{animation:shakeX 0.45s ease-in-out}
       .pop-in{animation:popIn 0.3s ease-out}
-      button:focus-visible{outline:2px solid #E2603F;outline-offset:2px}
+      button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     `}</style>
   );
 }
@@ -60,19 +60,19 @@ function LevelPicker({ molecule, problem }: { molecule: string; problem: (typeof
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           fontFamily: '"DM Sans", system-ui, sans-serif', fontSize: '0.85rem',
-          color: '#4A6275', textDecoration: 'none', marginBottom: 32,
+          color: 'var(--muted)', textDecoration: 'none', marginBottom: 32,
         }}
       >
         ← Back to lessons
       </Link>
 
-      <div style={{ color: '#E2603F', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: '"DM Sans", system-ui, sans-serif', marginBottom: 6 }}>
+      <div style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: '"DM Sans", system-ui, sans-serif', marginBottom: 6 }}>
         Specimen
       </div>
-      <h1 style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: '2.5rem', fontWeight: 700, margin: '0 0 6px', color: '#1A2E3B' }}>
+      <h1 style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: '2.5rem', fontWeight: 700, margin: '0 0 6px', color: 'var(--text)' }}>
         {molecule}
       </h1>
-      <p style={{ fontFamily: '"Fraunces", Georgia, serif', fontStyle: 'italic', color: '#4A6275', fontSize: '1rem', margin: '0 0 48px' }}>
+      <p style={{ fontFamily: '"Fraunces", Georgia, serif', fontStyle: 'italic', color: 'var(--muted)', fontSize: '1rem', margin: '0 0 48px' }}>
         {problem.sub}
       </p>
 
@@ -81,25 +81,25 @@ function LevelPicker({ molecule, problem }: { molecule: string; problem: (typeof
           <div
             key={lvl}
             style={{
-              background: 'white', border: '1.5px solid #E5E1D8', borderRadius: 10,
+              background: 'var(--surface)', border: '1.5px solid var(--border-subtle)', borderRadius: 10,
               padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}
           >
             <div>
-              <div style={{ fontFamily: '"DM Sans", system-ui, sans-serif', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#4A6275', marginBottom: 4 }}>
+              <div style={{ fontFamily: '"DM Sans", system-ui, sans-serif', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 4 }}>
                 Level {lvl}
               </div>
-              <div style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: '1.1rem', fontWeight: 600, color: '#1A2E3B' }}>
+              <div style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: '1.1rem', fontWeight: 600, color: 'var(--text)' }}>
                 {LEVEL_LABELS[lvl]}
               </div>
             </div>
             <button
               onClick={() => navigate(`/lesson?molecule=${encodeURIComponent(molecule)}&level=${lvl}`)}
               style={{
-                background: '#1A2E3B', color: '#F5EFE1', border: 'none',
+                background: 'var(--text)', color: 'var(--bg)', border: 'none',
                 padding: '10px 20px', borderRadius: 6, fontFamily: '"DM Sans", sans-serif',
                 fontWeight: 600, fontSize: '0.88rem', cursor: 'pointer',
-                boxShadow: '3px 3px 0 #E2603F',
+                boxShadow: '3px 3px 0 var(--accent)',
               }}
             >
               Start →
@@ -129,23 +129,23 @@ function LessonPrompt({
   return (
     <section
       style={{
-        background: '#FBFAF4', border: '1.5px solid #1A2E3B', borderRadius: 4,
-        padding: '18px 22px', boxShadow: '5px 5px 0 #1A2E3B', marginBottom: 20,
+        background: 'var(--surface)', border: '1.5px solid var(--text)', borderRadius: 4,
+        padding: '18px 22px', boxShadow: '5px 5px 0 var(--text)', marginBottom: 20,
       }}
     >
-      <h2 style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: '2rem', fontWeight: 600, margin: '0 0 4px', color: '#1A2E3B' }}>
+      <h2 style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: '2rem', fontWeight: 600, margin: '0 0 4px', color: 'var(--text)' }}>
         {problem.name}
       </h2>
-      <p style={{ fontFamily: '"Fraunces", Georgia, serif', fontStyle: 'italic', color: '#4A6275', fontSize: '0.95rem', margin: 0 }}>
+      <p style={{ fontFamily: '"Fraunces", Georgia, serif', fontStyle: 'italic', color: 'var(--muted)', fontSize: '0.95rem', margin: 0 }}>
         {problem.sub}
       </p>
       {hintLevel >= 1 && (
-        <div className="pop-in" style={{ marginTop: 12, fontFamily: '"JetBrains Mono", monospace', fontWeight: 600, fontSize: '1rem', color: '#1A2E3B', background: 'rgba(26,46,59,0.06)', display: 'inline-block', padding: '4px 10px', borderRadius: 4 }}>
+        <div className="pop-in" style={{ marginTop: 12, fontFamily: '"JetBrains Mono", monospace', fontWeight: 600, fontSize: '1rem', color: 'var(--text)', background: 'var(--ink-soft)', display: 'inline-block', padding: '4px 10px', borderRadius: 4 }}>
           {problem.formula}
         </div>
       )}
       {hintLevel >= 2 && (
-        <div className="pop-in" style={{ marginTop: 8, fontFamily: '"DM Sans", system-ui, sans-serif', fontSize: '0.85rem', fontStyle: 'italic', color: '#A03E2E' }}>
+        <div className="pop-in" style={{ marginTop: 8, fontFamily: '"DM Sans", system-ui, sans-serif', fontSize: '0.85rem', fontStyle: 'italic', color: 'var(--danger)' }}>
           {level === 1 && (() => {
             if (errorType === 'wrong_order')
               return `Rearrange — try starting with "${CARD_DEF[problem.correct[0]]?.name}"`;
@@ -182,7 +182,7 @@ function LessonControls({
   isLastLevel: boolean;
 }) {
   const ghost: React.CSSProperties = {
-    background: 'transparent', color: '#1A2E3B', border: '1.5px solid #1A2E3B',
+    background: 'transparent', color: 'var(--text)', border: '1.5px solid var(--text)',
     padding: '10px 18px', fontFamily: '"DM Sans", sans-serif', fontWeight: 500,
     fontSize: '0.88rem', borderRadius: 4, cursor: 'pointer', letterSpacing: '0.02em',
   };
@@ -194,11 +194,11 @@ function LessonControls({
           onClick={onCheck}
           disabled={checkDisabled}
           style={{
-            background: '#1A2E3B', color: '#F5EFE1', border: 'none', padding: '12px 24px',
+            background: 'var(--text)', color: 'var(--bg)', border: 'none', padding: '12px 24px',
             fontFamily: '"DM Sans", sans-serif', fontWeight: 600, fontSize: '0.95rem',
             borderRadius: 4, cursor: checkDisabled ? 'not-allowed' : 'pointer',
             opacity: checkDisabled ? 0.4 : 1, letterSpacing: '0.02em',
-            boxShadow: '3px 3px 0 #E2603F',
+            boxShadow: '3px 3px 0 var(--accent)',
           }}
         >
           check
@@ -211,7 +211,7 @@ function LessonControls({
             background: '#3C8D6A', color: 'white', border: 'none', padding: '12px 24px',
             fontFamily: '"DM Sans", sans-serif', fontWeight: 600, fontSize: '0.95rem',
             borderRadius: 4, cursor: 'pointer', letterSpacing: '0.02em',
-            boxShadow: '3px 3px 0 #1A2E3B',
+            boxShadow: '3px 3px 0 var(--text)',
           }}
         >
           {isLastLevel ? 'lesson complete ✓' : 'next level →'}
@@ -328,7 +328,7 @@ function Level2Exercise({ problem, level, onCorrect, onNextLevel }: { problem: (
   return (
     <>
       <LessonPrompt problem={problem} hintLevel={hintLevel} level={level} bondCount={graph.bonds.length} errorType={errorType} />
-      <div className={shake ? 'shake' : ''} style={{ height: canvasHeight, borderRadius: 10, overflow: 'hidden', border: '1.5px solid rgba(26,46,59,0.14)', background: '#FDFAF5' }}>
+      <div className={shake ? 'shake' : ''} style={{ height: canvasHeight, borderRadius: 10, overflow: 'hidden', border: '1.5px solid var(--panel-border)', background: 'var(--canvas-bg)' }}>
         <ReactFlowProvider>
           <BondsOnlyCanvas ref={canvasRef} graph={graph} resetKey={resetKey} />
         </ReactFlowProvider>
@@ -444,7 +444,7 @@ export function LessonPage() {
   }
 
   return (
-    <div style={{ background: '#F5EFE1', minHeight: '100vh', color: '#1A2E3B', padding: '24px 16px 60px', position: 'relative', overflowX: 'hidden' }}>
+    <div style={{ background: 'var(--bg)', minHeight: '100vh', color: 'var(--text)', padding: '24px 16px 60px', position: 'relative', overflowX: 'hidden' }}>
       <LessonStyles />
       <div className="lesson-grid-bg" style={{ position: 'absolute', inset: 0 }} />
 
@@ -454,15 +454,15 @@ export function LessonPage() {
         ) : (
           <>
             {/* Header */}
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', paddingBottom: 20, borderBottom: '1.5px solid #1A2E3B', marginBottom: 28 }}>
+            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', paddingBottom: 20, borderBottom: '1.5px solid var(--text)', marginBottom: 28 }}>
               <div>
                 <Link
                   to={`/lesson?molecule=${encodeURIComponent(moleculeName)}`}
-                  style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: '0.7rem', fontStyle: 'italic', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#4A6275', textDecoration: 'none' }}
+                  style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: '0.7rem', fontStyle: 'italic', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)', textDecoration: 'none' }}
                 >
                   ← {moleculeName}
                 </Link>
-                <h1 style={{ fontFamily: '"Fraunces", Georgia, serif', fontWeight: 700, fontSize: '2.3rem', lineHeight: 1, letterSpacing: '-0.02em', margin: '2px 0 0', color: '#1A2E3B' }}>
+                <h1 style={{ fontFamily: '"Fraunces", Georgia, serif', fontWeight: 700, fontSize: '2.3rem', lineHeight: 1, letterSpacing: '-0.02em', margin: '2px 0 0', color: 'var(--text)' }}>
                   Level {activeLevel}
                 </h1>
               </div>
@@ -475,9 +475,9 @@ export function LessonPage() {
                     onClick={() => goToLevel(lvl)}
                     style={{
                       width: 36, height: 36, borderRadius: '50%',
-                      border: '1.5px solid #1A2E3B',
-                      background: lvl === activeLevel ? '#1A2E3B' : 'transparent',
-                      color: lvl === activeLevel ? '#F5EFE1' : '#1A2E3B',
+                      border: '1.5px solid var(--text)',
+                      background: lvl === activeLevel ? 'var(--text)' : 'transparent',
+                      color: lvl === activeLevel ? 'var(--bg)' : 'var(--text)',
                       fontFamily: '"DM Sans", sans-serif', fontWeight: 700,
                       fontSize: '0.85rem', cursor: 'pointer',
                     }}

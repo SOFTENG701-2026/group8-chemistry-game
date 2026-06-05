@@ -43,8 +43,8 @@ export function FeedbackRow({ feedback, onNext, errorType, drawnName }: Feedback
         marginTop: '14px',
         padding: '12px 16px',
         borderRadius: '6px',
-        background: isRight ? '#3C7530' : '#A03E2E',
-        color: '#F5EFE1',
+        background: isRight ? '#3C7530' : 'var(--danger)',
+        color: 'var(--bg)',
         fontFamily: '"Fraunces", Georgia, serif',
         display: 'flex',
         justifyContent: 'space-between',
@@ -61,8 +61,8 @@ export function FeedbackRow({ feedback, onNext, errorType, drawnName }: Feedback
             width: 30,
             height: 30,
             borderRadius: '50%',
-            background: '#F5EFE1',
-            color: isRight ? '#2F7558' : '#A03E2E',
+            background: 'var(--bg)',
+            color: isRight ? '#2F7558' : 'var(--danger)',
             display: 'inline-grid',
             placeItems: 'center',
             flex: '0 0 auto',
@@ -86,8 +86,8 @@ export function FeedbackRow({ feedback, onNext, errorType, drawnName }: Feedback
         <button
           onClick={onNext}
           style={{
-            background: '#F5EFE1',
-            color: '#1A2E3B',
+            background: 'var(--bg)',
+            color: 'var(--text)',
             border: 'none',
             padding: '8px 18px',
             fontFamily: '"DM Sans", sans-serif',

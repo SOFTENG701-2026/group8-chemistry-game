@@ -36,12 +36,12 @@ function OnboardingStyles() {
       }
       .onboarding-grid-bg::before {
         content:"";position:absolute;inset:0;
-        background-image:linear-gradient(to right,rgba(26,46,59,0.05) 1px,transparent 1px),linear-gradient(to bottom,rgba(26,46,59,0.05) 1px,transparent 1px);
+        background-image:linear-gradient(to right,var(--grid-line) 1px,transparent 1px),linear-gradient(to bottom,var(--grid-line) 1px,transparent 1px);
         background-size:28px 28px;pointer-events:none;z-index:0;
       }
       .shake{animation:shakeX 0.45s ease-in-out}
       .pop-in{animation:popIn 0.3s ease-out}
-      button:focus-visible{outline:2px solid #E2603F;outline-offset:2px}
+      button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     `}</style>
   );
 }
@@ -49,7 +49,7 @@ function OnboardingStyles() {
 const skipLinkStyle: React.CSSProperties = {
   fontFamily: '"DM Sans", system-ui, sans-serif',
   fontSize: '0.85rem',
-  color: '#4A6275',
+  color: 'var(--muted)',
   textDecoration: 'none',
   background: 'none',
   border: 'none',
@@ -58,14 +58,14 @@ const skipLinkStyle: React.CSSProperties = {
 };
 
 const primaryBtn: React.CSSProperties = {
-  background: '#1A2E3B', color: '#F5EFE1', border: 'none', padding: '12px 24px',
+  background: 'var(--text)', color: 'var(--bg)', border: 'none', padding: '12px 24px',
   fontFamily: '"DM Sans", sans-serif', fontWeight: 600, fontSize: '0.95rem',
   borderRadius: 4, cursor: 'pointer', letterSpacing: '0.02em',
-  boxShadow: '3px 3px 0 #E2603F',
+  boxShadow: '3px 3px 0 var(--accent)',
 };
 
 const ghostBtn: React.CSSProperties = {
-  background: 'transparent', color: '#1A2E3B', border: '1.5px solid #1A2E3B',
+  background: 'transparent', color: 'var(--text)', border: '1.5px solid var(--text)',
   padding: '10px 18px', fontFamily: '"DM Sans", sans-serif', fontWeight: 500,
   fontSize: '0.88rem', borderRadius: 4, cursor: 'pointer', letterSpacing: '0.02em',
 };
@@ -108,13 +108,13 @@ function DiagnosticTask({
 
   return (
     <>
-      <div style={{ color: '#E2603F', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: '"DM Sans", system-ui, sans-serif', marginBottom: 6 }}>
+      <div style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: '"DM Sans", system-ui, sans-serif', marginBottom: 6 }}>
         Task {step + 1} of {total}
       </div>
-      <h1 style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: '2rem', fontWeight: 700, margin: '0 0 4px', color: '#1A2E3B' }}>
+      <h1 style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: '2rem', fontWeight: 700, margin: '0 0 4px', color: 'var(--text)' }}>
         Build {moleculeName}
       </h1>
-      <p style={{ fontFamily: '"Fraunces", Georgia, serif', fontStyle: 'italic', color: '#4A6275', fontSize: '0.95rem', margin: '0 0 8px' }}>
+      <p style={{ fontFamily: '"Fraunces", Georgia, serif', fontStyle: 'italic', color: 'var(--muted)', fontSize: '0.95rem', margin: '0 0 8px' }}>
         Drag the right pieces into the bench. No score — just showing us what you know.
       </p>
 
@@ -200,20 +200,20 @@ export function Onboarding() {
   }
 
   return (
-    <div style={{ background: '#F5EFE1', minHeight: '100vh', color: '#1A2E3B', padding: '24px 16px 60px', position: 'relative', overflow: 'hidden' }}>
+    <div style={{ background: 'var(--bg)', minHeight: '100vh', color: 'var(--text)', padding: '24px 16px 60px', position: 'relative', overflow: 'hidden' }}>
       <OnboardingStyles />
       <div className="onboarding-grid-bg" style={{ position: 'absolute', inset: 0 }} />
 
       <div style={{ maxWidth: 640, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {phase === 'intro' && (
           <section style={{ paddingTop: 32 }}>
-            <div style={{ color: '#E2603F', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: '"DM Sans", system-ui, sans-serif', marginBottom: 8 }}>
+            <div style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: '"DM Sans", system-ui, sans-serif', marginBottom: 8 }}>
               Find your level
             </div>
-            <h1 style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: '2.6rem', fontWeight: 700, margin: '0 0 12px', lineHeight: 1.05, color: '#1A2E3B' }}>
+            <h1 style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: '2.6rem', fontWeight: 700, margin: '0 0 12px', lineHeight: 1.05, color: 'var(--text)' }}>
               Let's see what you already know.
             </h1>
-            <p style={{ fontFamily: '"DM Sans", system-ui, sans-serif', color: '#4A6275', fontSize: '1rem', lineHeight: 1.6, maxWidth: 480, marginBottom: 32 }}>
+            <p style={{ fontFamily: '"DM Sans", system-ui, sans-serif', color: 'var(--muted)', fontSize: '1rem', lineHeight: 1.6, maxWidth: 480, marginBottom: 32 }}>
               Build a few molecules from cards — they get harder as you go. There's no score and nothing to fail. We'll use what you build to point you to the right starting lessons.
             </p>
             <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -238,16 +238,16 @@ export function Onboarding() {
 
         {phase === 'result' && (
           <section style={{ paddingTop: 32 }}>
-            <div style={{ color: '#E2603F', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: '"DM Sans", system-ui, sans-serif', marginBottom: 8 }}>
+            <div style={{ color: 'var(--accent)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: '"DM Sans", system-ui, sans-serif', marginBottom: 8 }}>
               Your starting point
             </div>
-            <h1 style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: '2.4rem', fontWeight: 700, margin: '0 0 8px', lineHeight: 1.1, color: '#1A2E3B' }}>
+            <h1 style={{ fontFamily: '"Fraunces", Georgia, serif', fontSize: '2.4rem', fontWeight: 700, margin: '0 0 8px', lineHeight: 1.1, color: 'var(--text)' }}>
               You're ready for {groupTitle(recommendedGroup)}.
             </h1>
-            <p style={{ fontFamily: '"DM Sans", system-ui, sans-serif', color: '#4A6275', fontSize: '1rem', lineHeight: 1.6, maxWidth: 480, marginBottom: 8 }}>
+            <p style={{ fontFamily: '"DM Sans", system-ui, sans-serif', color: 'var(--muted)', fontSize: '1rem', lineHeight: 1.6, maxWidth: 480, marginBottom: 8 }}>
               We'll highlight this group in the lesson library — but every lesson stays open, so explore wherever you like.
             </p>
-            <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '0.85rem', color: '#1A2E3B', background: 'rgba(26,46,59,0.06)', display: 'inline-block', padding: '6px 12px', borderRadius: 4, marginBottom: 32 }}>
+            <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '0.85rem', color: 'var(--text)', background: 'var(--ink-soft)', display: 'inline-block', padding: '6px 12px', borderRadius: 4, marginBottom: 32 }}>
               Group {recommendedGroup}: {groupTitle(recommendedGroup)}
             </div>
             <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>

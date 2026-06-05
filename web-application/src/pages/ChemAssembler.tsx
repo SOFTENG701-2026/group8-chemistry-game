@@ -18,11 +18,11 @@ function MoleculeReadoutPanel({ moleculeName }: { moleculeName: string | null })
     <section
       style={{
         marginTop: '24px',
-        background: 'rgba(255,255,255,0.72)',
-        border: '1.5px solid rgba(26,46,59,0.14)',
+        background: 'var(--panel-bg)',
+        border: '1.5px solid var(--panel-border)',
         borderRadius: '10px',
         padding: '14px 18px',
-        boxShadow: '0 1px 0 rgba(26,46,59,0.04)',
+        boxShadow: '0 1px 0 var(--ink-soft)',
       }}
     >
       <div
@@ -32,7 +32,7 @@ function MoleculeReadoutPanel({ moleculeName }: { moleculeName: string | null })
           fontWeight: 700,
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
-          color: '#4A6275',
+          color: 'var(--muted)',
           marginBottom: 4,
         }}
       >
@@ -44,7 +44,7 @@ function MoleculeReadoutPanel({ moleculeName }: { moleculeName: string | null })
           fontSize: '1.35rem',
           fontWeight: isKnown ? 600 : 400,
           fontStyle: isKnown ? 'normal' : 'italic',
-          color: isKnown ? '#1A2E3B' : '#8A9BA8',
+          color: isKnown ? 'var(--text)' : 'var(--muted-2)',
           lineHeight: 1.2,
         }}
       >
@@ -75,15 +75,15 @@ function ChemAssemblerStyles() {
         position: absolute;
         inset: 0;
         background-image:
-          linear-gradient(to right, rgba(26,46,59,0.05) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(26,46,59,0.05) 1px, transparent 1px);
+          linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+          linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
         background-size: 28px 28px;
         pointer-events: none;
         z-index: 0;
       }
       .shake { animation: shakeX 0.45s ease-in-out; }
       .pop-in { animation: popIn 0.3s ease-out; }
-      button:focus-visible { outline: 2px solid #E2603F; outline-offset: 2px; }
+      button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     `}</style>
   );
 }
@@ -103,10 +103,10 @@ export function ChemAssembler() {
   return (
     <div
       style={{
-        background: '#F5EFE1',
+        background: 'var(--bg)',
         minHeight: '100vh',
         fontFamily: '"DM Sans", system-ui, sans-serif',
-        color: '#1A2E3B',
+        color: 'var(--text)',
         padding: '24px 16px 60px',
         position: 'relative',
         overflow: 'hidden',
@@ -122,7 +122,7 @@ export function ChemAssembler() {
             justifyContent: 'space-between',
             alignItems: 'flex-end',
             paddingBottom: '20px',
-            borderBottom: '1.5px solid #1A2E3B',
+            borderBottom: '1.5px solid var(--text)',
             marginBottom: '28px',
           }}
         >
@@ -134,7 +134,7 @@ export function ChemAssembler() {
                 fontStyle: 'italic',
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
-                color: '#4A6275',
+                color: 'var(--muted)',
               }}
             >
               {isSandbox ? 'free play' : 'an exercise in'}
@@ -147,7 +147,7 @@ export function ChemAssembler() {
                 lineHeight: 1,
                 letterSpacing: '-0.02em',
                 margin: '2px 0 0',
-                color: '#1A2E3B',
+                color: 'var(--text)',
               }}
             >
               Sandbox
@@ -179,10 +179,10 @@ export function ChemAssembler() {
                 }}
                 style={{
                   padding: '6px 16px',
-                  border: '1.5px solid #1A2E3B',
+                  border: '1.5px solid var(--text)',
                   borderRadius: 6,
-                  background: active ? '#1A2E3B' : 'transparent',
-                  color: active ? '#F5EFE1' : '#1A2E3B',
+                  background: active ? 'var(--text)' : 'transparent',
+                  color: active ? 'var(--bg)' : 'var(--text)',
                   fontFamily: '"DM Sans", sans-serif',
                   fontWeight: 600,
                   fontSize: '0.8rem',

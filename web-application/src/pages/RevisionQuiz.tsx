@@ -63,10 +63,10 @@ export function RevisionQuiz() {
   if (!group || !quiz) {
     return (
       <Container size="md">
-        <Text style={{ color: '#B34A33', fontFamily: '"DM Sans", system-ui, sans-serif' }}>
+        <Text style={{ color: 'var(--danger)', fontFamily: '"DM Sans", system-ui, sans-serif' }}>
           Revision quiz not found.
         </Text>
-        <Link to="/lessons" style={{ color: '#1A2E3B', fontFamily: '"DM Sans", system-ui, sans-serif' }}>
+        <Link to="/lessons" style={{ color: 'var(--text)', fontFamily: '"DM Sans", system-ui, sans-serif' }}>
           Back to lessons
         </Link>
       </Container>
@@ -91,7 +91,7 @@ export function RevisionQuiz() {
           to="/lessons"
           style={{
             ...buttonBase,
-            color: '#4A6275',
+            color: 'var(--muted)',
             textDecoration: 'none',
             marginBottom: 22,
             fontSize: '0.84rem',
@@ -102,7 +102,7 @@ export function RevisionQuiz() {
         </Link>
 
         <Text style={{
-          color: '#E2603F',
+          color: 'var(--accent)',
           fontSize: 11,
           fontWeight: 700,
           letterSpacing: '0.12em',
@@ -116,7 +116,7 @@ export function RevisionQuiz() {
         <Text style={{
           fontFamily: '"Fraunces", Georgia, serif',
           fontStyle: 'italic',
-          color: '#4A6275',
+          color: 'var(--muted)',
           fontSize: '1rem',
           marginBottom: 28,
         }}>
@@ -124,15 +124,15 @@ export function RevisionQuiz() {
         </Text>
 
         {loadError && (
-          <Text style={{ color: '#B34A33', marginBottom: 18, fontFamily: '"DM Sans", system-ui, sans-serif' }}>
+          <Text style={{ color: 'var(--danger)', marginBottom: 18, fontFamily: '"DM Sans", system-ui, sans-serif' }}>
             {loadError}
           </Text>
         )}
 
         {!unlocked ? (
           <section style={{
-            background: '#FFFFFF',
-            border: '1.5px solid #D3D1CB',
+            background: 'var(--surface)',
+            border: '1.5px solid var(--border-subtle)',
             borderRadius: 8,
             padding: 22,
           }}>
@@ -143,8 +143,8 @@ export function RevisionQuiz() {
                 borderRadius: '50%',
                 display: 'grid',
                 placeItems: 'center',
-                background: '#F0EEE9',
-                color: '#777C78',
+                background: 'var(--panel-bg)',
+                color: 'var(--muted-2)',
               }}>
                 <IconLock size={22} stroke={2.2} />
               </div>
@@ -153,24 +153,24 @@ export function RevisionQuiz() {
                   fontFamily: '"Fraunces", Georgia, serif',
                   fontSize: '1.25rem',
                   fontWeight: 650,
-                  color: '#1A2E3B',
+                  color: 'var(--text)',
                 }}>
                   Quiz locked
                 </Text>
-                <Text style={{ fontFamily: '"DM Sans", system-ui, sans-serif', color: '#4A6275' }}>
+                <Text style={{ fontFamily: '"DM Sans", system-ui, sans-serif', color: 'var(--muted)' }}>
                   {masteredCount}/{group.molecules.length} molecules mastered in this group.
                 </Text>
               </div>
             </Group>
-            <Text style={{ fontFamily: '"DM Sans", system-ui, sans-serif', color: '#4A6275', lineHeight: 1.5 }}>
+            <Text style={{ fontFamily: '"DM Sans", system-ui, sans-serif', color: 'var(--muted)', lineHeight: 1.5 }}>
               Finish mastering the remaining molecules, then come back for the revision check.
             </Text>
           </section>
         ) : (
           <>
             <section style={{
-              background: '#FFFFFF',
-              border: '1px solid #E5E1D8',
+              background: 'var(--surface)',
+              border: '1px solid var(--border-subtle)',
               borderRadius: 8,
               padding: 18,
               marginBottom: 22,
@@ -179,7 +179,7 @@ export function RevisionQuiz() {
                 <Text style={{
                   fontFamily: '"DM Sans", system-ui, sans-serif',
                   fontWeight: 700,
-                  color: '#1A2E3B',
+                  color: 'var(--text)',
                 }}>
                   {submitted ? `Score: ${score}/${quiz.questions.length}` : `${quiz.questions.length} questions`}
                 </Text>
@@ -188,9 +188,9 @@ export function RevisionQuiz() {
                   onClick={resetQuiz}
                   style={{
                     ...buttonBase,
-                    border: '1.5px solid #C9C5BB',
-                    background: '#FFFFFF',
-                    color: '#1A2E3B',
+                    border: '1.5px solid var(--border-subtle)',
+                    background: 'var(--surface)',
+                    color: 'var(--text)',
                     padding: '8px 12px',
                     fontSize: '0.82rem',
                   }}
@@ -209,15 +209,15 @@ export function RevisionQuiz() {
                 <section
                   key={question.prompt}
                   style={{
-                    background: '#FFFFFF',
-                    border: '1px solid #E5E1D8',
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border-subtle)',
                     borderRadius: 8,
                     padding: 18,
                     marginBottom: 16,
                   }}
                 >
                   <Text style={{
-                    color: '#4A6275',
+                    color: 'var(--muted)',
                     fontSize: 11,
                     fontWeight: 700,
                     letterSpacing: '0.1em',
@@ -231,7 +231,7 @@ export function RevisionQuiz() {
                     fontFamily: '"Fraunces", Georgia, serif',
                     fontWeight: 650,
                     fontSize: '1.13rem',
-                    color: '#1A2E3B',
+                    color: 'var(--text)',
                     lineHeight: 1.35,
                     marginBottom: 14,
                   }}>
@@ -253,9 +253,9 @@ export function RevisionQuiz() {
                           }}
                           disabled={submitted}
                           style={{
-                            border: `1.5px solid ${revealCorrect ? '#3C8D6A' : revealWrong ? '#B34A33' : choiceIsSelected ? '#1A2E3B' : '#D3D1CB'}`,
-                            background: revealCorrect ? '#E1F1E9' : revealWrong ? '#F7DED8' : choiceIsSelected ? '#F0EEE9' : '#FFFFFF',
-                            color: '#1A2E3B',
+                            border: `1.5px solid ${revealCorrect ? '#3C8D6A' : revealWrong ? '#B34A33' : choiceIsSelected ? 'var(--text)' : 'var(--border-subtle)'}`,
+                            background: revealCorrect ? '#E1F1E9' : revealWrong ? '#F7DED8' : choiceIsSelected ? 'var(--panel-bg)' : 'var(--surface)',
+                            color: 'var(--text)',
                             borderRadius: 8,
                             padding: '12px 14px',
                             textAlign: 'left',
@@ -284,7 +284,7 @@ export function RevisionQuiz() {
                         display: 'flex',
                         alignItems: 'flex-start',
                         gap: 8,
-                        color: isCorrect ? '#2F7558' : '#B34A33',
+                        color: isCorrect ? '#2F7558' : 'var(--danger)',
                         marginTop: 12,
                       }}
                     >
@@ -294,7 +294,7 @@ export function RevisionQuiz() {
                           width: 22,
                           height: 22,
                           borderRadius: '50%',
-                          border: `1.5px solid ${isCorrect ? '#2F7558' : '#B34A33'}`,
+                          border: `1.5px solid ${isCorrect ? '#2F7558' : 'var(--danger)'}`,
                           display: 'inline-grid',
                           placeItems: 'center',
                           flex: '0 0 auto',
@@ -326,9 +326,9 @@ export function RevisionQuiz() {
                   to="/lessons"
                   style={{
                     ...buttonBase,
-                    border: '1.5px solid #1A2E3B',
-                    background: '#1A2E3B',
-                    color: '#FFFFFF',
+                    border: '1.5px solid var(--text)',
+                    background: 'var(--text)',
+                    color: 'var(--bg)',
                     padding: '12px 18px',
                     fontSize: '0.9rem',
                     textDecoration: 'none',
@@ -342,9 +342,9 @@ export function RevisionQuiz() {
                   onClick={resetQuiz}
                   style={{
                     ...buttonBase,
-                    border: '1.5px solid #C9C5BB',
-                    background: '#FFFFFF',
-                    color: '#1A2E3B',
+                    border: '1.5px solid var(--border-subtle)',
+                    background: 'var(--surface)',
+                    color: 'var(--text)',
                     padding: '12px 18px',
                     fontSize: '0.9rem',
                   }}
@@ -360,9 +360,9 @@ export function RevisionQuiz() {
                 disabled={!allAnswered}
                 style={{
                   ...buttonBase,
-                  border: '1.5px solid #1A2E3B',
-                  background: '#1A2E3B',
-                  color: '#FFFFFF',
+                  border: '1.5px solid var(--text)',
+                  background: 'var(--text)',
+                  color: 'var(--bg)',
                   padding: '12px 18px',
                   fontSize: '0.9rem',
                   opacity: !allAnswered ? 0.55 : 1,
