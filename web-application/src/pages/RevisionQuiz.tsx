@@ -277,14 +277,44 @@ export function RevisionQuiz() {
                   </div>
 
                   {submitted && (
-                    <Text style={{
-                      fontFamily: '"DM Sans", system-ui, sans-serif',
-                      color: isCorrect ? '#2F7558' : 'var(--danger)',
-                      lineHeight: 1.45,
-                      marginTop: 12,
-                    }}>
-                      {question.explanation}
-                    </Text>
+                    <div
+                      role="status"
+                      aria-label={isCorrect ? 'Correct answer explanation' : 'Incorrect answer explanation'}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 8,
+                        color: isCorrect ? '#2F7558' : 'var(--danger)',
+                        marginTop: 12,
+                      }}
+                    >
+                      <span
+                        title={isCorrect ? 'Correct' : 'Incorrect'}
+                        style={{
+                          width: 22,
+                          height: 22,
+                          borderRadius: '50%',
+                          border: `1.5px solid ${isCorrect ? '#2F7558' : 'var(--danger)'}`,
+                          display: 'inline-grid',
+                          placeItems: 'center',
+                          flex: '0 0 auto',
+                          marginTop: 1,
+                        }}
+                      >
+                        {isCorrect ? (
+                          <IconCheck size={15} stroke={2.6} aria-hidden="true" />
+                        ) : (
+                          <IconX size={15} stroke={2.6} aria-hidden="true" />
+                        )}
+                      </span>
+                      <Text style={{
+                        fontFamily: '"DM Sans", system-ui, sans-serif',
+                        color: 'inherit',
+                        lineHeight: 1.45,
+                      }}>
+                        {question.explanation}
+                      </Text>
+                    </div>
                   )}
                 </section>
               );
